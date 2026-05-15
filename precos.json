@@ -1,0 +1,30 @@
+{
+  "meta": {
+    "actualizado_em": "2026-05-15 14:14",
+    "metodo": "ENERSIA-AI"
+  },
+  "comercializadoras": {
+    "Endesa": {
+      "preco_kwh": 0.1362
+    },
+    "Iberdrola": {
+      "preco_kwh": 0.1382
+    },
+    "Goldenergy": {
+      "preco_kwh": 0.1399
+    },
+    "EDP": {
+      "preco_kwh": 0.142
+    },
+    "Plenitude": {
+      "preco_kwh": 0.1433
+    },
+    "Repsol": {
+      "preco_kwh": 0.148
+    },
+    "Galp Energia": {
+      "preco_kwh": 0.1542
+    }
+  },
+  "melhor_oferta": "Endesa"
+}
