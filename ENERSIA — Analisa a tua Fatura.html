@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<!-- saved from url=(0052)file:///C:/Users/User/Downloads/analisar-fatura.html -->
+<html lang="pt"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ENERSIA — Analisa a tua Fatura</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  :root{--verde:#00C896;--verde-escuro:#009970;--verde-claro:#E6FBF5;--azul-escuro:#0A1628;--azul-mid:#112240;--cinza:#8892A4;--cinza-claro:#F4F7FA;--branco:#fff;--laranja:#FF6B35;--vermelho:#FF4757;--sombra:0 4px 24px rgba(0,0,0,0.08)}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'DM Sans',sans-serif;background:#F0F4F8;color:var(--azul-escuro);min-height:100vh}
+  header{background:var(--azul-escuro);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--verde);text-decoration:none}
+  .logo span{color:#fff}
+  nav a{color:rgba(255,255,255,0.6);text-decoration:none;font-size:0.85rem;margin-left:1.5rem;transition:color .2s}
+  nav a:hover{color:var(--verde)}
+  .hero{background:linear-gradient(135deg,var(--azul-escuro),var(--azul-mid));padding:3rem 2rem 4rem;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;top:-50%;left:-20%;width:60%;height:200%;background:radial-gradient(circle,rgba(0,200,150,0.08),transparent 70%);pointer-events:none}
+  .badge-hero{display:inline-flex;align-items:center;gap:6px;background:rgba(0,200,150,0.15);border:1px solid rgba(0,200,150,0.3);color:var(--verde);padding:6px 14px;border-radius:100px;font-size:0.78rem;font-weight:500;margin-bottom:1.2rem}
+  .badge-hero::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--verde);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+  .hero h1{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;color:#fff;line-height:1.15;margin-bottom:.8rem}
+  .hero h1 em{font-style:normal;color:var(--verde)}
+  .hero p{color:rgba(255,255,255,0.6);font-size:1rem;max-width:480px;margin:0 auto;line-height:1.6}
+  .main{max-width:760px;margin:-2rem auto 3rem;padding:0 1.5rem;position:relative}
+  .card{background:#fff;border-radius:20px;box-shadow:var(--sombra);padding:2rem;margin-bottom:1.5rem}
+  .how-steps{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem}
+  .how-step{flex:1;min-width:120px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
+  .how-num{width:36px;height:36px;background:var(--verde-claro);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;color:var(--verde-escuro)}
+  .how-step p{font-size:.78rem;color:var(--cinza);line-height:1.4}
+  .error-box{display:none;background:#FEF2F2;border:1.5px solid #FECACA;border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;color:#991B1B;font-size:.85rem}
+  .error-box.show{display:block}
+  .card h2{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:1.2rem}
+  .dropzone{border:2px dashed #D1D9E6;border-radius:14px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all .25s;background:var(--cinza-claro);position:relative}
+  .dropzone:hover,.dropzone.drag-over{border-color:var(--verde);background:var(--verde-claro)}
+  .dropzone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+  .dz-icon{width:52px;height:52px;background:rgba(0,200,150,0.12);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
+  .dz-icon svg{width:26px;height:26px;stroke:var(--verde);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .dropzone h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.4rem}
+  .dropzone p{font-size:.83rem;color:var(--cinza);margin-bottom:.8rem}
+  .btn-upload-label{display:inline-block;background:var(--verde);color:#fff;padding:9px 20px;border-radius:8px;font-size:.85rem;font-weight:500;pointer-events:none}
+  .file-preview{display:none;align-items:center;gap:12px;background:var(--verde-claro);border:1px solid rgba(0,200,150,0.25);border-radius:10px;padding:12px 16px;margin-top:1rem}
+  .file-preview.show{display:flex}
+  .fi{width:40px;height:40px;background:var(--verde);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .fi svg{width:20px;height:20px;fill:#fff}
+  .fn{flex:1;min-width:0}
+  .fn-name{font-size:.87rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fn-size{font-size:.75rem;color:var(--cinza);margin-top:2px}
+  .btn-remove{background:none;border:none;cursor:pointer;color:var(--cinza);padding:4px;border-radius:4px;display:flex;transition:color .2s}
+  .btn-remove:hover{color:var(--vermelho)}
+  .btn-remove svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+  .or-div{display:flex;align-items:center;gap:12px;margin:1.2rem 0;color:var(--cinza);font-size:.8rem}
+  .or-div::before,.or-div::after{content:'';flex:1;height:1px;background:#E2E8F0}
+  .btn-cam{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border:1.5px solid #D1D9E6;border-radius:10px;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.87rem;color:var(--azul-escuro);font-weight:500;transition:all .2s}
+  .btn-cam:hover{border-color:var(--verde);color:var(--verde);background:var(--verde-claro)}
+  .btn-cam svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .info-box{background:var(--verde-claro);border:1px solid rgba(0,200,150,0.2);border-radius:10px;padding:10px 14px;margin-top:1rem;font-size:.82rem;color:#1A4A3A;display:flex;gap:8px;align-items:center}
+  .info-box svg{width:16px;height:16px;flex-shrink:0;stroke:var(--verde-escuro);fill:none;stroke-width:2;stroke-linecap:round}
+  .btn-analisar{width:100%;padding:16px;background:var(--verde);color:#fff;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;margin-top:1.2rem;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+  .btn-analisar:hover{background:var(--verde-escuro);transform:translateY(-1px)}
+  .btn-analisar:disabled{background:#9CA3AF;cursor:not-allowed;transform:none}
+  .btn-analisar svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .loading-card{display:none;text-align:center;padding:2.5rem 2rem}
+  .loading-card.show{display:block}
+  .spinner{width:48px;height:48px;border:3px solid var(--verde-claro);border-top-color:var(--verde);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 1.2rem}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-card h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.4rem}
+  .loading-card p{font-size:.85rem;color:var(--cinza)}
+  .lst{list-style:none;margin-top:1.5rem;text-align:left;max-width:300px;margin-left:auto;margin-right:auto}
+  .lst li{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:.83rem;color:var(--cinza);transition:color .3s}
+  .lst li.done{color:var(--verde)}
+  .lst li.active{color:var(--azul-escuro);font-weight:500}
+  .sdot{width:20px;height:20px;border-radius:50%;border:2px solid #D1D9E6;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .3s}
+  li.done .sdot{border-color:var(--verde);background:var(--verde);color:#fff}
+  li.active .sdot{border-color:var(--verde);animation:pb 1s infinite}
+  @keyframes pb{0%,100%{box-shadow:0 0 0 0 rgba(0,200,150,0.4)}50%{box-shadow:0 0 0 4px rgba(0,200,150,0.1)}}
+  .res-card{display:none;overflow:hidden}
+  .res-card.show{display:block}
+  .res-header{background:var(--azul-escuro);padding:1.5rem 2rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+  .res-header h2{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:.3rem}
+  .res-header p{font-size:.82rem;color:rgba(255,255,255,0.5)}
+  .poub{background:var(--verde);color:#fff;padding:8px 16px;border-radius:10px;text-align:center;flex-shrink:0}
+  .poub .val{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;display:block;line-height:1}
+  .poub .lbl{font-size:.7rem;opacity:.85;margin-top:2px;display:block}
+  .res-body{padding:1.5rem 2rem}
+  .dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:1.5rem}
+  .ditem{background:var(--cinza-claro);border-radius:10px;padding:12px 14px}
+  .dlabel{font-size:.72rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .dval{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700}
+  .dval.d{color:var(--verde)}
+  .dval.a{color:var(--laranja)}
+  .stitle{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:.8rem;padding-bottom:.5rem;border-bottom:1px solid #EEF2F7}
+  .recbox{background:linear-gradient(135deg,#E6FBF5,#F0FDF9);border:1.5px solid rgba(0,200,150,0.2);border-radius:14px;padding:1.2rem 1.5rem;margin:1rem 0}
+  .recbox h4{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--verde-escuro);margin-bottom:.5rem}
+  .recbox p{font-size:.85rem;color:#1A4A3A;line-height:1.65}
+  .abox{background:#FFF8E7;border:1.5px solid #FFE082;border-radius:10px;padding:10px 14px;margin-top:8px;font-size:.83rem;color:#7A5C00;display:flex;gap:8px;align-items:flex-start}
+  .abox svg{width:16px;height:16px;flex-shrink:0;margin-top:1px}
+  .cta-b{background:var(--azul-escuro);border-radius:16px;padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:1.5rem}
+  .cta-b h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:#fff;margin-bottom:.2rem}
+  .cta-b p{font-size:.82rem;color:rgba(255,255,255,0.55)}
+  .btn-c{background:var(--verde);color:#fff;padding:12px 22px;border-radius:10px;border:none;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;white-space:nowrap;transition:all .2s;text-decoration:none;display:inline-block}
+  .btn-c:hover{background:var(--verde-escuro)}
+  .aitxt{font-size:.87rem;line-height:1.75;color:#374151}
+  .aitxt p{margin-bottom:.8rem}
+  .btn-nova{width:100%;padding:12px;background:#fff;border:1.5px solid #D1D9E6;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--cinza);cursor:pointer;transition:all .2s;margin-bottom:1rem}
+  .btn-nova:hover{border-color:var(--verde);color:var(--verde)}
+  footer{text-align:center;padding:2rem 1.5rem;font-size:.78rem;color:var(--cinza)}
+  footer a{color:var(--verde);text-decoration:none}
+  @media(max-width:480px){.res-header,.cta-b{flex-direction:column}.btn-c{width:100%;text-align:center}}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="file:///C:/Users/User/Downloads/index.html" class="logo">ENER<span>SIA</span></a>
+  <nav>
+    <a href="file:///C:/Users/User/Downloads/index.html">Início</a>
+    <a href="file:///C:/Users/User/Downloads/index.html#precos">Preços</a>
+    <a href="file:///C:/Users/User/Downloads/analisar-fatura.html" style="color:var(--verde)">Analisar Fatura</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="badge-hero">IA a trabalhar para ti</div>
+  <h1>A tua fatura analisada<br>em <em>15 segundos</em></h1>
+  <p>Envia a tua fatura de energia. A nossa IA lê tudo, compara com o mercado e diz-te exatamente quanto podes poupar.</p>
+</div>
+
+<div class="main">
+
+  <div class="card">
+    <h2 style="font-family:&#39;Syne&#39;,sans-serif;font-size:.95rem">Como funciona</h2>
+    <div class="how-steps">
+      <div class="how-step"><div class="how-num">1</div><p>Upload do PDF ou foto</p></div>
+      <div class="how-step"><div class="how-num">2</div><p>IA extrai os dados</p></div>
+      <div class="how-step"><div class="how-num">3</div><p>Compara com o mercado</p></div>
+      <div class="how-step"><div class="how-num">4</div><p>Recomendação personalizada</p></div>
+    </div>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="card" id="uploadCard">
+    <h2>📄 Envia a tua fatura</h2>
+    <div class="dropzone" id="dropzone">
+      <input type="file" id="fileInput" accept=".pdf,image/*">
+      <div class="dz-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></div>
+      <h3>Arrasta a fatura aqui</h3>
+      <p>PDF ou foto (JPG, PNG) — máximo 10MB</p>
+      <span class="btn-upload-label">Escolher ficheiro</span>
+    </div>
+
+    <div class="file-preview" id="filePreview">
+      <div class="fi"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="none"></path></svg></div>
+      <div class="fn"><div class="fn-name" id="fileName">—</div><div class="fn-size" id="fileSize">—</div></div>
+      <button class="btn-remove" id="removeFile"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+    </div>
+
+    <div class="or-div">ou</div>
+
+    <button class="btn-cam" onclick="document.getElementById(&#39;camInput&#39;).click()">
+      <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+      Foto com o telemóvel
+    </button>
+    <input type="file" id="camInput" accept="image/*" capture="environment" style="display:none">
+
+    <div class="info-box">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      Análise gratuita e confidencial. Os teus dados não são partilhados com terceiros.
+    </div>
+
+    <button class="btn-analisar" id="btnAnalisar" onclick="analisar()" disabled="">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+      Analisar Fatura com IA — Grátis
+    </button>
+  </div>
+
+  <div class="card loading-card" id="loadingCard">
+    <div class="spinner"></div>
+    <h3>A IA está a analisar a tua fatura...</h3>
+    <p>Aguarda uns segundos</p>
+    <ul class="lst">
+      <li id="s1"><span class="sdot">✓</span> A ler o documento</li>
+      <li id="s2"><span class="sdot">✓</span> A extrair dados de consumo</li>
+      <li id="s3"><span class="sdot">✓</span> A comparar com o mercado</li>
+      <li id="s4"><span class="sdot">✓</span> A gerar recomendação</li>
+    </ul>
+  </div>
+
+  <div class="card res-card" id="resCard">
+    <div class="res-header">
+      <div><h2 id="rComercializadora">—</h2><p id="rPeriodo">—</p></div>
+      <div class="poub" id="poub" style="display:none"><span class="val" id="pVal">—</span><span class="lbl">poupança/mês</span></div>
+    </div>
+    <div class="res-body">
+      <p class="stitle">Dados extraídos</p>
+      <div class="dgrid" id="dgrid"></div>
+      <p class="stitle" style="margin-top:1.5rem">Análise detalhada</p>
+      <div class="aitxt" id="aitxt"></div>
+      <div class="cta-b">
+        <div><h3>Quer mudar e poupar já?</h3><p>Gerimos tudo, sem custos de mudança.</p></div>
+        <a href="https://calendly.com/geralenersia/30min" target="_blank" class="btn-c">Agendar Consulta →</a>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-nova" id="btnNova" onclick="reset()" style="display:none">↺ Analisar outra fatura</button>
+</div>
+
+<footer>
+  <p>© 2026 ENERSIA · <a href="file:///C:/Users/User/Downloads/index.html">Voltar ao site</a> · Análise gratuita e confidencial</p>
+</footer>
+
+<script>
+const WH = 'https://fluxodigitalpt.app.n8n.cloud/webhook/analisar-fatura';
+let file = null, fileB64 = null;
+
+const fi = document.getElementById('fileInput');
+const ci = document.getElementById('camInput');
+const btn = document.getElementById('btnAnalisar');
+
+fi.addEventListener('change', e => e.target.files[0] && handleFile(e.target.files[0]));
+ci.addEventListener('change', e => e.target.files[0] && handleFile(e.target.files[0]));
+
+const dz = document.getElementById('dropzone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); e.dataTransfer.files[0] && handleFile(e.dataTransfer.files[0]); });
+
+document.getElementById('removeFile').addEventListener('click', () => {
+  file = null; fileB64 = null; fi.value = ''; ci.value = '';
+  document.getElementById('filePreview').classList.remove('show');
+  btn.disabled = true;
+});
+
+function handleFile(f) {
+  if (f.size > 10*1024*1024) { err('Ficheiro demasiado grande. Máximo 10MB.'); return; }
+  file = f;
+  document.getElementById('fileName').textContent = f.name;
+  document.getElementById('fileSize').textContent = (f.size/1024).toFixed(0) + ' KB';
+  document.getElementById('filePreview').classList.add('show');
+  const r = new FileReader();
+  r.onload = e => { fileB64 = e.target.result.split(',')[1]; btn.disabled = false; };
+  r.readAsDataURL(f);
+  clearErr();
+}
+
+async function analisar() {
+  if (!fileB64) return;
+  document.getElementById('uploadCard').style.display = 'none';
+  document.getElementById('loadingCard').classList.add('show');
+  document.getElementById('resCard').classList.remove('show');
+  document.getElementById('btnNova').style.display = 'none';
+  clearErr();
+  animSteps();
+
+  try {
+    const res = await fetch(WH, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ficheiro_base64: fileB64,
+        mime_type: file.type || 'application/pdf',
+        nome_ficheiro: file.name || 'fatura.pdf',
+        tipo: file.type === 'application/pdf' ? 'pdf' : 'imagem'
+      })
+    });
+
+    if (!res.ok) throw new Error('Erro no servidor: ' + res.status);
+    const data = await res.json();
+    let r = data.dados;
+    if (typeof r === 'string') r = JSON.parse(r);
+    if (!r) throw new Error('Resposta inválida.');
+    showResult(r);
+  } catch(e) {
+    document.getElementById('loadingCard').classList.remove('show');
+    document.getElementById('uploadCard').style.display = 'block';
+    err('Erro: ' + e.message);
+  }
+}
+
+function animSteps() {
+  const steps = ['s1','s2','s3','s4'];
+  const delays = [0,3000,7000,11000];
+  steps.forEach((id,i) => setTimeout(() => {
+    if (i>0) { document.getElementById(steps[i-1]).classList.remove('active'); document.getElementById(steps[i-1]).classList.add('done'); }
+    document.getElementById(id).classList.add('active');
+  }, delays[i]));
+}
+
+function showResult(r) {
+  document.getElementById('loadingCard').classList.remove('show');
+  document.getElementById('resCard').classList.add('show');
+  document.getElementById('btnNova').style.display = 'block';
+
+  document.getElementById('rComercializadora').textContent = r.comercializadora || '—';
+  document.getElementById('rPeriodo').textContent = 'Período: ' + (r.periodo || '—');
+
+  if (r.poupanca_mensal_estimada > 0) {
+    document.getElementById('poub').style.display = 'block';
+    document.getElementById('pVal').textContent = '-' + Number(r.poupanca_mensal_estimada).toFixed(0) + '€';
+  }
+
+  const dados = [];
+  if (r.total_fatura) dados.push({l:'Total fatura',v:Number(r.total_fatura).toFixed(2)+'€',c:'a'});
+  if (r.eletricidade?.consumo_kwh) dados.push({l:'Consumo elec.',v:r.eletricidade.consumo_kwh+' kWh'});
+  if (r.eletricidade?.tarifa_kwh) dados.push({l:'Tarifa elec.',v:Number(r.eletricidade.tarifa_kwh).toFixed(4)+'€/kWh'});
+  if (r.eletricidade?.potencia_kva) dados.push({l:'Potência',v:r.eletricidade.potencia_kva+' kVA'});
+  if (r.gas?.consumo_kwh) dados.push({l:'Consumo gás',v:r.gas.consumo_kwh+' kWh',c:r.gas.leitura_tipo?.includes('Estimada')?'a':''});
+  if (r.eletricidade?.desconto) dados.push({l:'Desconto ativo',v:r.eletricidade.desconto,c:'d'});
+  if (r.taxas) dados.push({l:'Taxas',v:Number(r.taxas).toFixed(2)+'€'});
+
+  document.getElementById('dgrid').innerHTML = dados.map(d=>`<div class="ditem"><div class="dlabel">${d.l}</div><div class="dval ${d.c||''}">${d.v}</div></div>`).join('');
+
+  let html = '';
+  if (r.analise) r.analise.split(/\n+/).filter(p=>p.trim()).forEach(p=>{html+=`<p>${p.trim()}</p>`;});
+  if (r.alertas?.length) r.alertas.forEach(a=>{html+=`<div class="abox"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>${a}</span></div>`;});
+  if (r.recomendacao_comercializador) html+=`<div class="recbox" style="margin-top:1rem"><h4>💡 Recomendação ENERSIA</h4><p>Mudar para <strong>${r.recomendacao_comercializador}</strong> pode representar uma poupança de <strong>${r.poupanca_mensal_estimada?Number(r.poupanca_mensal_estimada).toFixed(0)+'€/mês':'valor significativo'}</strong>. Sem corte e tratamos de tudo por ti.</p></div>`;
+  document.getElementById('aitxt').innerHTML = html;
+}
+
+function reset() {
+  file=null;fileB64=null;fi.value='';ci.value='';
+  document.getElementById('filePreview').classList.remove('show');
+  document.getElementById('resCard').classList.remove('show');
+  document.getElementById('btnNova').style.display='none';
+  document.getElementById('uploadCard').style.display='block';
+  btn.disabled=true;clearErr();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function err(msg){const b=document.getElementById('errorBox');b.textContent='⚠️ '+msg;b.classList.add('show');}
+function clearErr(){document.getElementById('errorBox').classList.remove('show');}
+</script>
+
+
+</body></html>
