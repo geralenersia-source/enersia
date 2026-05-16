@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="pt">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0054)file:///C:/Users/User/Downloads/analisar-fatura_2.html -->
+<html lang="pt"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ENERSIA — Analisa a tua Fatura</title>
 <style>
@@ -112,11 +112,11 @@
 <body>
 
 <header>
-  <a href="index.html" class="logo">ENER<span>SIA</span></a>
+  <a href="file:///C:/Users/User/Downloads/index.html" class="logo">ENER<span>SIA</span></a>
   <nav>
-    <a href="index.html">Início</a>
-    <a href="index.html#precos">Preços</a>
-    <a href="analisar-fatura.html" style="color:var(--verde)">Analisar Fatura</a>
+    <a href="file:///C:/Users/User/Downloads/index.html">Início</a>
+    <a href="file:///C:/Users/User/Downloads/index.html#precos">Preços</a>
+    <a href="file:///C:/Users/User/Downloads/analisar-fatura.html" style="color:var(--verde)">Analisar Fatura</a>
   </nav>
 </header>
 
@@ -129,7 +129,7 @@
 <div class="main">
 
   <div class="card">
-    <h2 style="font-family:'Syne',sans-serif;font-size:.95rem">Como funciona</h2>
+    <h2 style="font-family:&#39;Syne&#39;,sans-serif;font-size:.95rem">Como funciona</h2>
     <div class="how-steps">
       <div class="how-step"><div class="how-num">1</div><p>Upload do PDF ou foto</p></div>
       <div class="how-step"><div class="how-num">2</div><p>IA extrai os dados</p></div>
@@ -144,33 +144,33 @@
     <h2>📄 Envia a tua fatura</h2>
     <div class="dropzone" id="dropzone">
       <input type="file" id="fileInput" accept=".pdf,image/*">
-      <div class="dz-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+      <div class="dz-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></div>
       <h3>Arrasta a fatura aqui</h3>
       <p>PDF ou foto (JPG, PNG) — máximo 10MB</p>
       <span class="btn-upload-label">Escolher ficheiro</span>
     </div>
 
     <div class="file-preview" id="filePreview">
-      <div class="fi"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="none"/></svg></div>
+      <div class="fi"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="none"></path></svg></div>
       <div class="fn"><div class="fn-name" id="fileName">—</div><div class="fn-size" id="fileSize">—</div></div>
-      <button class="btn-remove" id="removeFile"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <button class="btn-remove" id="removeFile"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
     </div>
 
     <div class="or-div">ou</div>
 
-    <button class="btn-cam" onclick="document.getElementById('camInput').click()">
-      <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+    <button class="btn-cam" onclick="document.getElementById(&#39;camInput&#39;).click()">
+      <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
       Foto com o telemóvel
     </button>
     <input type="file" id="camInput" accept="image/*" capture="environment" style="display:none">
 
     <div class="info-box">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
       Análise gratuita e confidencial. Os teus dados não são partilhados com terceiros.
     </div>
 
-    <button class="btn-analisar" id="btnAnalisar" onclick="analisar()" disabled>
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <button class="btn-analisar" id="btnAnalisar" onclick="analisar()" disabled="">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
       Analisar Fatura com IA — Grátis
     </button>
   </div>
@@ -208,11 +208,11 @@
 </div>
 
 <footer>
-  <p>© 2026 ENERSIA · <a href="index.html">Voltar ao site</a> · Análise gratuita e confidencial</p>
+  <p>© 2026 ENERSIA · <a href="file:///C:/Users/User/Downloads/index.html">Voltar ao site</a> · Análise gratuita e confidencial</p>
 </footer>
 
 <script>
-const WH = 'https://fluxodigitalpt.app.n8n.cloud/webhook/analisar-fatura';
+const WH = 'https://hook.eu1.make.com/rc32bxy5vo23zg4vpt2mjrs10gep58la';
 let file = null, fileB64 = null;
 
 const fi = document.getElementById('fileInput');
@@ -268,14 +268,17 @@ async function analisar() {
 
     if (!res.ok) throw new Error('Erro no servidor: ' + res.status);
     const data = await res.json();
-    let r = data.dados;
+
+    // Suporta resposta directa ou dentro de .dados
+    let r = data.dados || data;
     if (typeof r === 'string') r = JSON.parse(r);
-    if (!r) throw new Error('Resposta inválida.');
+    if (!r || !r.comercializadora) throw new Error('Resposta inválida da IA.');
     showResult(r);
   } catch(e) {
     document.getElementById('loadingCard').classList.remove('show');
     document.getElementById('uploadCard').style.display = 'block';
-    err('Erro: ' + e.message);
+    err('Ocorreu um erro ao processar a fatura. Por favor tente novamente ou contacte-nos.');
+    console.error(e);
   }
 }
 
@@ -313,7 +316,8 @@ function showResult(r) {
   document.getElementById('dgrid').innerHTML = dados.map(d=>`<div class="ditem"><div class="dlabel">${d.l}</div><div class="dval ${d.c||''}">${d.v}</div></div>`).join('');
 
   let html = '';
-  if (r.analise) r.analise.split(/\n+/).filter(p=>p.trim()).forEach(p=>{html+=`<p>${p.trim()}</p>`;});
+  const analise = r.analise_detalhada || r.analise || '';
+  if (analise) analise.split(/\n+/).filter(p=>p.trim()).forEach(p=>{html+=`<p>${p.trim()}</p>`;});
   if (r.alertas?.length) r.alertas.forEach(a=>{html+=`<div class="abox"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>${a}</span></div>`;});
   if (r.recomendacao_comercializador) html+=`<div class="recbox" style="margin-top:1rem"><h4>💡 Recomendação ENERSIA</h4><p>Mudar para <strong>${r.recomendacao_comercializador}</strong> pode representar uma poupança de <strong>${r.poupanca_mensal_estimada?Number(r.poupanca_mensal_estimada).toFixed(0)+'€/mês':'valor significativo'}</strong>. Sem corte e tratamos de tudo por ti.</p></div>`;
   document.getElementById('aitxt').innerHTML = html;
@@ -332,5 +336,6 @@ function reset() {
 function err(msg){const b=document.getElementById('errorBox');b.textContent='⚠️ '+msg;b.classList.add('show');}
 function clearErr(){document.getElementById('errorBox').classList.remove('show');}
 </script>
-</body>
-</html>
+
+
+</body></html>
