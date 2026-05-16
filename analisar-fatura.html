@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0054)file:///C:/Users/User/Downloads/analisar-fatura_2.html -->
+<!-- saved from url=(0054)file:///C:/Users/User/Downloads/analisar-fatura_3.html -->
 <html lang="pt"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -112,11 +112,11 @@
 <body>
 
 <header>
-  <a href="file:///C:/Users/User/Downloads/index.html" class="logo">ENER<span>SIA</span></a>
+  <a href="file:///C:/" class="logo">ENER<span>SIA</span></a>
   <nav>
-    <a href="file:///C:/Users/User/Downloads/index.html">Início</a>
-    <a href="file:///C:/Users/User/Downloads/index.html#precos">Preços</a>
-    <a href="file:///C:/Users/User/Downloads/analisar-fatura.html" style="color:var(--verde)">Analisar Fatura</a>
+    <a href="file:///C:/">Início</a>
+    <a href="file:///C:/#precos">Preços</a>
+    <a href="file:///C:/analisar-fatura.html" style="color:var(--verde)">Analisar Fatura</a>
   </nav>
 </header>
 
@@ -204,11 +204,11 @@
     </div>
   </div>
 
-  <button class="btn-nova" id="btnNova" onclick="reset()" style="display:none">↺ Analisar outra fatura</button>
+  <button class="btn-nova" id="btnNova" onclick="resetForm()" style="display:none">↺ Analisar outra fatura</button>
 </div>
 
 <footer>
-  <p>© 2026 ENERSIA · <a href="file:///C:/Users/User/Downloads/index.html">Voltar ao site</a> · Análise gratuita e confidencial</p>
+  <p>© 2026 ENERSIA · <a href="file:///C:/">Voltar ao site</a> · Análise gratuita e confidencial</p>
 </footer>
 
 <script>
@@ -225,7 +225,10 @@ ci.addEventListener('change', e => e.target.files[0] && handleFile(e.target.file
 const dz = document.getElementById('dropzone');
 dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
 dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); e.dataTransfer.files[0] && handleFile(e.dataTransfer.files[0]); });
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag-over');
+  e.dataTransfer.files[0] && handleFile(e.dataTransfer.files[0]);
+});
 
 document.getElementById('removeFile').addEventListener('click', () => {
   file = null; fileB64 = null; fi.value = ''; ci.value = '';
@@ -234,15 +237,38 @@ document.getElementById('removeFile').addEventListener('click', () => {
 });
 
 function handleFile(f) {
-  if (f.size > 10*1024*1024) { err('Ficheiro demasiado grande. Máximo 10MB.'); return; }
+  if (f.size > 10*1024*1024) { showErr('Ficheiro demasiado grande. Máximo 10MB.'); return; }
   file = f;
   document.getElementById('fileName').textContent = f.name;
   document.getElementById('fileSize').textContent = (f.size/1024).toFixed(0) + ' KB';
   document.getElementById('filePreview').classList.add('show');
-  const r = new FileReader();
-  r.onload = e => { fileB64 = e.target.result.split(',')[1]; btn.disabled = false; };
-  r.readAsDataURL(f);
+  const reader = new FileReader();
+  reader.onload = e => { fileB64 = e.target.result.split(',')[1]; btn.disabled = false; };
+  reader.readAsDataURL(f);
   clearErr();
+}
+
+// Extrai JSON de texto que pode ter ```json ... ``` ou JSON puro
+function extrairJSON(texto) {
+  if (!texto) return null;
+
+  // Tenta parse directo primeiro
+  try { return JSON.parse(texto.trim()); } catch(e) {}
+
+  // Tenta extrair de bloco markdown ```json ... ```
+  const matchMd = texto.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (matchMd) {
+    try { return JSON.parse(matchMd[1].trim()); } catch(e) {}
+  }
+
+  // Tenta extrair entre { e } (último recurso)
+  const start = texto.indexOf('{');
+  const end = texto.lastIndexOf('}');
+  if (start !== -1 && end !== -1 && end > start) {
+    try { return JSON.parse(texto.slice(start, end + 1)); } catch(e) {}
+  }
+
+  return null;
 }
 
 async function analisar() {
@@ -267,18 +293,51 @@ async function analisar() {
     });
 
     if (!res.ok) throw new Error('Erro no servidor: ' + res.status);
-    const data = await res.json();
 
-    // Suporta resposta directa ou dentro de .dados
-    let r = data.dados || data;
-    if (typeof r === 'string') r = JSON.parse(r);
-    if (!r || !r.comercializadora) throw new Error('Resposta inválida da IA.');
+    // Lê como texto para máxima flexibilidade
+    const texto = await res.text();
+    console.log('MAKE RAW RESPONSE:', texto);
+
+    let r = null;
+
+    // Tenta parse do texto inteiro como JSON
+    try {
+      const data = JSON.parse(texto);
+
+      // Caso 1: Make devolveu { "raw": "...texto do claude..." }
+      if (data.raw) {
+        r = extrairJSON(data.raw);
+      }
+      // Caso 2: Make devolveu { "sucesso": true, "dados": {...} }
+      else if (data.dados) {
+        r = typeof data.dados === 'string' ? extrairJSON(data.dados) : data.dados;
+      }
+      // Caso 3: Make devolveu os campos directamente { "comercializadora": "...", ... }
+      else if (data.comercializadora) {
+        r = data;
+      }
+      // Caso 4: Make devolveu { "sucesso": true, "comercializadora": "..." }
+      else if (data.sucesso && Object.keys(data).length > 2) {
+        r = data;
+      }
+    } catch(e) {
+      // O texto não é JSON válido — tenta extrair JSON de dentro
+      r = extrairJSON(texto);
+    }
+
+    console.log('DADOS EXTRAÍDOS:', r);
+
+    if (!r || (!r.comercializadora && !r.total_fatura)) {
+      throw new Error('A IA não conseguiu extrair dados suficientes da fatura.');
+    }
+
     showResult(r);
+
   } catch(e) {
     document.getElementById('loadingCard').classList.remove('show');
     document.getElementById('uploadCard').style.display = 'block';
-    err('Ocorreu um erro ao processar a fatura. Por favor tente novamente ou contacte-nos.');
-    console.error(e);
+    showErr('Ocorreu um erro ao processar a fatura. Por favor tente novamente ou contacte-nos.');
+    console.error('ERRO DETALHADO:', e);
   }
 }
 
@@ -286,7 +345,10 @@ function animSteps() {
   const steps = ['s1','s2','s3','s4'];
   const delays = [0,3000,7000,11000];
   steps.forEach((id,i) => setTimeout(() => {
-    if (i>0) { document.getElementById(steps[i-1]).classList.remove('active'); document.getElementById(steps[i-1]).classList.add('done'); }
+    if (i>0) {
+      document.getElementById(steps[i-1]).classList.remove('active');
+      document.getElementById(steps[i-1]).classList.add('done');
+    }
     document.getElementById(id).classList.add('active');
   }, delays[i]));
 }
@@ -296,46 +358,82 @@ function showResult(r) {
   document.getElementById('resCard').classList.add('show');
   document.getElementById('btnNova').style.display = 'block';
 
-  document.getElementById('rComercializadora').textContent = r.comercializadora || '—';
+  document.getElementById('rComercializadora').textContent = r.comercializadora || 'Comercializadora';
   document.getElementById('rPeriodo').textContent = 'Período: ' + (r.periodo || '—');
 
-  if (r.poupanca_mensal_estimada > 0) {
+  // Poupança — aceita número ou string
+  const poupanca = parseFloat(r.poupanca_mensal_estimada) || 0;
+  if (poupanca > 0) {
     document.getElementById('poub').style.display = 'block';
-    document.getElementById('pVal').textContent = '-' + Number(r.poupanca_mensal_estimada).toFixed(0) + '€';
+    document.getElementById('pVal').textContent = '-' + poupanca.toFixed(0) + '€';
   }
 
+  // Dados extraídos — estrutura flexível (directo ou dentro de eletricidade/gas)
   const dados = [];
-  if (r.total_fatura) dados.push({l:'Total fatura',v:Number(r.total_fatura).toFixed(2)+'€',c:'a'});
-  if (r.eletricidade?.consumo_kwh) dados.push({l:'Consumo elec.',v:r.eletricidade.consumo_kwh+' kWh'});
-  if (r.eletricidade?.tarifa_kwh) dados.push({l:'Tarifa elec.',v:Number(r.eletricidade.tarifa_kwh).toFixed(4)+'€/kWh'});
-  if (r.eletricidade?.potencia_kva) dados.push({l:'Potência',v:r.eletricidade.potencia_kva+' kVA'});
-  if (r.gas?.consumo_kwh) dados.push({l:'Consumo gás',v:r.gas.consumo_kwh+' kWh',c:r.gas.leitura_tipo?.includes('Estimada')?'a':''});
-  if (r.eletricidade?.desconto) dados.push({l:'Desconto ativo',v:r.eletricidade.desconto,c:'d'});
-  if (r.taxas) dados.push({l:'Taxas',v:Number(r.taxas).toFixed(2)+'€'});
+  const totalFatura = parseFloat(r.total_fatura);
+  if (!isNaN(totalFatura)) dados.push({l:'Total fatura', v: totalFatura.toFixed(2)+'€', c:'a'});
 
-  document.getElementById('dgrid').innerHTML = dados.map(d=>`<div class="ditem"><div class="dlabel">${d.l}</div><div class="dval ${d.c||''}">${d.v}</div></div>`).join('');
+  // Consumo — aceita consumo_kwh directo ou dentro de eletricidade
+  const consumo = r.consumo_kwh || r.eletricidade?.consumo_kwh;
+  if (consumo) dados.push({l:'Consumo', v: consumo+' kWh'});
 
+  const tarifa = r.tarifa_atual || r.eletricidade?.tarifa_kwh;
+  if (tarifa) dados.push({l:'Tarifa', v: parseFloat(tarifa).toFixed(4)+'€/kWh'});
+
+  const potencia = r.eletricidade?.potencia_kva;
+  if (potencia) dados.push({l:'Potência', v: potencia+' kVA'});
+
+  const perc = parseFloat(r.percentagem_poupanca);
+  if (!isNaN(perc) && perc > 0) dados.push({l:'Poupança', v: perc.toFixed(0)+'%', c:'d'});
+
+  document.getElementById('dgrid').innerHTML = dados.length
+    ? dados.map(d=>`<div class="ditem"><div class="dlabel">${d.l}</div><div class="dval ${d.c||''}">${d.v}</div></div>`).join('')
+    : '<div class="ditem"><div class="dlabel">Análise</div><div class="dval">Ver detalhes abaixo</div></div>';
+
+  // Análise detalhada
   let html = '';
   const analise = r.analise_detalhada || r.analise || '';
-  if (analise) analise.split(/\n+/).filter(p=>p.trim()).forEach(p=>{html+=`<p>${p.trim()}</p>`;});
-  if (r.alertas?.length) r.alertas.forEach(a=>{html+=`<div class="abox"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>${a}</span></div>`;});
-  if (r.recomendacao_comercializador) html+=`<div class="recbox" style="margin-top:1rem"><h4>💡 Recomendação ENERSIA</h4><p>Mudar para <strong>${r.recomendacao_comercializador}</strong> pode representar uma poupança de <strong>${r.poupanca_mensal_estimada?Number(r.poupanca_mensal_estimada).toFixed(0)+'€/mês':'valor significativo'}</strong>. Sem corte e tratamos de tudo por ti.</p></div>`;
+  if (analise) {
+    analise.split(/\n+/).filter(p=>p.trim()).forEach(p => { html += `<p>${p.trim()}</p>`; });
+  }
+
+  // Alertas — aceita string ou array
+  const alertas = r.alertas;
+  if (alertas) {
+    const listaAlertas = Array.isArray(alertas) ? alertas : [alertas];
+    listaAlertas.filter(a=>a).forEach(a => {
+      html += `<div class="abox"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>${a}</span></div>`;
+    });
+  }
+
+  // Recomendação
+  if (r.recomendacao_comercializador) {
+    const poupStr = poupanca > 0 ? poupanca.toFixed(0)+'€/mês' : 'valor significativo';
+    html += `<div class="recbox" style="margin-top:1rem"><h4>💡 Recomendação ENERSIA</h4><p>Mudar para <strong>${r.recomendacao_comercializador}</strong> pode representar uma poupança de <strong>${poupStr}</strong>. ${r.motivo_recomendacao || 'Sem corte e tratamos de tudo por ti.'}</p></div>`;
+  }
+
+  if (!html) html = '<p>Análise concluída. Contacte-nos para saber mais sobre as opções disponíveis para o seu perfil de consumo.</p>';
   document.getElementById('aitxt').innerHTML = html;
 }
 
-function reset() {
-  file=null;fileB64=null;fi.value='';ci.value='';
+function resetForm() {
+  file = null; fileB64 = null; fi.value = ''; ci.value = '';
   document.getElementById('filePreview').classList.remove('show');
   document.getElementById('resCard').classList.remove('show');
-  document.getElementById('btnNova').style.display='none';
-  document.getElementById('uploadCard').style.display='block';
-  btn.disabled=true;clearErr();
+  document.getElementById('btnNova').style.display = 'none';
+  document.getElementById('uploadCard').style.display = 'block';
+  btn.disabled = true; clearErr();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function err(msg){const b=document.getElementById('errorBox');b.textContent='⚠️ '+msg;b.classList.add('show');}
-function clearErr(){document.getElementById('errorBox').classList.remove('show');}
+function showErr(msg) {
+  const b = document.getElementById('errorBox');
+  b.textContent = '⚠️ ' + msg;
+  b.classList.add('show');
+}
+function clearErr() { document.getElementById('errorBox').classList.remove('show'); }
 </script>
+
 
 
 </body></html>
