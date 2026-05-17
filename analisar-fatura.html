@@ -790,11 +790,19 @@
     // Log para debug
     console.log('RAW recebido:', texto.substring(0, 200));
 
-    // 1. Limpar caracteres invisíveis e espaços extra
-    let t = texto.trim();
+    // 1. Limpar caracteres de controlo inválidos em JSON
+    //    (tabs \t e newlines \n são permitidos mas outros control chars não)
+    //    Remove caracteres ASCII 0-8, 11-12, 14-31 que causam "Bad control character"
+    let t = texto
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')  // control chars ilegais
+      .replace(/\r\n/g, '\\n')                          // CRLF → \n literal
+      .replace(/\r/g, '\\n')                            // CR → \n literal
+      .trim();
 
     // 2. Tentar parse directo
-    try { return JSON.parse(t); } catch(e) {}
+    try { return JSON.parse(t); } catch(e) {
+      console.log('Parse directo falhou:', e.message);
+    }
 
     // 3. Remover markdown backticks (todas as variações)
     t = t.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
@@ -884,17 +892,22 @@
 
       // Extrair raw da resposta
       let rawTexto = '';
-      if (data.raw) {
+      if (typeof data.raw === 'string') {
         rawTexto = data.raw;
-      } else if (data.sucesso && data.raw !== undefined) {
-        rawTexto = data.raw;
+      } else if (data.raw !== undefined) {
+        rawTexto = JSON.stringify(data.raw);
       } else if (typeof data === 'string') {
         rawTexto = data;
       } else {
         rawTexto = JSON.stringify(data);
       }
 
-      console.log('RAW TEXTO:', rawTexto.substring(0, 300));
+      // Sanitizar control characters ANTES de qualquer processamento
+      rawTexto = rawTexto
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
+        .trim();
+
+      console.log('RAW TEXTO sanitizado:', rawTexto.substring(0, 300));
 
       const dados = extrairJSON(rawTexto);
       console.log('DADOS EXTRAÍDOS:', dados);
