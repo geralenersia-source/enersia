@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///C:/Users/User/Downloads/analisar-fatura.html -->
+<!-- saved from url=(0054)file:///C:/Users/User/Downloads/analisar-fatura_4.html -->
 <html lang="pt"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -253,8 +253,7 @@ function extrairJSON(texto) {
   if (!texto) return null;
 
   // Tenta parse directo primeiro
-  const trimmed = texto.trim();
-  try { return JSON.parse(trimmed); } catch(e) {}
+  try { return JSON.parse(texto.trim()); } catch(e) {}
 
   // Tenta extrair de bloco markdown ```json ... ```
   const matchMd = texto.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -262,18 +261,23 @@ function extrairJSON(texto) {
     try { return JSON.parse(matchMd[1].trim()); } catch(e) {}
   }
 
-  // Encontra o primeiro { e tenta parsear progressivamente do último } para trás
+  // Usa contagem de chavetas para encontrar JSON completo (ignora conteúdo de strings)
   const start = texto.indexOf('{');
   if (start === -1) return null;
 
-  // Percorre de trás para a frente procurando um } que feche JSON válido
-  for (let i = texto.length - 1; i >= start; i--) {
-    if (texto[i] === '}') {
-      try {
-        const candidate = texto.slice(start, i + 1);
-        const parsed = JSON.parse(candidate);
-        return parsed;
-      } catch(e) {}
+  let depth = 0, inString = false, escape = false;
+  for (let i = start; i < texto.length; i++) {
+    const ch = texto[i];
+    if (escape) { escape = false; continue; }
+    if (ch === '\' && inString) { escape = true; continue; }
+    if (ch === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (ch === '{') depth++;
+    if (ch === '}') {
+      depth--;
+      if (depth === 0) {
+        try { return JSON.parse(texto.slice(start, i + 1)); } catch(e) { break; }
+      }
     }
   }
 
