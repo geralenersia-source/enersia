@@ -249,40 +249,43 @@ function handleFile(f) {
   clearErr();
 }
 
-// Extrai JSON de texto que pode ter ```json ... ``` ou JSON puro
+// Extrai JSON de texto — suporta JSON puro, markdown, e texto com lixo à volta
 function extrairJSON(texto) {
   if (!texto) return null;
 
-  // Tenta parse directo primeiro
-  try { return JSON.parse(texto.trim()); } catch(e) {}
+  // Limpa o texto
+  let t = texto.trim();
 
-  // Tenta extrair de bloco markdown ```json ... ```
-  const matchMd = texto.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if (matchMd) {
-    try { return JSON.parse(matchMd[1].trim()); } catch(e) {}
-  }
+  // Tenta parse directo
+  try { return JSON.parse(t); } catch(e) {}
 
-  // Usa contagem de chavetas para encontrar JSON completo (ignora conteúdo de strings)
-  const start = texto.indexOf('{');
+  // Extrai de bloco markdown ```json ... ```
+  const md = t.match(/`{3}(?:json)?[\r\n]+([\s\S]*?)`{3}/);
+  if (md) { try { return JSON.parse(md[1].trim()); } catch(e) {} }
+
+  // Encontra o { de abertura
+  const start = t.indexOf('{');
   if (start === -1) return null;
 
-  // Percorre o texto encontrando o } que fecha o JSON correctamente
-  let depth = 0;
-  let inStr = false;
-  let prev = '';
-  for (let i = start; i < texto.length; i++) {
-    const ch = texto[i];
-    if (ch === '"' && prev !== '\\') inStr = !inStr;
-    if (!inStr) {
-      if (ch === '{') depth++;
-      if (ch === '}') {
+  // Percorre caracter a caracter contando chavetas, ignorando strings
+  let depth = 0, inString = false, i = start;
+  while (i < t.length) {
+    const c = t[i];
+    if (inString) {
+      if (c === '\\') { i += 2; continue; } // skip escaped char
+      if (c === '"') inString = false;
+    } else {
+      if (c === '"') { inString = true; }
+      else if (c === '{') { depth++; }
+      else if (c === '}') {
         depth--;
         if (depth === 0) {
-          try { return JSON.parse(texto.slice(start, i + 1)); } catch(e) { break; }
+          const candidate = t.slice(start, i + 1);
+          try { return JSON.parse(candidate); } catch(e) { break; }
         }
       }
     }
-    prev = ch;
+    i++;
   }
 
   return null;
@@ -380,9 +383,16 @@ function showResult(r) {
 
   // Poupança — aceita número ou string
   const poupanca = parseFloat(r.poupanca_mensal_estimada) || 0;
+  const poupancaStr = r.poupanca_mensal_estimada || '';
+  // Mostra sempre o bloco de poupança
+  document.getElementById('poub').style.display = 'block';
   if (poupanca > 0) {
-    document.getElementById('poub').style.display = 'block';
     document.getElementById('pVal').textContent = '-' + poupanca.toFixed(0) + '€';
+  } else if (poupancaStr && poupancaStr !== '0' && poupancaStr !== '0,00') {
+    // Poupança em formato texto (ex: "8-12€", "20-35€")
+    document.getElementById('pVal').textContent = poupancaStr.startsWith('-') ? poupancaStr : '-' + poupancaStr;
+  } else {
+    document.getElementById('pVal').textContent = 'Ver análise';
   }
 
   // Dados extraídos — estrutura flexível (directo ou dentro de eletricidade/gas)
@@ -401,7 +411,11 @@ function showResult(r) {
   if (potencia) dados.push({l:'Potência', v: potencia+' kVA'});
 
   const perc = parseFloat(r.percentagem_poupanca);
-  if (!isNaN(perc) && perc > 0) dados.push({l:'Poupança', v: perc.toFixed(0)+'%', c:'d'});
+  if (!isNaN(perc) && perc > 0) {
+    dados.push({l:'Poupança estimada', v: perc.toFixed(0)+'%', c:'d'});
+  } else if (r.percentagem_poupanca && r.percentagem_poupanca !== '0') {
+    dados.push({l:'Poupança estimada', v: r.percentagem_poupanca+'%', c:'d'});
+  }
 
   document.getElementById('dgrid').innerHTML = dados.length
     ? dados.map(d=>`<div class="ditem"><div class="dlabel">${d.l}</div><div class="dval ${d.c||''}">${d.v}</div></div>`).join('')
@@ -423,10 +437,13 @@ function showResult(r) {
     });
   }
 
-  // Recomendação
-  if (r.recomendacao_comercializador) {
-    const poupStr = poupanca > 0 ? poupanca.toFixed(0)+'€/mês' : 'valor significativo';
-    html += `<div class="recbox" style="margin-top:1rem"><h4>💡 Recomendação ENERSIA</h4><p>Mudar para <strong>${r.recomendacao_comercializador}</strong> pode representar uma poupança de <strong>${poupStr}</strong>. ${r.motivo_recomendacao || 'Sem corte e tratamos de tudo por ti.'}</p></div>`;
+  // Recomendação — mostra sempre
+  const recComercializador = r.recomendacao_comercializador || '';
+  const poupancaDisplay = poupanca > 0 ? poupanca.toFixed(0)+'€/mês' : (r.poupanca_mensal_estimada && r.poupanca_mensal_estimada !== '0' ? r.poupanca_mensal_estimada+'€/mês' : 'valor a avaliar');
+  if (recComercializador && recComercializador.toLowerCase() !== 'manter' && !recComercializador.toLowerCase().includes('manter')) {
+    html += `<div class="recbox" style="margin-top:1rem"><h4>💡 Recomendação ENERSIA</h4><p>Mudar para <strong>${recComercializador}</strong> pode representar uma poupança de <strong>${poupancaDisplay}</strong>. ${r.motivo_recomendacao || 'Tratamos de tudo por ti, sem corte de fornecimento.'}</p></div>`;
+  } else {
+    html += `<div class="recbox" style="margin-top:1rem"><h4>💡 Análise ENERSIA</h4><p>${r.motivo_recomendacao || 'A tua fatura foi analisada. Contacta-nos para uma comparação completa com o mercado actual e identificar as melhores oportunidades de poupança.'}</p></div>`;
   }
 
   if (!html) html = '<p>Análise concluída. Contacte-nos para saber mais sobre as opções disponíveis para o seu perfil de consumo.</p>';
