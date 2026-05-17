@@ -424,6 +424,68 @@
       margin-top: 0.5rem;
     }
     .btn-nova:hover { border-color: var(--verde); color: var(--verde); }
+
+    /* FORMULÁRIO DE CONTACTO */
+    .form-contacto {
+      margin-top: 1.2rem;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 1.2rem;
+    }
+    .form-contacto .form-titulo {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #374151;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
+    }
+    .form-row.full { grid-template-columns: 1fr; }
+    .input-grupo {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .input-grupo label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .input-grupo input {
+      padding: 0.65rem 0.85rem;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      color: #1a1a2e;
+      background: #f9fafb;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      width: 100%;
+    }
+    .input-grupo input:focus {
+      border-color: var(--verde);
+      box-shadow: 0 0 0 3px rgba(0,200,150,0.12);
+      background: white;
+    }
+    .input-grupo input::placeholder { color: #9ca3af; }
+    .input-grupo input.campo-erro { border-color: #ef4444; }
+    .form-nota {
+      font-size: 0.72rem;
+      color: #9ca3af;
+      margin-top: 0.4rem;
+    }
+    @media (max-width: 480px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+
     footer {
       text-align: center;
       padding: 2rem 1rem;
@@ -491,6 +553,28 @@
       </div>
 
       <p class="nota-privacidade">🔒 Análise gratuita e confidencial. Os teus dados não são partilhados com terceiros.</p>
+
+      <!-- FORMULÁRIO DE CONTACTO -->
+      <div class="form-contacto">
+        <div class="form-titulo">👤 Os teus dados de contacto</div>
+        <div class="form-row">
+          <div class="input-grupo">
+            <label>Nome *</label>
+            <input type="text" id="inputNome" placeholder="O teu nome" autocomplete="name">
+          </div>
+          <div class="input-grupo">
+            <label>Telefone *</label>
+            <input type="tel" id="inputTelefone" placeholder="9XX XXX XXX" autocomplete="tel">
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="input-grupo">
+            <label>Email *</label>
+            <input type="email" id="inputEmail" placeholder="email@exemplo.pt" autocomplete="email">
+          </div>
+        </div>
+        <p class="form-nota">* Campos obrigatórios — usados apenas para enviar a tua análise e proposta de poupança.</p>
+      </div>
 
       <button class="btn-analisar" id="btnAnalisar" onclick="analisar()" disabled>
         Analisar Fatura com IA — Grátis
@@ -861,6 +945,36 @@
   async function analisar() {
     if (!ficheiroActual) return;
 
+    // Validar campos de contacto
+    const nome     = document.getElementById('inputNome').value.trim();
+    const email    = document.getElementById('inputEmail').value.trim();
+    const telefone = document.getElementById('inputTelefone').value.trim();
+
+    let erroContacto = false;
+
+    ['inputNome','inputEmail','inputTelefone'].forEach(id => {
+      document.getElementById(id).classList.remove('campo-erro');
+    });
+
+    if (!nome) {
+      document.getElementById('inputNome').classList.add('campo-erro');
+      erroContacto = true;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      document.getElementById('inputEmail').classList.add('campo-erro');
+      erroContacto = true;
+    }
+    if (!telefone || telefone.length < 9) {
+      document.getElementById('inputTelefone').classList.add('campo-erro');
+      erroContacto = true;
+    }
+
+    if (erroContacto) {
+      // Scroll suave para o formulário
+      document.getElementById('inputNome').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
     // UI: mostrar loading
     document.getElementById('upload-section').style.display = 'none';
     document.getElementById('erro').style.display = 'none';
@@ -873,7 +987,7 @@
       const base64 = await lerBase64(ficheiroActual);
       const mime   = ficheiroActual.type || 'application/pdf';
 
-      // Enviar para Make
+      // Enviar para Make — com dados de contacto
       const res = await fetch(WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -881,7 +995,10 @@
           ficheiro_base64: base64,
           mime_type: mime,
           nome_ficheiro: ficheiroActual.name,
-          tipo: mime.startsWith('image/') ? 'imagem' : 'pdf'
+          tipo: mime.startsWith('image/') ? 'imagem' : 'pdf',
+          nome: nome,
+          email: email,
+          telefone: telefone
         })
       });
 
@@ -1039,6 +1156,11 @@
     document.getElementById('erro').style.display = 'none';
     document.getElementById('loading').style.display = 'none';
     document.getElementById('upload-section').style.display = 'block';
+    // Limpar campos de contacto
+    ['inputNome','inputEmail','inputTelefone'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.value = ''; el.classList.remove('campo-erro'); }
+    });
     // Reset barra e nós
     const bar = document.getElementById('progressBar');
     if (bar) bar.style.width = '0%';
