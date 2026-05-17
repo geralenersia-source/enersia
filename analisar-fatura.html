@@ -887,27 +887,43 @@
 
       if (!res.ok) throw new Error('Erro HTTP: ' + res.status);
 
-      const data = await res.json();
-      console.log('MAKE RAW RESPONSE:', data);
+      // Usar res.text() em vez de res.json() para controlar o parse
+      // O Make pode devolver control characters dentro das strings que res.json() rejeita
+      const textoRaw = await res.text();
+      console.log('MAKE TEXT RAW (primeiros 300):', textoRaw.substring(0, 300));
 
-      // Extrair raw da resposta
+      // Sanitizar ANTES de qualquer JSON.parse
+      // Remove control chars ilegais em JSON: 0x00-0x08, 0x0B, 0x0C, 0x0E-0x1F
+      // Mantém: 0x09 (tab), 0x0A (newline), 0x0D (CR) — mas escapa-os correctamente
+      const textoLimpo = textoRaw
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, ' ')
+        .trim();
+
+      // Parsear o envelope do Make {sucesso, raw}
+      let data;
+      try {
+        data = JSON.parse(textoLimpo);
+      } catch(e) {
+        console.error('Parse do envelope falhou:', e.message);
+        // Tentar extrair directamente do texto bruto
+        const dadosDirectos = extrairJSON(textoLimpo);
+        if (dadosDirectos) { mostrarResultado(dadosDirectos); return; }
+        throw new Error('Resposta inválida do servidor.');
+      }
+
+      console.log('MAKE DATA parsed:', data);
+
+      // Extrair o campo raw (que contém o JSON do Claude)
       let rawTexto = '';
       if (typeof data.raw === 'string') {
         rawTexto = data.raw;
       } else if (data.raw !== undefined) {
         rawTexto = JSON.stringify(data.raw);
-      } else if (typeof data === 'string') {
-        rawTexto = data;
       } else {
-        rawTexto = JSON.stringify(data);
+        rawTexto = textoLimpo;
       }
 
-      // Sanitizar control characters ANTES de qualquer processamento
-      rawTexto = rawTexto
-        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
-        .trim();
-
-      console.log('RAW TEXTO sanitizado:', rawTexto.substring(0, 300));
+      console.log('RAW TEXTO final:', rawTexto.substring(0, 300));
 
       const dados = extrairJSON(rawTexto);
       console.log('DADOS EXTRAÍDOS:', dados);
