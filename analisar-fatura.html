@@ -892,35 +892,59 @@
       const textoRaw = await res.text();
       console.log('MAKE TEXT RAW (primeiros 300):', textoRaw.substring(0, 300));
 
-      // Sanitizar ANTES de qualquer JSON.parse
-      // Remove control chars ilegais em JSON: 0x00-0x08, 0x0B, 0x0C, 0x0E-0x1F
-      // Mantém: 0x09 (tab), 0x0A (newline), 0x0D (CR) — mas escapa-os correctamente
-      const textoLimpo = textoRaw
-        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, ' ')
-        .trim();
+      // ── SANITIZAÇÃO COMPLETA ──────────────────────────────
+      // Problema: o Make devolve o JSON do Claude dentro do campo "raw"
+      // com newlines REAIS (\n) dentro das strings — JSON.parse rejeita isso.
+      // Solução: escapar todos os control chars dentro de strings JSON.
+
+      function sanitizarJSONTexto(str) {
+        // Percorre char a char, dentro de strings JSON escapa \n \r \t e outros
+        let resultado = '';
+        let emString = false;
+        let escapando = false;
+        for (let i = 0; i < str.length; i++) {
+          const c = str[i];
+          const code = str.charCodeAt(i);
+          if (escapando) { resultado += c; escapando = false; continue; }
+          if (c === '\\' && emString) { resultado += c; escapando = true; continue; }
+          if (c === '"') { emString = !emString; resultado += c; continue; }
+          if (emString) {
+            // Dentro de string: escapar control chars ilegais
+            if (code === 0x0A) { resultado += '\\n';  continue; } // newline
+            if (code === 0x0D) { resultado += '\\r';  continue; } // CR
+            if (code === 0x09) { resultado += '\\t';  continue; } // tab
+            if (code < 0x20)  { resultado += ' ';    continue; } // outros control
+          }
+          resultado += c;
+        }
+        return resultado;
+      }
+
+      const textoSanitizado = sanitizarJSONTexto(textoRaw.trim());
+      console.log('TEXTO SANITIZADO (300):', textoSanitizado.substring(0, 300));
 
       // Parsear o envelope do Make {sucesso, raw}
       let data;
       try {
-        data = JSON.parse(textoLimpo);
+        data = JSON.parse(textoSanitizado);
       } catch(e) {
-        console.error('Parse do envelope falhou:', e.message);
-        // Tentar extrair directamente do texto bruto
-        const dadosDirectos = extrairJSON(textoLimpo);
+        console.error('Parse envelope falhou:', e.message, '@ pos', e.message.match(/\d+/)?.[0]);
+        // Fallback: tentar extrair JSON directamente do texto bruto
+        const dadosDirectos = extrairJSON(textoSanitizado);
         if (dadosDirectos) { mostrarResultado(dadosDirectos); return; }
-        throw new Error('Resposta inválida do servidor.');
+        throw new Error('Resposta inválida do servidor. Tente novamente.');
       }
 
-      console.log('MAKE DATA parsed:', data);
+      console.log('MAKE DATA parsed OK:', Object.keys(data));
 
-      // Extrair o campo raw (que contém o JSON do Claude)
+      // Extrair o campo raw (JSON do Claude)
       let rawTexto = '';
       if (typeof data.raw === 'string') {
         rawTexto = data.raw;
       } else if (data.raw !== undefined) {
         rawTexto = JSON.stringify(data.raw);
       } else {
-        rawTexto = textoLimpo;
+        rawTexto = textoSanitizado;
       }
 
       console.log('RAW TEXTO final:', rawTexto.substring(0, 300));
