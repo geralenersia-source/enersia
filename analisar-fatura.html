@@ -1,1441 +1,1175 @@
 
 <!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ENERSIA — Analisa a tua Fatura</title>
+  <style>
+    :root {
+      --verde: #00c896;
+      --verde-escuro: #00a87a;
+      --azul-escuro: #0a1628;
+      --azul-medio: #112240;
+      --texto: #e8f0fe;
+      --texto-secundario: #8892a4;
+      --card-bg: #ffffff;
+      --card-borda: #e5e7eb;
+      --erro: #ef4444;
+      --aviso: #f59e0b;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--azul-escuro);
+      color: var(--texto);
+      min-height: 100vh;
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: rgba(10,22,40,0.95);
+      border-bottom: 1px solid rgba(0,200,150,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { font-size: 1.4rem; font-weight: 800; color: var(--verde); letter-spacing: 2px; }
+    .logo span { color: var(--texto); }
+    nav a { color: var(--texto-secundario); text-decoration: none; margin-left: 1.5rem; font-size: 0.9rem; }
+    nav a.active { color: var(--verde); }
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+      background: linear-gradient(180deg, #0a1628 0%, #112240 100%);
+    }
+    .hero h1 { font-size: 2.2rem; font-weight: 800; line-height: 1.2; margin-bottom: 1rem; }
+    .hero h1 em { color: var(--verde); font-style: normal; }
+    .hero p { color: var(--texto-secundario); font-size: 1rem; max-width: 480px; margin: 0 auto 2rem; }
+    .como-funciona {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .passo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      color: var(--texto-secundario);
+      max-width: 90px;
+      text-align: center;
+    }
+    .passo-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(0,200,150,0.15);
+      border: 1px solid var(--verde);
+      color: var(--verde);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.85rem;
+    }
+    .container { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 2rem;
+      color: #1a1a2e;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    }
+    .card h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
+    .upload-area {
+      border: 2px dashed #d1d5db;
+      border-radius: 12px;
+      padding: 2.5rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .upload-area:hover, .upload-area.dragover {
+      border-color: var(--verde-escuro);
+      background: rgba(0,200,150,0.04);
+    }
+    .upload-area input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .upload-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+    .upload-area h3 { font-size: 1rem; font-weight: 600; color: #1a1a2e; margin-bottom: 0.3rem; }
+    .upload-area p { font-size: 0.82rem; color: #6b7280; }
+    .btn-escolher {
+      display: inline-block;
+      background: var(--verde);
+      color: white;
+      padding: 0.6rem 1.4rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      margin-top: 1rem;
+      cursor: pointer;
+      border: none;
+      pointer-events: none;
+    }
+    .divisor { display: flex; align-items: center; gap: 1rem; margin: 1rem 0; color: #9ca3af; font-size: 0.82rem; }
+    .divisor::before, .divisor::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
+    .btn-camera {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: white;
+      color: #374151;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .ficheiro-selec {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      margin-top: 1rem;
+    }
+    .ficheiro-selec .icon { font-size: 1.6rem; }
+    .ficheiro-selec .info { flex: 1; }
+    .ficheiro-selec .nome { font-size: 0.88rem; font-weight: 600; color: #166534; }
+    .ficheiro-selec .tamanho { font-size: 0.78rem; color: #4ade80; }
+    .ficheiro-selec .remover { background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 1.1rem; padding: 0.2rem; }
+    .nota-privacidade {
+      text-align: center;
+      font-size: 0.78rem;
+      color: #9ca3af;
+      margin: 0.8rem 0 1.2rem;
+    }
+    .btn-analisar {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--verde), var(--verde-escuro));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.3px;
+    }
+    .btn-analisar:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,200,150,0.4); }
+    .btn-analisar:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-<html lang="pt"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    /* LOADING — FIO ELÉCTRICO */
+    #loading { display: none; }
+    .loading-card {
+      background: var(--azul-medio);
+      border-radius: 20px;
+      padding: 2.5rem 1.5rem 2rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(0,200,150,0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    .loading-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(0,200,150,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .loading-titulo {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--verde);
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+    }
+    .loading-subtitulo {
+      font-size: 0.88rem;
+      color: var(--texto-secundario);
+      margin-bottom: 2rem;
+    }
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ENERSIA — Gestor Energético com Inteligência Artificial</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:'Outfit',sans-serif;background:#fff;color:#080E1C;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-:root{
-  --sun:#FF8C00;--sky:#0066FF;--teal:#00B4A0;--ink:#080E1C;--mid:#3D4F6E;--muted:#7B8BA8;
-  --off:#F6F8FC;--off2:#EDF1F8;--border:rgba(8,14,28,.08);--border2:rgba(8,14,28,.14);
-  --r:14px;--r2:22px;
-}
+    /* CIRCUITO SVG */
+    .circuito-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto 2rem;
+    }
+    .circuito-svg { width: 100%; height: auto; display: block; }
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:999;height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-.logo-orb{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--sun),var(--sky));display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 16px rgba(255,140,0,.3)}
-.logo-name{font-size:19px;font-weight:900;letter-spacing:-.5px;color:var(--ink)}
-.logo-name span{background:linear-gradient(90deg,var(--sun),var(--sky));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.nav-links{display:flex;gap:28px}
-.nav-links a{font-size:14px;color:var(--mid);text-decoration:none;font-weight:500;transition:color .2s;cursor:pointer}
-.nav-links a:hover{color:var(--ink)}
-.nav-r{display:flex;align-items:center;gap:10px}
-.live-tag{display:flex;align-items:center;gap:6px;background:rgba(0,180,160,.09);border:1px solid rgba(0,180,160,.25);border-radius:100px;padding:5px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:.5px}
-.live-d{width:5px;height:5px;border-radius:50%;background:var(--teal);animation:blink 1.5s ease infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.btn-nav{background:linear-gradient(135deg,var(--sun),#E06800);color:#fff;border:none;border-radius:var(--r);padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;box-shadow:0 4px 16px rgba(255,140,0,.3);transition:all .2s}
-.btn-nav:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(255,140,0,.4)}
-.btn-wa{width:38px;height:38px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;font-size:18px;box-shadow:0 3px 12px rgba(37,211,102,.3);transition:all .2s}
-.btn-wa:hover{transform:scale(1.08)}
+    /* Nós do circuito */
+    .no-circulo {
+      transition: all 0.4s ease;
+    }
+    .no-circulo.activo circle {
+      fill: var(--verde);
+      filter: drop-shadow(0 0 8px rgba(0,200,150,0.8));
+    }
+    .no-circulo.activo .no-num { fill: #0a1628; }
+    .no-circulo.done circle { fill: var(--verde); opacity: 0.5; }
+    .no-circulo.done .no-num { fill: #0a1628; }
 
-/* TICKER */
-.ticker{position:relative;z-index:1;background:#0d1729;padding:10px 0;overflow:hidden;margin-top:66px;border-bottom:1px solid rgba(255,255,255,.06)}
-.ticker-wrap{display:flex;animation:tkr 30s linear infinite;width:max-content}
-.ticker-wrap:hover{animation-play-state:paused}
-@keyframes tkr{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.tk{display:flex;align-items:center;gap:12px;padding:0 32px;border-right:1px solid rgba(255,255,255,.07);flex-shrink:0}
-.tk-chip{width:60px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;letter-spacing:.5px;overflow:hidden}
-.tk-chip img,.cc-chip img{width:100%;height:100%;object-fit:contain;padding:2px}
-.logo-pill{display:flex;align-items:center;justify-content:center;border-radius:4px;overflow:hidden}
-.edp{background:#E8001D;color:#fff}.galp{background:#004F8C;color:#fff}.endesa{background:#00784A;color:#fff}
-.iber{background:#5800A0;color:#fff}.repsol{background:#E85000;color:#fff}.golden{background:#D4A000;color:#1a0a00}
-.plenitude{background:#003E82;color:#fff}.coop{background:#006830;color:#fff}
-.tk-price{font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,.8)}
-.tk-d{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 6px;border-radius:4px}
-.tk-save{background:rgba(0,180,160,.2);color:#00E5D3}.tk-ref{background:rgba(255,255,255,.08);color:rgba(255,255,255,.4)}
+    /* Linha base */
+    .fio-base { stroke: rgba(255,255,255,0.07); stroke-width: 2; fill: none; stroke-linecap: round; }
 
-/* HERO */
-.hero{position:relative;z-index:1;padding:80px 24px 60px;text-align:center;background:linear-gradient(160deg,#FFFBF4 0%,#F0F6FF 50%,#F0FFF8 100%)}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.9);border:1px solid rgba(8,14,28,.12);border-radius:100px;padding:6px 16px;margin-bottom:28px;font-size:13px;color:var(--mid);font-weight:500;box-shadow:0 2px 12px rgba(8,14,28,.06)}
-.badge-tag{background:linear-gradient(135deg,var(--sun),var(--sky));color:#fff;border-radius:100px;padding:2px 10px;font-size:10px;font-weight:700}
-h1{font-size:clamp(40px,6vw,80px);font-weight:900;line-height:.96;letter-spacing:-3px;color:var(--ink);max-width:900px;margin:0 auto 24px}
-.g1{background:linear-gradient(90deg,var(--sun),#FF4500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.g2{background:linear-gradient(90deg,var(--sky),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero-sub{font-size:18px;color:var(--mid);max-width:580px;margin:0 auto 16px;line-height:1.65}
-.hero-tagline{font-size:14px;font-style:italic;color:var(--muted);margin-bottom:40px}
-.hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:48px}
-.btn-hero{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--sun),#E06800);color:#fff;border:none;border-radius:var(--r);padding:16px 32px;font-size:16px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;box-shadow:0 6px 28px rgba(255,140,0,.35);transition:all .22s;text-decoration:none}
-.btn-hero:hover{transform:translateY(-2px);box-shadow:0 10px 40px rgba(255,140,0,.45)}
-.btn-hero2{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.9);color:var(--ink);border:1px solid rgba(8,14,28,.12);border-radius:var(--r);padding:16px 26px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;box-shadow:0 2px 12px rgba(8,14,28,.06);transition:all .2s;text-decoration:none}
-.btn-hero2:hover{background:#fff;box-shadow:0 8px 32px rgba(8,14,28,.1);transform:translateY(-1px)}
-.stats-row{display:flex;max-width:760px;margin:0 auto;background:rgba(255,255,255,.9);border:1px solid var(--border);border-radius:var(--r2);box-shadow:0 8px 32px rgba(8,14,28,.08);overflow:hidden}
-.stat{flex:1;padding:18px 24px;text-align:center;border-right:1px solid var(--border)}
-.stat:last-child{border-right:none}
-.stat-num{font-size:28px;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,var(--sun),var(--sky));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px;font-weight:500}
+    /* Fio carregado */
+    .fio-energia {
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .fio-energia.seg1 { stroke: url(#gradFio1); }
+    .fio-energia.seg2 { stroke: url(#gradFio2); }
+    .fio-energia.seg3 { stroke: url(#gradFio3); }
 
-/* COMERC */
-.comerc-sec{position:relative;z-index:1;padding:40px 0;background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.comerc-lbl{text-align:center;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
-.comerc-fade{overflow:hidden;position:relative}
-.comerc-fade::before,.comerc-fade::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none}
-.comerc-fade::before{left:0;background:linear-gradient(90deg,#fff,transparent)}
-.comerc-fade::after{right:0;background:linear-gradient(270deg,#fff,transparent)}
-.comerc-track{display:flex;animation:tkr 25s linear infinite;width:max-content}
-.comerc-track:hover{animation-play-state:paused}
-.cc{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 24px;border-right:1px solid var(--border);flex-shrink:0;min-width:140px;transition:background .2s}
-.cc:hover{background:var(--off)}
-.cc-chip{border-radius:8px;display:flex;align-items:center;justify-content:center}
-.cc-p{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--ink)}
-.cc-b{font-size:9px;font-weight:700;padding:2px 8px;border-radius:100px}
-.b-best{background:rgba(0,180,160,.12);color:#007A70;border:1px solid rgba(0,180,160,.3)}
-.b-high{background:rgba(255,140,0,.1);color:#B05000;border:1px solid rgba(255,140,0,.2)}
-.b-mid{background:rgba(0,102,255,.08);color:#0044BB;border:1px solid rgba(0,102,255,.2)}
+    /* Pulso de energia que percorre o fio */
+    .pulso {
+      fill: none;
+      stroke: #fff;
+      stroke-width: 3;
+      stroke-linecap: round;
+      opacity: 0;
+    }
+    .pulso.a { animation: pulsoMover1 1.2s ease-in-out forwards; }
+    .pulso.b { animation: pulsoMover2 1.2s ease-in-out forwards; }
+    .pulso.c { animation: pulsoMover3 1.2s ease-in-out forwards; }
 
-/* SOLAR STRIP */
-.solar-strip{position:relative;z-index:1;overflow:hidden;height:300px}
-.solar-inner{width:100%;height:100%;background:linear-gradient(to bottom,transparent 0%,rgba(8,14,28,.6) 60%,rgba(8,14,28,.85) 100%),url('https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1400&q=80') center/cover no-repeat;display:flex;align-items:flex-end;padding:32px 48px}
-.solar-text{color:#fff;max-width:520px}
-.solar-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,140,0,.9);border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;color:#fff;margin-bottom:12px}
-.solar-title{font-size:clamp(22px,3vw,36px);font-weight:900;letter-spacing:-.5px;margin-bottom:8px;line-height:1.1}
-.solar-sub{font-size:14px;color:rgba(255,255,255,.75);margin-bottom:16px;line-height:1.6}
-.btn-solar{display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--ink);border:none;border-radius:var(--r);padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
-.btn-solar:hover{background:rgba(255,248,230,1);transform:translateY(-1px)}
+    @keyframes pulsoMover1 {
+      0%   { stroke-dashoffset: 120; opacity: 0.9; }
+      100% { stroke-dashoffset: 0;   opacity: 0; }
+    }
+    @keyframes pulsoMover2 {
+      0%   { stroke-dashoffset: 120; opacity: 0.9; }
+      100% { stroke-dashoffset: 0;   opacity: 0; }
+    }
+    @keyframes pulsoMover3 {
+      0%   { stroke-dashoffset: 120; opacity: 0.9; }
+      100% { stroke-dashoffset: 0;   opacity: 0; }
+    }
 
-/* SECTION */
-.sec{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:80px 32px}
-.sec-tag{display:inline-flex;align-items:center;gap:8px;font-size:10px;font-weight:700;color:var(--sky);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
-.sec-tag::before{content:'';width:16px;height:2px;background:linear-gradient(90deg,var(--sky),var(--teal));border-radius:1px}
-h2{font-size:clamp(30px,4vw,52px);font-weight:900;letter-spacing:-2px;line-height:1.05;margin-bottom:14px}
-h2 .g{background:linear-gradient(90deg,var(--sun),var(--sky));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.sec-sub{font-size:16px;color:var(--mid);max-width:500px;line-height:1.7;margin-bottom:48px}
+    /* Ícone check no nó */
+    .check-icon {
+      opacity: 0;
+      transition: opacity 0.3s 0.2s;
+    }
+    .no-circulo.activo .check-icon,
+    .no-circulo.done .check-icon { opacity: 1; }
 
-/* ANALYSIS */
-.az-wrap{display:grid;grid-template-columns:1fr 1.1fr;gap:2px;background:var(--border);border-radius:var(--r2);overflow:hidden;box-shadow:0 8px 40px rgba(8,14,28,.1);border:1px solid var(--border)}
-.az-left{background:linear-gradient(150deg,#FFF6EB,#EEF5FF);padding:44px 36px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:480px;position:relative;overflow:hidden}
-.az-left-icon{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,rgba(255,140,0,.15),rgba(0,102,255,.1));display:flex;align-items:center;justify-content:center;font-size:38px;margin-bottom:20px;border:1px solid rgba(255,140,0,.2)}
-.az-left-title{font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:8px}
-.az-left-sub{font-size:14px;color:var(--mid);line-height:1.6;margin-bottom:28px;max-width:260px}
-.az-methods{display:flex;flex-direction:column;gap:8px;width:100%}
-.az-btn{display:flex;align-items:center;gap:12px;padding:13px 16px;background:rgba(255,255,255,.85);border:1px solid rgba(8,14,28,.1);border-radius:var(--r);cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif;width:100%;text-align:left;box-shadow:0 1px 4px rgba(8,14,28,.04)}
-.az-btn:hover{background:#fff;border-color:rgba(255,140,0,.35);box-shadow:0 4px 16px rgba(255,140,0,.1);transform:translateX(3px)}
-.az-btn-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
-.ic-photo{background:linear-gradient(135deg,rgba(255,140,0,.15),rgba(255,140,0,.05))}
-.ic-pdf{background:linear-gradient(135deg,rgba(220,40,40,.12),rgba(220,40,40,.04))}
-.ic-manual{background:linear-gradient(135deg,rgba(0,102,255,.12),rgba(0,102,255,.04))}
-.az-btn-title{font-size:13px;font-weight:600;color:var(--ink)}
-.az-btn-sub{font-size:11px;color:var(--muted);margin-top:1px}
-.or-sep{font-size:10px;color:var(--muted);text-align:center;font-weight:600;letter-spacing:1px}
+    /* Label do passo */
+    .step-label {
+      font-size: 11px;
+      fill: var(--texto-secundario);
+      text-anchor: middle;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      transition: fill 0.3s;
+    }
+    .no-circulo.activo .step-label,
+    .no-circulo.done  .step-label { fill: var(--verde); }
 
-.az-right{background:#fff;padding:36px;display:flex;flex-direction:column}
-.az-rhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)}
-.az-rtitle{font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:7px}
-.az-rtitle::before{content:'';width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--sun),var(--sky))}
-.az-status{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);display:flex;align-items:center;gap:4px;letter-spacing:.4px}
-.az-status::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--teal)}
-.step-bar{display:flex;gap:4px;margin-bottom:20px}
-.sb{flex:1;height:3px;border-radius:2px;transition:all .3s}
-.sb.act{background:linear-gradient(90deg,var(--sun),var(--sky))}.sb.dn{background:var(--teal);opacity:.5}.sb.td{background:var(--border2)}
+    /* Mensagem dinâmica */
+    .loading-msg {
+      font-size: 0.9rem;
+      color: var(--texto);
+      font-weight: 500;
+      min-height: 1.4em;
+      transition: opacity 0.3s;
+    }
+    .loading-msg.fade { opacity: 0; }
 
-/* FORM FIELDS */
-.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
-.fl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase}
-.fi,.fs{width:100%;background:var(--off);border:1.5px solid var(--border2);border-radius:var(--r);padding:11px 14px;font-size:14px;color:var(--ink);font-family:'Outfit',sans-serif;outline:none;transition:all .2s}
-.fi::placeholder{color:rgba(123,139,168,.5)}
-.fi:focus,.fs:focus{border-color:var(--sky);background:#fff;box-shadow:0 0 0 3px rgba(0,102,255,.07)}
-.fs{-webkit-appearance:none;cursor:pointer}
-.fs option{background:#fff}
-.fg2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.chip{background:var(--off);border:1.5px solid var(--border);border-radius:var(--r);padding:9px 4px;text-align:center;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:3px}
-.chip:hover{border-color:rgba(0,102,255,.3);background:#EEF5FF}
-.chip.on{border-color:var(--sky);background:#EEF5FF;box-shadow:0 0 0 2px rgba(0,102,255,.08)}
-.chip-e{font-size:16px}.chip-l{font-size:10px;font-weight:600;color:var(--mid)}
-.chip.on .chip-l{color:var(--sky)}
-.btn-nx{width:100%;background:linear-gradient(135deg,var(--sun),#E06800);color:#fff;border:none;border-radius:var(--r);padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;box-shadow:0 4px 16px rgba(255,140,0,.25);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:8px}
-.btn-nx:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(255,140,0,.35)}
-.btn-nx:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.btn-bk{background:var(--off);border:1.5px solid var(--border2);border-radius:var(--r);padding:9px 14px;font-size:12px;font-weight:600;color:var(--mid);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;margin-bottom:10px;display:inline-flex;align-items:center;gap:4px}
-.btn-bk:hover{background:#fff;color:var(--ink)}
-.fn{font-size:11px;color:var(--muted);text-align:center;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:4px}
-.fn-err{display:none;font-size:11px;color:#CC2200;text-align:center;padding:7px;background:rgba(220,50,50,.06);border-radius:8px;margin-top:6px}
-.fn-err.show{display:block}
+    /* Barra de progresso */
+    .progress-bar-wrap {
+      background: rgba(255,255,255,0.06);
+      border-radius: 99px;
+      height: 4px;
+      margin: 1rem auto 0;
+      max-width: 280px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--verde), #00ffb3);
+      width: 0%;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 8px rgba(0,200,150,0.6);
+    }
 
-/* LOADING */
-.ld-wrap{display:none;flex-direction:column;align-items:center;padding:28px 0;flex:1}
-.ld-wrap.show{display:flex}
-.ld-orb{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,rgba(255,140,0,.15),rgba(0,102,255,.1));display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px;animation:op 2s ease infinite}
-@keyframes op{0%,100%{box-shadow:0 0 0 0 rgba(255,140,0,.25)}50%{box-shadow:0 0 0 16px rgba(255,140,0,0)}}
-.ld-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px}
-.ld-sub{font-size:12px;color:var(--muted);margin-bottom:24px}
-.ld-steps{width:100%;display:flex;flex-direction:column;gap:8px}
-.ls{display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(123,139,168,.6);font-weight:500;transition:all .3s}
-.ls.act{color:var(--ink)}.ls.dn{color:var(--teal)}
-.ls-dot{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--border2);font-size:10px;transition:all .3s}
-.ls.act .ls-dot{border-color:var(--sun);background:rgba(255,140,0,.1)}
-.ls.dn .ls-dot{border-color:var(--teal);background:rgba(0,180,160,.1);color:var(--teal)}
-.ls.dn .ls-dot::after{content:'✓'}
+    /* ERRO */
+    #erro { display: none; }
+    .erro-card {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      color: var(--erro);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+    }
 
-/* RESULT */
-.res-wrap{display:none;flex:1;flex-direction:column}
-.res-wrap.show{display:flex}
-.res-hero{background:linear-gradient(135deg,#FFF5E8,#EEF5FF);border:1.5px solid rgba(255,140,0,.2);border-radius:var(--r);padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px}
-.res-score{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--sun),var(--sky));display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(255,140,0,.28)}
-.rs-n{font-size:20px;font-weight:900;color:#fff;line-height:1;letter-spacing:-1px}
-.rs-l{font-size:7px;color:rgba(255,255,255,.8);font-weight:700;letter-spacing:.5px}
-.res-sav{font-size:28px;font-weight:900;letter-spacing:-1px;background:linear-gradient(90deg,var(--sun),#E05000);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
-.res-sav-sub{font-size:11px;color:var(--mid);margin-top:2px;font-weight:500}
-.res-rows{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
-.rr{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--off);border:1px solid var(--border);border-radius:10px}
-.rr-l{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
-.rr-v{font-size:13px;font-weight:700;color:var(--ink)}
-.rr-v.g{color:#007A70}.rr-v.o{color:var(--sun)}.rr-v.r{color:#CC2200}
+    /* RESULTADO */
+    #resultado { display: none; }
+    .resultado-header {
+      background: var(--azul-medio);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(0,200,150,0.2);
+    }
+    .resultado-header h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .resultado-header .periodo { font-size: 0.82rem; color: var(--texto-secundario); }
+    .poupanca-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--verde);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      margin-top: 0.8rem;
+    }
+    .metricas {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+    .metrica {
+      background: var(--azul-medio);
+      border-radius: 12px;
+      padding: 1rem;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .metrica .label { font-size: 0.72rem; color: var(--texto-secundario); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem; }
+    .metrica .valor { font-size: 1.1rem; font-weight: 700; color: var(--texto); }
+    .metrica .valor.destaque { color: var(--verde); }
+    .secao {
+      background: var(--azul-medio);
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 0.8rem;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .secao h3 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--texto-secundario); margin-bottom: 0.7rem; }
+    .secao p { font-size: 0.88rem; line-height: 1.6; color: var(--texto); }
+    .alertas-lista { list-style: none; }
+    .alertas-lista li {
+      font-size: 0.85rem;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      line-height: 1.5;
+    }
+    .alertas-lista li:last-child { border-bottom: none; }
+    .recomendacao-card {
+      background: linear-gradient(135deg, rgba(0,200,150,0.12), rgba(0,168,122,0.08));
+      border: 1px solid rgba(0,200,150,0.3);
+      border-radius: 14px;
+      padding: 1.4rem;
+      margin-bottom: 1rem;
+    }
+    .recomendacao-card h3 { color: var(--verde); font-size: 0.9rem; margin-bottom: 0.4rem; }
+    .recomendacao-card .nome-comercial { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.6rem; }
+    .recomendacao-card p { font-size: 0.85rem; line-height: 1.6; color: var(--texto-secundario); }
+    .cta-card {
+      background: var(--azul-medio);
+      border-radius: 14px;
+      padding: 1.4rem;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 1rem;
+    }
+    .cta-card p { font-size: 0.85rem; color: var(--texto-secundario); margin-bottom: 1rem; }
+    .btn-cta {
+      display: inline-block;
+      background: var(--verde);
+      color: white;
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    .btn-nova {
+      width: 100%;
+      padding: 0.75rem;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      color: var(--texto-secundario);
+      font-size: 0.88rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    .btn-nova:hover { border-color: var(--verde); color: var(--verde); }
 
-/* IA MSGS */
-.ia-box{background:var(--off);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:12px}
-.ia-title{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
-.ia-msg{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--ink);line-height:1.5;margin-bottom:6px}
-.ia-msg:last-child{margin-bottom:0}
-.ia-ic{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;margin-top:1px}
-.ia-warn{background:rgba(255,140,0,.12);color:var(--sun)}
-.ia-ok{background:rgba(0,180,160,.12);color:var(--teal)}
-.ia-info{background:rgba(0,102,255,.1);color:var(--sky)}
+    /* FORMULÁRIO DE CONTACTO */
+    .form-contacto {
+      margin-top: 1.2rem;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 1.2rem;
+    }
+    .form-contacto .form-titulo {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #374151;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
+    }
+    .form-row.full { grid-template-columns: 1fr; }
+    .input-grupo {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .input-grupo label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .input-grupo input {
+      padding: 0.65rem 0.85rem;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      color: #1a1a2e;
+      background: #f9fafb;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      width: 100%;
+    }
+    .input-grupo input:focus {
+      border-color: var(--verde);
+      box-shadow: 0 0 0 3px rgba(0,200,150,0.12);
+      background: white;
+    }
+    .input-grupo input::placeholder { color: #9ca3af; }
+    .input-grupo input.campo-erro { border-color: #ef4444; }
+    .form-nota {
+      font-size: 0.72rem;
+      color: #9ca3af;
+      margin-top: 0.4rem;
+    }
+    @media (max-width: 480px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
 
-/* CHART */
-.chart-wrap{margin-bottom:12px}
-.chart-lbl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
-.chart-bars{display:flex;align-items:flex-end;gap:4px;height:70px}
-.cbar{flex:1;border-radius:4px 4px 0 0;position:relative;transition:height .6s ease}
-.cbar-n{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:7px;color:var(--muted);font-weight:700;white-space:nowrap}
-.chart-spacer{height:22px}
-
-/* RANKING */
-.rank-wrap{margin-bottom:12px}
-.rank-lbl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
-.rank-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;margin-bottom:4px;border:1px solid transparent;transition:all .2s}
-.rank-row:hover{background:var(--off);border-color:var(--border)}
-.rank-pos{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0}
-.rp1{background:linear-gradient(135deg,#FFD700,#FFA500);color:#fff}
-.rp2{background:linear-gradient(135deg,#C0C0C0,#A0A0A0);color:#fff}
-.rp3{background:linear-gradient(135deg,#CD7F32,#A0522D);color:#fff}
-.rpn{background:var(--off2);color:var(--muted)}
-.rank-chip-small{width:44px;height:17px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;flex-shrink:0}
-.rank-name{flex:1;font-size:12px;font-weight:600;color:var(--ink)}
-.rank-price{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mid)}
-.rank-bar-w{width:60px;height:5px;background:var(--off2);border-radius:3px;overflow:hidden}
-.rank-bar-f{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--teal),var(--sky))}
-.rank-pct{font-size:10px;font-weight:700;color:var(--teal);margin-left:4px}
-.rank-cur .rank-name{color:var(--muted)}
-.rank-cur .rank-bar-f{background:rgba(220,50,50,.3)}
-
-/* ACTION BTNS */
-.btn-book{width:100%;background:linear-gradient(135deg,var(--sun),#E06800);color:#fff;border:none;border-radius:var(--r);padding:13px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;box-shadow:0 4px 16px rgba(255,140,0,.25);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:7px}
-.btn-book:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(255,140,0,.35)}
-.btn-wa-res{width:100%;background:#25D366;color:#fff;border:none;border-radius:var(--r);padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:7px;text-decoration:none}
-.btn-wa-res:hover{background:#1ebe5c;transform:translateY(-1px)}
-.btn-pdf{width:100%;background:var(--off);color:var(--mid);border:1.5px solid var(--border2);border-radius:var(--r);padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
-.btn-pdf:hover{background:#fff;color:var(--ink)}
-
-/* BOOKING */
-.bk-panel{display:none;margin-top:8px;background:var(--off);border:1.5px solid var(--border2);border-radius:var(--r);overflow:hidden}
-.bk-panel.show{display:block}
-.bk-head{padding:12px 14px;border-bottom:1px solid var(--border);background:#fff;display:flex;align-items:center;gap:8px}
-.bk-title{font-size:13px;font-weight:700;color:var(--ink)}
-.bk-sub{font-size:11px;color:var(--muted);margin-top:1px}
-.slots{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:10px}
-.slot{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px;text-align:center;cursor:pointer;transition:all .2s}
-.slot:hover{border-color:rgba(255,140,0,.35);background:rgba(255,140,0,.02)}
-.slot.on{border-color:var(--sun);background:rgba(255,140,0,.05);box-shadow:0 0 0 2px rgba(255,140,0,.1)}
-.slot-d{font-size:8px;color:var(--muted);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px}
-.slot-t{font-size:13px;font-weight:800;color:var(--ink)}
-.slot.on .slot-t{color:var(--sun)}
-.btn-conf{margin:0 10px 10px;width:calc(100% - 20px);background:linear-gradient(135deg,var(--sun),#E06800);color:#fff;border:none;border-radius:var(--r);padding:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif;box-shadow:0 4px 12px rgba(255,140,0,.22);transition:all .2s;display:none}
-.btn-conf.show{display:block}
-.btn-conf:hover{transform:translateY(-1px)}
-.confirmed{display:none;text-align:center;padding:24px 0;flex-direction:column;align-items:center}
-.confirmed.show{display:flex}
-.conf-ic{width:56px;height:56px;border-radius:50%;background:rgba(0,180,160,.1);border:2px solid rgba(0,180,160,.3);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:12px}
-.conf-t{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:5px}
-.conf-s{font-size:13px;color:var(--mid);line-height:1.6;max-width:240px}
-
-/* SUCCESS */
-.success-wrap{display:none;flex-direction:column;align-items:center;text-align:center;padding:20px 0;gap:10px}
-.success-wrap.show{display:flex}
-.succ-ic{width:56px;height:56px;border-radius:50%;background:rgba(0,180,160,.1);border:2px solid rgba(0,180,160,.3);display:flex;align-items:center;justify-content:center;font-size:26px}
-.succ-t{font-size:17px;font-weight:800;color:var(--ink)}
-.succ-s{font-size:13px;color:var(--mid);line-height:1.6;max-width:260px}
-.succ-steps{margin-top:10px;padding:12px;background:rgba(0,180,160,.06);border:1px solid rgba(0,180,160,.15);border-radius:var(--r);text-align:left;width:100%}
-.succ-steps-title{font-size:9px;font-weight:700;color:var(--teal);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
-.succ-step{font-size:12px;color:var(--mid);line-height:1.6}
-
-/* BENTO */
-.bento{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.bc{background:#fff;border:1px solid var(--border);border-radius:var(--r2);padding:28px 24px;transition:all .22s}
-.bc:hover{box-shadow:0 8px 32px rgba(8,14,28,.1);transform:translateY(-2px);border-color:var(--border2)}
-.bc.wide{grid-column:span 2}
-.bc.acc{background:linear-gradient(135deg,#FFF8EE,#EEF5FF);border-color:rgba(255,140,0,.18)}
-.bc-tag{font-size:9px;font-weight:700;color:var(--sky);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.bc-tag::before{content:'';width:12px;height:2px;background:linear-gradient(90deg,var(--sky),var(--teal));border-radius:1px}
-.bc-icon{font-size:28px;margin-bottom:12px;display:block}
-.bc-title{font-size:17px;font-weight:800;letter-spacing:-.3px;margin-bottom:7px}
-.bc-desc{font-size:14px;color:var(--mid);line-height:1.7}
-.bc-num{font-size:38px;font-weight:900;letter-spacing:-2px;background:linear-gradient(135deg,var(--sun),var(--sky));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:8px 0 3px}
-.bc-nl{font-size:12px;color:var(--muted)}
-.bc-list{list-style:none;margin-top:10px;display:flex;flex-direction:column;gap:7px}
-.bc-list li{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--mid)}
-.bc-list li::before{content:'→';color:var(--sky);font-weight:700;font-size:11px;flex-shrink:0;margin-top:1px}
-
-/* SOCIAL */
-.social-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.sc{background:#fff;border:1px solid var(--border);border-radius:var(--r2);padding:24px 20px;transition:all .22s;position:relative;overflow:hidden}
-.sc:hover{box-shadow:0 8px 32px rgba(8,14,28,.1);transform:translateY(-2px)}
-.sc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px}
-.sc-wa::after{background:linear-gradient(90deg,#25D366,#128C7E)}
-.sc-ig::after{background:linear-gradient(90deg,#E1306C,#F77737,#FCAF45)}
-.sc-li::after{background:linear-gradient(90deg,#0077B5,#0066A0)}
-.sc-em::after{background:linear-gradient(90deg,var(--sun),var(--sky))}
-.sc-icon{font-size:26px;margin-bottom:10px;display:block}
-.sc-name{font-size:15px;font-weight:800;color:var(--ink);margin-bottom:5px}
-.sc-desc{font-size:12px;color:var(--mid);line-height:1.6;margin-bottom:12px}
-.sc-auto{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:.5px;background:rgba(0,180,160,.08);color:#007A74;border:1px solid rgba(0,180,160,.25);border-radius:100px;padding:3px 9px}
-.sc-auto::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--teal);animation:blink 1.5s ease infinite}
-
-/* CHAT */
-.chat-fab{position:fixed;bottom:24px;right:24px;z-index:999;cursor:pointer}
-.chat-fab-btn{width:58px;height:58px;background:linear-gradient(135deg,var(--sun),#E06800);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 8px 28px rgba(255,140,0,.4);transition:all .3s;position:relative}
-.chat-fab-btn:hover{transform:scale(1.08);box-shadow:0 12px 40px rgba(255,140,0,.5)}
-.chat-notif{position:absolute;top:-3px;right:-3px;width:18px;height:18px;background:var(--sky);border-radius:50%;font-size:9px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
-.chat-win{position:fixed;bottom:96px;right:24px;width:360px;background:#fff;border:1px solid var(--border2);border-radius:var(--r2);box-shadow:0 20px 60px rgba(8,14,28,.16);overflow:hidden;z-index:999;display:none;flex-direction:column}
-.chat-win.open{display:flex}
-.cw-h{display:flex;align-items:center;gap:10px;padding:14px 16px;background:linear-gradient(135deg,#FFF5E8,#EEF5FF);border-bottom:1px solid var(--border)}
-.cw-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--sun),var(--sky));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;box-shadow:0 3px 10px rgba(255,140,0,.28)}
-.cw-name{font-size:13px;font-weight:700;color:var(--ink)}
-.cw-st{font-size:11px;color:var(--teal);font-weight:600;display:flex;align-items:center;gap:4px}
-.cw-st::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--teal);animation:blink 1.5s ease infinite}
-.cw-close{margin-left:auto;background:transparent;border:none;cursor:pointer;font-size:17px;color:var(--muted);transition:color .2s}
-.cw-close:hover{color:var(--ink)}
-.cw-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:260px;max-height:320px}
-.cmsg{display:flex;gap:8px}
-.cmsg.u{flex-direction:row-reverse}
-.cmsg-av{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px}
-.cmsg-av-b{background:none;overflow:hidden}
-.cmsg-av-u{background:var(--off2);color:var(--muted)}
-.cmsg-bub{max-width:83%;padding:10px 12px;font-size:13px;line-height:1.6;border-radius:14px}
-.cmsg-bot .cmsg-bub{background:var(--off);border:1px solid var(--border);border-radius:4px 14px 14px 14px;color:var(--ink)}
-.cmsg.u .cmsg-bub{background:linear-gradient(135deg,var(--sun),#E06800);color:#fff;font-weight:500;border-radius:14px 4px 14px 14px}
-.cmsg-t{font-size:9px;color:var(--muted);margin-top:2px;text-align:right}
-.qrs{display:flex;flex-wrap:wrap;gap:5px;padding:7px 12px}
-.qr{background:var(--off);border:1px solid var(--border2);border-radius:100px;padding:5px 12px;font-size:12px;font-weight:500;color:var(--mid);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
-.qr:hover{background:rgba(255,140,0,.08);border-color:rgba(255,140,0,.3);color:var(--sun)}
-.cw-inp-row{display:flex;gap:7px;padding:10px;border-top:1px solid var(--border);background:var(--off)}
-.cw-inp{flex:1;background:#fff;border:1.5px solid var(--border2);border-radius:100px;padding:8px 14px;font-size:13px;color:var(--ink);font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s}
-.cw-inp:focus{border-color:var(--sky)}
-.cw-inp::placeholder{color:var(--muted)}
-.cw-send{width:34px;height:34px;background:linear-gradient(135deg,var(--sun),#E06800);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;box-shadow:0 3px 10px rgba(255,140,0,.25);transition:all .2s}
-.cw-send:hover{transform:scale(1.08)}
-.typing{display:flex;gap:3px;padding:7px 10px;background:var(--off);border:1px solid var(--border);border-radius:4px 14px 14px 14px;width:fit-content}
-.td{width:4px;height:4px;border-radius:50%;background:var(--muted);animation:tdB .7s ease infinite}
-.td:nth-child(2){animation-delay:.12s}.td:nth-child(3){animation-delay:.24s}
-@keyframes tdB{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-
-/* FOOTER */
-footer{position:relative;z-index:1;background:var(--ink);padding:56px 32px 28px;color:rgba(255,255,255,.55)}
-.ft-inner{max-width:1200px;margin:0 auto}
-.ft-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:36px}
-.ft-name{font-size:20px;font-weight:900;color:#fff;margin-bottom:4px}
-.ft-sub{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:1px;margin-bottom:12px}
-.ft-desc{font-size:13px;line-height:1.7;font-weight:300;max-width:250px;margin-bottom:16px}
-.ft-ct{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px}
-.ft-links{list-style:none;display:flex;flex-direction:column;gap:9px}
-.ft-links a{font-size:13px;color:rgba(255,255,255,.4);text-decoration:none;transition:color .2s;font-weight:300}
-.ft-links a:hover{color:rgba(255,255,255,.8)}
-.ft-bot{display:flex;align-items:center;justify-content:space-between;padding-top:20px;border-top:1px solid rgba(255,255,255,.07);font-size:11px;color:rgba(255,255,255,.22)}
-.ft-wa{display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:700;width:fit-content;box-shadow:0 4px 12px rgba(37,211,102,.28);transition:all .2s;margin-bottom:8px}
-.ft-wa:hover{background:#1ebe5c;transform:translateY(-1px)}
-.ft-email{font-size:13px;color:rgba(255,255,255,.4);text-decoration:none;transition:color .2s;display:block;margin-top:4px}
-.ft-email:hover{color:rgba(255,255,255,.7)}
-
-/* TABS */
-.main-tabs{display:flex;background:var(--off2);border:1px solid var(--border2);border-radius:var(--r2);padding:4px;gap:4px;margin-bottom:28px;max-width:400px}
-.main-tab{flex:1;padding:11px 16px;border-radius:var(--r);font-size:14px;font-weight:600;cursor:pointer;transition:all .22s;text-align:center;border:none;background:transparent;font-family:'Outfit',sans-serif;color:var(--muted)}
-.main-tab.on{background:#fff;color:var(--ink);box-shadow:0 2px 10px rgba(8,14,28,.08);font-weight:700}
-
-/* TECH */
-.tech-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.tech-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:16px 12px;text-align:center;transition:all .2s}
-.tech-card:hover{box-shadow:0 6px 24px rgba(8,14,28,.08);transform:translateY(-2px)}
-.tech-icon{font-size:22px;margin-bottom:7px;display:block}
-.tech-name{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:2px}
-.tech-role{font-size:10px;color:var(--muted)}
-.tech-cat{font-size:8px;font-weight:700;padding:2px 7px;border-radius:100px;margin-top:5px;display:inline-block}
-.cat-ia{background:rgba(255,140,0,.1);color:#B05000}
-.cat-crm{background:rgba(0,102,255,.08);color:#0044BB}
-.cat-auto{background:rgba(0,180,160,.1);color:#007A74}
-.cat-db{background:rgba(139,92,246,.1);color:#6030B0}
-
-@media(max-width:960px){
-  nav{padding:0 16px}.nav-links{display:none}
-  .az-wrap{grid-template-columns:1fr}.bento{grid-template-columns:1fr 1fr}.bc.wide{grid-column:span 1}
-  .social-grid{grid-template-columns:1fr 1fr}.tech-grid{grid-template-columns:repeat(3,1fr)}
-  .ft-top{grid-template-columns:1fr 1fr}.chat-win{width:calc(100vw - 24px);right:12px}
-  .stats-row{flex-wrap:wrap}.stat{border-right:none;border-bottom:1px solid var(--border);flex:1 0 40%}
-}
-@media(max-width:600px){
-  h1{letter-spacing:-1.5px}.bento{grid-template-columns:1fr}.tech-grid{grid-template-columns:repeat(2,1fr)}
-  .social-grid{grid-template-columns:1fr}.fg2{grid-template-columns:1fr}
-  .chips{grid-template-columns:repeat(3,1fr)}.ft-top{grid-template-columns:1fr}
-}
-</style>
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.78rem;
+      color: var(--texto-secundario);
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    footer a { color: var(--verde); text-decoration: none; }
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 1.6rem; }
+      .metricas { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
-  <a class="logo" href="/">
-    <div class="logo-orb">⚡</div>
-    <div>
-      <div class="logo-name">ENER<span>SIA</span></div>
-      <div style="font-size:9px;color:var(--muted);letter-spacing:.5px">Gestor Energético com IA</div>
-    </div>
-  </a>
-  <div class="nav-links">
-    <a onclick="document.getElementById(&#39;analise&#39;).scrollIntoView({behavior:&#39;smooth&#39;})">Análise</a>
-    <a onclick="document.getElementById(&#39;solar-sec&#39;).scrollIntoView({behavior:&#39;smooth&#39;})">Solar</a>
-    <a onclick="document.getElementById(&#39;plataforma&#39;).scrollIntoView({behavior:&#39;smooth&#39;})">Plataforma</a>
-    <a onclick="document.getElementById(&#39;tech-sec&#39;).scrollIntoView({behavior:&#39;smooth&#39;})">Tecnologia</a>
-  </div>
-  <div class="nav-r">
-    <div class="live-tag"><div class="live-d"></div>ERSE LIVE</div>
-    <a class="btn-wa" href="https://wa.me/351910322702?text=Ol%C3%A1%2C+gostaria+de+analisar+a+minha+fatura+energ%C3%A9tica+gratuitamente." target="_blank" title="WhatsApp">💬</a>
-    <a class="btn-nav" href="/analisar-fatura.html" style="text-decoration:none">⚡ Analisar grátis</a>
+  <div class="logo">ENER<span>SIA</span></div>
+  <div>
+    <a href="https://enersia.pages.dev/">Início</a>
+    <a href="https://enersia.pages.dev/#precos">Preços</a>
+    <a href="#" class="active">Analisar Fatura</a>
   </div>
 </nav>
 
-<!-- TICKER -->
-<div class="ticker">
-  <div class="ticker-wrap">
-    <div class="tk"><div class="tk-chip edp" style="background:none;padding:0;border:none"><div style="background:#E8001D;border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:4px;min-width:64px;justify-content:center">
-        <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="white" opacity="0.25"/><text x="7" y="10.5" text-anchor="middle" font-size="7" font-weight="900" fill="white" font-family="Arial">EDP</text></svg>
-        <span style="color:white;font-size:9px;font-weight:900;letter-spacing:.5px;font-family:Arial Black,Arial">EDP</span></div></div><span class="tk-price">€0.1420/kWh</span><span class="tk-d tk-ref">REFERÊNCIA</span></div>
-    <div class="tk"><div class="tk-chip galp" style="background:none;padding:0;border:none"><div style="background:#004F8C;border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:4px;min-width:64px;justify-content:center">
-        <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="6,1 11,11 1,11" fill="#F7A600"/></svg>
-        <span style="color:white;font-size:9px;font-weight:900;letter-spacing:.5px;font-family:Arial Black,Arial">GALP</span></div></div><span class="tk-price">€0.1542/kWh</span><span class="tk-d tk-save">−29% SAVE</span></div>
-    <div class="tk"><div class="tk-chip endesa" style="background:none;padding:0;border:none"><div style="background:#00A0E3;border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:3px;min-width:68px;justify-content:center">
-        <svg width="10" height="12" viewBox="0 0 10 12"><path d="M5 1 L9 6 L5 11 L1 6 Z" fill="white" opacity="0.8"/></svg>
-        <span style="color:white;font-size:8.5px;font-weight:900;letter-spacing:.3px;font-family:Arial Black,Arial">ENDESA</span></div></div><span class="tk-price">€0.1362/kWh</span><span class="tk-d tk-save">−4% SAVE</span></div>
-    <div class="tk"><div class="tk-chip iber" style="background:none;padding:0;border:none"><div style="background:#5800A0;border-radius:6px;padding:3px 6px;display:flex;align-items:center;gap:3px;min-width:76px;justify-content:center">
-        <svg width="10" height="12" viewBox="0 0 10 12"><rect x="1" y="1" width="8" height="10" rx="2" fill="white" opacity="0.2"/><path d="M3 4 L7 4 L7 8 L3 8" stroke="white" stroke-width="1.2" fill="none"/></svg>
-        <span style="color:white;font-size:7px;font-weight:900;letter-spacing:.2px;font-family:Arial Black,Arial">IBERDROLA</span></div></div><span class="tk-price">€0.1382/kWh</span><span class="tk-d tk-save">−3% SAVE</span></div>
-    <div class="tk"><div class="tk-chip repsol" style="background:none;padding:0;border:none"><div style="background:linear-gradient(135deg,#F7A600,#E8001D);border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:4px;min-width:64px;justify-content:center">
-        <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="white" opacity="0.3"/><circle cx="6" cy="6" r="2.5" fill="white"/></svg>
-        <span style="color:white;font-size:9px;font-weight:900;letter-spacing:.5px;font-family:Arial Black,Arial">REPSOL</span></div></div><span class="tk-price">€0.1480/kWh</span><span class="tk-d tk-save">−28% SAVE</span></div>
-    <div class="tk"><div class="tk-chip golden" style="background:none;padding:0;border:none"><div style="background:linear-gradient(135deg,#D4A000,#B8860B);border-radius:6px;padding:3px 6px;display:flex;align-items:center;gap:3px;min-width:78px;justify-content:center">
-        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1 L8 5 L12 5 L9 8 L10 12 L6 9.5 L2 12 L3 8 L0 5 L4 5 Z" fill="white" opacity="0.9"/></svg>
-        <span style="color:white;font-size:7px;font-weight:900;letter-spacing:.2px;font-family:Arial Black,Arial">GOLDENERGY</span></div></div><span class="tk-price">€0.1399/kWh</span><span class="tk-d tk-save">−1% SAVE</span></div>
-    <div class="tk"><div class="tk-chip plenitude" style="background:none;padding:0;border:none"><div style="background:#003E82;border-radius:6px;padding:3px 6px;display:flex;align-items:center;gap:3px;min-width:76px;justify-content:center">
-        <svg width="10" height="12" viewBox="0 0 10 12"><ellipse cx="5" cy="6" rx="4" ry="5" fill="none" stroke="#00C8FF" stroke-width="1.5"/><line x1="5" y1="1" x2="5" y2="11" stroke="#00C8FF" stroke-width="1"/></svg>
-        <span style="color:white;font-size:7px;font-weight:900;letter-spacing:.2px;font-family:Arial Black,Arial">PLENITUDE</span></div></div><span class="tk-price">€0.1433/kWh</span><span class="tk-d tk-save">−29% SAVE</span></div>
-    <div class="tk"><div class="tk-chip coop" style="background:none;padding:0;border:none"><div style="background:#006830;border-radius:6px;padding:3px 6px;display:flex;align-items:center;gap:3px;min-width:80px;justify-content:center">
-        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1 C2 1 1 5 3 7 C5 9 7 9 9 7 C11 5 10 1 6 1" fill="none" stroke="#90EE90" stroke-width="1.5"/><circle cx="6" cy="6" r="1.5" fill="#90EE90"/></svg>
-        <span style="color:white;font-size:7px;font-weight:900;letter-spacing:.2px;font-family:Arial Black,Arial">COOPERNICO</span></div></div><span class="tk-price">€0.1267/kWh</span><span class="tk-d tk-save">−11% SAVE</span></div>
-    <div class="tk" style="gap:6px;font-family:&#39;JetBrains Mono&#39;,monospace;font-size:10px;color:rgba(255,255,255,.35);letter-spacing:1px;padding:0 24px">ERSE · <span id="liveClock" style="color:rgba(255,255,255,.5)">14:20:38</span></div>
-    <div class="tk"><div class="tk-chip edp" style="background:none;padding:0;border:none"><div style="background:#E8001D;border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:4px;min-width:64px;justify-content:center">
-        <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="white" opacity="0.25"/><text x="7" y="10.5" text-anchor="middle" font-size="7" font-weight="900" fill="white" font-family="Arial">EDP</text></svg>
-        <span style="color:white;font-size:9px;font-weight:900;letter-spacing:.5px;font-family:Arial Black,Arial">EDP</span></div></div><span class="tk-price">€0.1420/kWh</span><span class="tk-d tk-ref">REFERÊNCIA</span></div>
-    <div class="tk"><div class="tk-chip galp" style="background:none;padding:0;border:none"><div style="background:#004F8C;border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:4px;min-width:64px;justify-content:center">
-        <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="6,1 11,11 1,11" fill="#F7A600"/></svg>
-        <span style="color:white;font-size:9px;font-weight:900;letter-spacing:.5px;font-family:Arial Black,Arial">GALP</span></div></div><span class="tk-price">€0.1542/kWh</span><span class="tk-d tk-save">−29% SAVE</span></div>
-    <div class="tk"><div class="tk-chip endesa" style="background:none;padding:0;border:none"><div style="background:#00A0E3;border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:3px;min-width:68px;justify-content:center">
-        <svg width="10" height="12" viewBox="0 0 10 12"><path d="M5 1 L9 6 L5 11 L1 6 Z" fill="white" opacity="0.8"/></svg>
-        <span style="color:white;font-size:8.5px;font-weight:900;letter-spacing:.3px;font-family:Arial Black,Arial">ENDESA</span></div></div><span class="tk-price">€0.1362/kWh</span><span class="tk-d tk-save">−4% SAVE</span></div>
-    <div class="tk"><div class="tk-chip iber" style="background:none;padding:0;border:none"><div style="background:#5800A0;border-radius:6px;padding:3px 6px;display:flex;align-items:center;gap:3px;min-width:76px;justify-content:center">
-        <svg width="10" height="12" viewBox="0 0 10 12"><rect x="1" y="1" width="8" height="10" rx="2" fill="white" opacity="0.2"/><path d="M3 4 L7 4 L7 8 L3 8" stroke="white" stroke-width="1.2" fill="none"/></svg>
-        <span style="color:white;font-size:7px;font-weight:900;letter-spacing:.2px;font-family:Arial Black,Arial">IBERDROLA</span></div></div><span class="tk-price">€0.1382/kWh</span><span class="tk-d tk-save">−3% SAVE</span></div>
-    <div class="tk"><div class="tk-chip repsol" style="background:none;padding:0;border:none"><div style="background:linear-gradient(135deg,#F7A600,#E8001D);border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:4px;min-width:64px;justify-content:center">
-        <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="white" opacity="0.3"/><circle cx="6" cy="6" r="2.5" fill="white"/></svg>
-        <span style="color:white;font-size:9px;font-weight:900;letter-spacing:.5px;font-family:Arial Black,Arial">REPSOL</span></div></div><span class="tk-price">€0.1480/kWh</span><span class="tk-d tk-save">−28% SAVE</span></div>
-    <div class="tk"><div class="tk-chip golden" style="background:none;padding:0;border:none"><div style="background:linear-gradient(135deg,#D4A000,#B8860B);border-radius:6px;padding:3px 6px;display:flex;align-items:center;gap:3px;min-width:78px;justify-content:center">
-        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1 L8 5 L12 5 L9 8 L10 12 L6 9.5 L2 12 L3 8 L0 5 L4 5 Z" fill="white" opacity="0.9"/></svg>
-        <span style="color:white;font-size:7px;font-weight:900;letter-spacing:.2px;font-family:Arial Black,Arial">GOLDENERGY</span></div></div><span class="tk-price">€0.1399/kWh</span><span class="tk-d tk-save">−1% SAVE</span></div>
-    <div class="tk"><div class="tk-chip plenitude" style="background:none;padding:0;border:none"><div style="background:#003E82;border-radius:6px;padding:3px 6px;display:flex;align-items:center;gap:3px;min-width:76px;justify-content:center">
-        <svg width="10" height="12" viewBox="0 0 10 12"><ellipse cx="5" cy="6" rx="4" ry="5" fill="none" stroke="#00C8FF" stroke-width="1.5"/><line x1="5" y1="1" x2="5" y2="11" stroke="#00C8FF" stroke-width="1"/></svg>
-        <span style="color:white;font-size:7px;font-weight:900;letter-spacing:.2px;font-family:Arial Black,Arial">PLENITUDE</span></div></div><span class="tk-price">€0.1433/kWh</span><span class="tk-d tk-save">−29% SAVE</span></div>
-    <div class="tk"><div class="tk-chip coop" style="background:none;padding:0;border:none"><div style="background:#006830;border-radius:6px;padding:3px 6px;display:flex;align-items:center;gap:3px;min-width:80px;justify-content:center">
-        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1 C2 1 1 5 3 7 C5 9 7 9 9 7 C11 5 10 1 6 1" fill="none" stroke="#90EE90" stroke-width="1.5"/><circle cx="6" cy="6" r="1.5" fill="#90EE90"/></svg>
-        <span style="color:white;font-size:7px;font-weight:900;letter-spacing:.2px;font-family:Arial Black,Arial">COOPERNICO</span></div></div><span class="tk-price">€0.1267/kWh</span><span class="tk-d tk-save">−11% SAVE</span></div>
-  </div>
-</div>
-
-<!-- HERO -->
 <div class="hero">
-  <div class="hero-badge"><span class="badge-tag">IA ENERGÉTICA</span> Primeira plataforma de Portugal ligada à ERSE</div>
-  <h1>A partir de agora,<br><span class="g1">empresas e famílias</span><br><span class="g2">têm um Gestor Energético</span><br>com IA na palma da mão</h1>
-  <p class="hero-sub">Análise automática de faturas, comparação em tempo real com dados ERSE, diagnóstico instantâneo — para empresas e residencial.</p>
-  <p class="hero-tagline">"O futuro da energia não será vendido. Será inteligente."</p>
-  <div class="hero-ctas">
-    <button class="btn-hero" onclick="document.getElementById(&#39;analise&#39;).scrollIntoView({behavior:&#39;smooth&#39;})">⚡ Analisar a minha fatura — grátis</button>
-    <button class="btn-hero2" onclick="document.getElementById(&#39;solar-sec&#39;).scrollIntoView({behavior:&#39;smooth&#39;})">☀️ Simular energia solar</button>
-  </div>
-  <div class="stats-row">
-    <div class="stat"><div class="stat-num">22%</div><div class="stat-lbl">poupança média identificada</div></div>
-    <div class="stat"><div class="stat-num">8</div><div class="stat-lbl">comercializadoras comparadas</div></div>
-    <div class="stat"><div class="stat-num">60s</div><div class="stat-lbl">diagnóstico em tempo real</div></div>
-    <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">gratuito · sem compromisso</div></div>
+  <h1>A tua fatura analisada<br>em <em>15 segundos</em></h1>
+  <p>Envia a tua fatura de energia. A nossa IA lê tudo, compara com o mercado e diz-te exatamente quanto podes poupar.</p>
+  <div class="como-funciona">
+    <div class="passo"><div class="passo-num">1</div>Upload do PDF ou foto</div>
+    <div class="passo"><div class="passo-num">2</div>IA extrai os dados</div>
+    <div class="passo"><div class="passo-num">3</div>Compara com o mercado</div>
+    <div class="passo"><div class="passo-num">4</div>Recomendação personalizada</div>
   </div>
 </div>
 
-<!-- COMERC -->
-<div class="comerc-sec">
-  <div class="comerc-lbl">Comparamos todas as comercializadoras certificadas pela ERSE</div>
-  <div class="comerc-fade">
-    <div class="comerc-track">
-      <div class="cc"><div class="cc-chip edp" style="background:none;padding:0;border:none"><div style="background:#E8001D;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:4px"><svg width="14" height="14" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="white" opacity="0.2"/><circle cx="10" cy="10" r="4" fill="white" opacity="0.6"/></svg><span style="color:white;font-size:10px;font-weight:900;font-family:Arial Black">EDP</span></div></div><div class="cc-p">€0.1817/kWh</div><span class="cc-b b-high">REFERÊNCIA</span></div>
-      <div class="cc"><div class="cc-chip galp" style="background:none;padding:0;border:none"><div style="background:#004F8C;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:4px"><svg width="12" height="12" viewBox="0 0 12 12"><polygon points="6,1 11,11 1,11" fill="#F7A600"/></svg><span style="color:white;font-size:10px;font-weight:900;font-family:Arial Black">GALP</span></div></div><div class="cc-p">€0.1284/kWh</div><span class="cc-b b-best">🥇 MELHOR</span></div>
-      <div class="cc"><div class="cc-chip endesa" style="background:none;padding:0;border:none"><div style="background:#00A0E3;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:3px"><svg width="10" height="12" viewBox="0 0 10 12"><path d="M5 1 L9 6 L5 11 L1 6 Z" fill="white" opacity="0.8"/></svg><span style="color:white;font-size:9px;font-weight:900;font-family:Arial Black">ENDESA</span></div></div><div class="cc-p">€0.1310/kWh</div><span class="cc-b b-mid">−28%</span></div>
-      <div class="cc"><div class="cc-chip iber" style="background:none;padding:0;border:none"><div style="background:#5800A0;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center"><span style="color:white;font-size:7.5px;font-weight:900;font-family:Arial Black;letter-spacing:.2px">IBERDROLA</span></div></div><div class="cc-p">€0.1298/kWh</div><span class="cc-b b-mid">−29%</span></div>
-      <div class="cc"><div class="cc-chip repsol" style="background:none;padding:0;border:none"><div style="background:linear-gradient(135deg,#F7A600,#E8001D);border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:4px"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="white" opacity="0.3"/><circle cx="5" cy="5" r="2" fill="white"/></svg><span style="color:white;font-size:9px;font-weight:900;font-family:Arial Black">REPSOL</span></div></div><div class="cc-p">€0.1302/kWh</div><span class="cc-b b-mid">−28%</span></div>
-      <div class="cc"><div class="cc-chip golden" style="background:none;padding:0;border:none"><div style="background:linear-gradient(135deg,#D4A000,#B8860B);border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:3px"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1 L8 5 L12 5 L9 8 L10 12 L6 9.5 L2 12 L3 8 L0 5 L4 5 Z" fill="white" opacity="0.9"/></svg><span style="color:white;font-size:7px;font-weight:900;font-family:Arial Black">GOLDENERGY</span></div></div><div class="cc-p">€0.1256/kWh</div><span class="cc-b b-best">🥈 TOP 2</span></div>
-      <div class="cc"><div class="cc-chip plenitude" style="background:none;padding:0;border:none"><div style="background:#003E82;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center"><span style="color:white;font-size:7.5px;font-weight:900;font-family:Arial Black;letter-spacing:.2px">PLENITUDE</span></div></div><div class="cc-p">€0.1289/kWh</div><span class="cc-b b-mid">−29%</span></div>
-      <div class="cc"><div class="cc-chip coop" style="background:none;padding:0;border:none"><div style="background:#006830;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:3px"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 1 C2 1 1 4 3 6 C5 8 7 8 9 6 C11 4 8 1 5 1" fill="none" stroke="#90EE90" stroke-width="1.2"/><circle cx="5" cy="5" r="1.2" fill="#90EE90"/></svg><span style="color:white;font-size:7px;font-weight:900;font-family:Arial Black">COOPERNICO</span></div></div><div class="cc-p">€0.1267/kWh</div><span class="cc-b b-best">🥉 TOP 3</span></div>
-      <div class="cc"><div class="cc-chip edp" style="background:none;padding:0;border:none"><div style="background:#E8001D;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:4px"><svg width="14" height="14" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="white" opacity="0.2"/><circle cx="10" cy="10" r="4" fill="white" opacity="0.6"/></svg><span style="color:white;font-size:10px;font-weight:900;font-family:Arial Black">EDP</span></div></div><div class="cc-p">€0.1817/kWh</div><span class="cc-b b-high">REFERÊNCIA</span></div>
-      <div class="cc"><div class="cc-chip galp" style="background:none;padding:0;border:none"><div style="background:#004F8C;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:4px"><svg width="12" height="12" viewBox="0 0 12 12"><polygon points="6,1 11,11 1,11" fill="#F7A600"/></svg><span style="color:white;font-size:10px;font-weight:900;font-family:Arial Black">GALP</span></div></div><div class="cc-p">€0.1284/kWh</div><span class="cc-b b-best">🥇 MELHOR</span></div>
-      <div class="cc"><div class="cc-chip endesa" style="background:none;padding:0;border:none"><div style="background:#00A0E3;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:3px"><svg width="10" height="12" viewBox="0 0 10 12"><path d="M5 1 L9 6 L5 11 L1 6 Z" fill="white" opacity="0.8"/></svg><span style="color:white;font-size:9px;font-weight:900;font-family:Arial Black">ENDESA</span></div></div><div class="cc-p">€0.1310/kWh</div><span class="cc-b b-mid">−28%</span></div>
-      <div class="cc"><div class="cc-chip iber" style="background:none;padding:0;border:none"><div style="background:#5800A0;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center"><span style="color:white;font-size:7.5px;font-weight:900;font-family:Arial Black;letter-spacing:.2px">IBERDROLA</span></div></div><div class="cc-p">€0.1298/kWh</div><span class="cc-b b-mid">−29%</span></div>
-      <div class="cc"><div class="cc-chip repsol" style="background:none;padding:0;border:none"><div style="background:linear-gradient(135deg,#F7A600,#E8001D);border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:4px"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="white" opacity="0.3"/><circle cx="5" cy="5" r="2" fill="white"/></svg><span style="color:white;font-size:9px;font-weight:900;font-family:Arial Black">REPSOL</span></div></div><div class="cc-p">€0.1302/kWh</div><span class="cc-b b-mid">−28%</span></div>
-      <div class="cc"><div class="cc-chip golden" style="background:none;padding:0;border:none"><div style="background:linear-gradient(135deg,#D4A000,#B8860B);border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:3px"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1 L8 5 L12 5 L9 8 L10 12 L6 9.5 L2 12 L3 8 L0 5 L4 5 Z" fill="white" opacity="0.9"/></svg><span style="color:white;font-size:7px;font-weight:900;font-family:Arial Black">GOLDENERGY</span></div></div><div class="cc-p">€0.1256/kWh</div><span class="cc-b b-best">🥈 TOP 2</span></div>
-      <div class="cc"><div class="cc-chip plenitude" style="background:none;padding:0;border:none"><div style="background:#003E82;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center"><span style="color:white;font-size:7.5px;font-weight:900;font-family:Arial Black;letter-spacing:.2px">PLENITUDE</span></div></div><div class="cc-p">€0.1289/kWh</div><span class="cc-b b-mid">−29%</span></div>
-      <div class="cc"><div class="cc-chip coop" style="background:none;padding:0;border:none"><div style="background:#006830;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:3px"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 1 C2 1 1 4 3 6 C5 8 7 8 9 6 C11 4 8 1 5 1" fill="none" stroke="#90EE90" stroke-width="1.2"/><circle cx="5" cy="5" r="1.2" fill="#90EE90"/></svg><span style="color:white;font-size:7px;font-weight:900;font-family:Arial Black">COOPERNICO</span></div></div><div class="cc-p">€0.1267/kWh</div><span class="cc-b b-best">🥉 TOP 3</span></div>
+<div class="container">
+
+  <!-- UPLOAD -->
+  <div id="upload-section">
+    <div class="card">
+      <h2>📄 Envia a tua fatura</h2>
+      <div class="upload-area" id="uploadArea">
+        <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,image/*" capture="environment">
+        <div class="upload-icon">⬆️</div>
+        <h3>Arrasta a fatura aqui</h3>
+        <p>PDF ou foto (JPG, PNG) — máximo 10MB</p>
+        <span class="btn-escolher">Escolher ficheiro</span>
+      </div>
+
+      <div class="divisor">ou</div>
+
+      <button class="btn-camera" onclick="document.getElementById('cameraInput').click()">
+        📷 Foto com o telemóvel
+      </button>
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
+
+      <div id="ficheiroSelec" style="display:none" class="ficheiro-selec">
+        <span class="icon">📄</span>
+        <div class="info">
+          <div class="nome" id="ficheiroNome"></div>
+          <div class="tamanho" id="ficheiroTamanho"></div>
+        </div>
+        <button class="remover" onclick="removerFicheiro()">✕</button>
+      </div>
+
+      <p class="nota-privacidade">🔒 Análise gratuita e confidencial. Os teus dados não são partilhados com terceiros.</p>
+
+      <!-- FORMULÁRIO DE CONTACTO -->
+      <div class="form-contacto">
+        <div class="form-titulo">👤 Os teus dados de contacto</div>
+        <div class="form-row">
+          <div class="input-grupo">
+            <label>Nome *</label>
+            <input type="text" id="inputNome" placeholder="O teu nome" autocomplete="name">
+          </div>
+          <div class="input-grupo">
+            <label>Telefone *</label>
+            <input type="tel" id="inputTelefone" placeholder="9XX XXX XXX" autocomplete="tel">
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="input-grupo">
+            <label>Email *</label>
+            <input type="email" id="inputEmail" placeholder="email@exemplo.pt" autocomplete="email">
+          </div>
+        </div>
+        <p class="form-nota">* Campos obrigatórios — usados apenas para enviar a tua análise e proposta de poupança.</p>
+      </div>
+
+      <button class="btn-analisar" id="btnAnalisar" onclick="analisar()" disabled>
+        Analisar Fatura com IA — Grátis
+      </button>
     </div>
   </div>
-</div>
 
-<!-- SOLAR STRIP -->
-<div class="solar-strip">
-  <div class="solar-inner">
-    <div class="solar-text">
-      <div class="solar-badge">☀️ Energia Solar</div>
-      <div class="solar-title">Solar compensa para si?<br>Descubra em 60 segundos.</div>
-      <div class="solar-sub">A IA analisa o seu consumo e calcula o ROI real da instalação solar — empresa ou residencial. Sem visita técnica.</div>
-      <button class="btn-solar" onclick="document.getElementById(&#39;analise&#39;).scrollIntoView({behavior:&#39;smooth&#39;});setTimeout(function(){switchTab(&#39;solar&#39;)},400)">Simular agora →</button>
-    </div>
-  </div>
-</div>
+  <!-- LOADING — FIO ELÉCTRICO -->
+  <div id="loading">
+    <div class="loading-card">
+      <div class="loading-titulo">⚡ ENERSIA IA</div>
+      <div class="loading-subtitulo">A analisar a tua fatura de energia</div>
 
-<!-- ANALYSIS SECTION -->
-<div class="sec" id="analise">
-  <div class="sec-tag">DIAGNÓSTICO GRATUITO</div>
-  <h2>Análise IA completa —<br><span class="g">empresa ou residencial</span></h2>
-  <p class="sec-sub">A ENERSIA lê a sua fatura, identifica tarifa, potência, ciclos, consumo, custo/kWh, impostos e padrão — e compara com o mercado real.</p>
+      <div class="circuito-wrap">
+        <svg class="circuito-svg" viewBox="0 0 360 160" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Gradientes dos fios -->
+            <linearGradient id="gradFio1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#00c896"/>
+              <stop offset="100%" stop-color="#00ffb3"/>
+            </linearGradient>
+            <linearGradient id="gradFio2" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#00ffb3"/>
+              <stop offset="100%" stop-color="#00c896"/>
+            </linearGradient>
+            <linearGradient id="gradFio3" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#00c896"/>
+              <stop offset="100%" stop-color="#7fffd4"/>
+            </linearGradient>
+            <!-- Glow filter -->
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2.5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
 
-  <div class="main-tabs">
-    <button class="main-tab on" onclick="switchTab(&#39;empresa&#39;)">🏢 Empresa</button>
-    <button class="main-tab" onclick="switchTab(&#39;residencial&#39;)">🏠 Residencial</button>
-    <button class="main-tab" onclick="switchTab(&#39;solar&#39;)">☀️ Solar</button>
-  </div>
+          <!-- FIOS BASE (cinza escuro) -->
+          <!-- Seg 1: nó1 → nó2 (linha horizontal simples) -->
+          <path class="fio-base" d="M 68,80 L 128,80"/>
+          <!-- Seg 2: nó2 → nó3 -->
+          <path class="fio-base" d="M 168,80 L 192,80"/>
+          <!-- Seg 3: nó3 → nó4 -->
+          <path class="fio-base" d="M 232,80 L 292,80"/>
 
-  <div class="az-wrap">
-    <!-- LEFT -->
-    <div class="az-left" id="azLeft">
-      <div class="az-left-icon" id="azIcon">🏢</div>
-      <div class="az-left-title" id="azTitle">Análise para Empresas</div>
-      <p class="az-left-sub" id="azSub">Foto da fatura, PDF ou dados manuais. A IA extrai tudo e compara em segundos.</p>
-      <div class="az-methods">
-        <button class="az-btn" onclick="document.getElementById(&#39;photoIn&#39;).click()">
-          <div class="az-btn-ic ic-photo">📸</div>
-          <div><div class="az-btn-title">Foto da fatura</div><div class="az-btn-sub">OCR automático via IA</div></div>
-          <span style="margin-left:auto;color:var(--muted);font-size:16px">→</span>
-        </button>
-        <div class="or-sep">OU</div>
-        <button class="az-btn" onclick="document.getElementById(&#39;pdfIn&#39;).click()">
-          <div class="az-btn-ic ic-pdf">📄</div>
-          <div><div class="az-btn-title">Upload PDF</div><div class="az-btn-sub">Qualquer comercializadora</div></div>
-          <span style="margin-left:auto;color:var(--muted);font-size:16px">→</span>
-        </button>
-        <div class="or-sep">OU</div>
-        <button class="az-btn" onclick="showForm()">
-          <div class="az-btn-ic ic-manual">✏️</div>
-          <div><div class="az-btn-title">Preencher manualmente</div><div class="az-btn-sub">60 segundos · sem fatura</div></div>
-          <span style="margin-left:auto;color:var(--muted);font-size:16px">→</span>
-        </button>
-      </div>
-      <input type="file" id="photoIn" accept="image/*" capture="environment" style="display:none" onchange="handleFile()">
-      <input type="file" id="pdfIn" accept=".pdf,image/*" style="display:none" onchange="handleFile()">
-    </div>
+          <!-- FIOS ENERGIA (animados, verde) -->
+          <path id="fioE1" class="fio-energia seg1" d="M 68,80 L 128,80" stroke-dasharray="60" stroke-dashoffset="60"/>
+          <path id="fioE2" class="fio-energia seg2" d="M 168,80 L 192,80 Q 212,80 212,80" stroke-dasharray="44" stroke-dashoffset="44"/>
+          <path id="fioE3" class="fio-energia seg3" d="M 232,80 L 292,80" stroke-dasharray="60" stroke-dashoffset="60"/>
 
-    <!-- RIGHT -->
-    <div class="az-right" id="azRight">
-      <div class="az-rhead">
-        <div class="az-rtitle">ENERSIA · Diagnóstico IA</div>
-        <div class="az-status">Sistema activo</div>
-      </div>
-      <div class="step-bar" id="stepBar">
-        <div class="sb act" id="sb1"></div>
-        <div class="sb td" id="sb2"></div>
-        <div class="sb td" id="sb3"></div>
-      </div>
+          <!-- PULSOS (faísca branca) -->
+          <path id="pulso1" class="pulso" d="M 68,80 L 128,80" stroke-dasharray="20 40" stroke-dashoffset="60"/>
+          <path id="pulso2" class="pulso" d="M 168,80 L 212,80" stroke-dasharray="20 24" stroke-dashoffset="44"/>
+          <path id="pulso3" class="pulso" d="M 232,80 L 292,80" stroke-dasharray="20 40" stroke-dashoffset="60"/>
 
-      <!-- STEP 1 -->
-      <div id="step1" style="display:flex;flex-direction:column;flex:1">
-        <div class="fg"><label class="fl" id="lEmp">Nome / Empresa *</label><input class="fi" id="fEmp" placeholder="Nome ou empresa"></div>
-        <div class="fg2">
-          <div class="fg"><label class="fl">Nome *</label><input class="fi" id="fNome" placeholder="Primeiro nome"></div>
-          <div class="fg"><label class="fl">Telemóvel *</label><input class="fi" id="fTel" type="tel" placeholder="+351 9xx xxx xxx"></div>
-        </div>
-        <div class="fg"><label class="fl">Email *</label><input class="fi" id="fEmail" type="email" placeholder="email@empresa.pt"></div>
-        <div class="fg"><label class="fl">Distrito *</label>
-          <select class="fs" id="fDistrito">
-            <option value="">Seleccione o distrito</option>
-            <option>Aveiro</option><option>Beja</option><option>Braga</option><option>Bragança</option>
-            <option>Castelo Branco</option><option>Coimbra</option><option>Évora</option><option>Faro</option>
-            <option>Guarda</option><option>Leiria</option><option>Lisboa</option><option>Portalegre</option>
-            <option>Porto</option><option>Santarém</option><option>Setúbal</option><option>Viana do Castelo</option>
-            <option>Vila Real</option><option>Viseu</option><option>Açores</option><option>Madeira</option>
-          </select>
-        </div>
-        <div class="fg">
-          <label class="fl" style="margin-bottom:6px" id="lSec">Sector</label>
-          <div class="chips" id="secChips">
-            <div class="chip" onclick="pickChip(this,&#39;sc&#39;)"><span class="chip-e">🏨</span><span class="chip-l">Hotel</span></div>
-            <div class="chip" onclick="pickChip(this,&#39;sc&#39;)"><span class="chip-e">🍕</span><span class="chip-l">Restauração</span></div>
-            <div class="chip" onclick="pickChip(this,&#39;sc&#39;)"><span class="chip-e">🏭</span><span class="chip-l">Indústria</span></div>
-            <div class="chip" onclick="pickChip(this,&#39;sc&#39;)"><span class="chip-e">🏥</span><span class="chip-l">Saúde</span></div>
-            <div class="chip" onclick="pickChip(this,&#39;sc&#39;)"><span class="chip-e">🛒</span><span class="chip-l">Comércio</span></div>
-            <div class="chip" onclick="pickChip(this,&#39;sc&#39;)"><span class="chip-e">🚛</span><span class="chip-l">Logística</span></div>
-          </div>
-        </div>
-        <div class="fg" style="margin-top:4px">
-          <label class="fl" style="margin-bottom:6px">Tipo de contrato</label>
-          <div class="chips" style="grid-template-columns:repeat(3,1fr)">
-            <div class="chip" onclick="pickChip(this,&#39;tc&#39;)"><span class="chip-e">⚡</span><span class="chip-l">Só Energia</span></div>
-            <div class="chip on" onclick="pickChip(this,&#39;tc&#39;)"><span class="chip-e">⚡🔥</span><span class="chip-l">Energia + Gás</span></div>
-            <div class="chip" onclick="pickChip(this,&#39;tc&#39;)"><span class="chip-e">🔥</span><span class="chip-l">Só Gás</span></div>
-          </div>
-        </div>
-        <button class="btn-nx" onclick="goStep(2)">Continuar →</button>
-        <div class="fn">🔒 RGPD · dados protegidos · sem spam</div>
+          <!-- NÓ 1 — Upload -->
+          <g id="no1" class="no-circulo activo" filter="url(#glow)">
+            <circle cx="40" cy="80" r="22" fill="rgba(0,200,150,0.12)" stroke="#00c896" stroke-width="1.5"/>
+            <text class="no-num" x="40" y="85" text-anchor="middle" font-size="13" font-weight="800" fill="#00c896">1</text>
+            <text class="step-label" x="40" y="118">Upload</text>
+          </g>
+
+          <!-- NÓ 2 — Leitura -->
+          <g id="no2" class="no-circulo" filter="url(#glow)">
+            <circle cx="148" cy="80" r="22" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+            <text class="no-num" x="148" y="85" text-anchor="middle" font-size="13" font-weight="800" fill="#8892a4">2</text>
+            <text class="step-label" x="148" y="118">Leitura IA</text>
+          </g>
+
+          <!-- NÓ 3 — Comparação -->
+          <g id="no3" class="no-circulo" filter="url(#glow)">
+            <circle cx="212" cy="80" r="22" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+            <text class="no-num" x="212" y="85" text-anchor="middle" font-size="13" font-weight="800" fill="#8892a4">3</text>
+            <text class="step-label" x="212" y="118">Mercado</text>
+          </g>
+
+          <!-- NÓ 4 — Resultado -->
+          <g id="no4" class="no-circulo" filter="url(#glow)">
+            <circle cx="320" cy="80" r="22" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+            <text class="no-num" x="320" y="85" text-anchor="middle" font-size="13" font-weight="800" fill="#8892a4">4</text>
+            <text class="step-label" x="320" y="118">Resultado</text>
+          </g>
+        </svg>
       </div>
 
-      <!-- STEP 2 -->
-      <div id="step2" style="display:none;flex-direction:column;flex:1">
-        <button class="btn-bk" onclick="goStep(1)">← Voltar</button>
-        <div class="fg"><label class="fl">Comercializadora actual *</label>
-          <select class="fs" id="fComerc">
-            <option value="">Seleccione</option>
-            <option>EDP Comercial</option><option>Galp Energia</option><option>Endesa</option>
-            <option>Iberdrola</option><option>Repsol</option><option>Goldenergy</option>
-            <option>Plenitude</option><option>Coopernico</option><option>Outro / Não sei</option>
-          </select>
-        </div>
-        <div class="fg2">
-          <div class="fg"><label class="fl">Consumo/mês *</label>
-            <select class="fs" id="fConsumo">
-              <option value="">Seleccione</option>
-              <option value="150">Até 150 kWh</option><option value="500">150–500 kWh</option>
-              <option value="2000">500–2.000 kWh</option><option value="8000">2.000–10.000 kWh</option>
-              <option value="25000">10.000–50.000 kWh</option><option value="100000">+50.000 kWh</option>
-            </select>
-          </div>
-          <div class="fg"><label class="fl">Fatura mensal (€)</label>
-            <select class="fs" id="fFatura">
-              <option value="">Seleccione</option>
-              <option value="60">Até €60</option><option value="120">€60–€120</option>
-              <option value="300">€120–€300</option><option value="800">€300–€800</option>
-              <option value="2500">€800–€2.500</option><option value="8000">€2.500–€8.000</option>
-              <option value="25000">+€8.000</option>
-            </select>
-          </div>
-        </div>
-        <div class="fg2">
-          <div class="fg"><label class="fl">Potência (kVA)</label>
-            <select class="fs" id="fPot">
-              <option value="">Não sei</option>
-              <option value="1.15">1,15 kVA</option>
-              <option value="2.30">2,30 kVA</option>
-              <option value="3.45">3,45 kVA</option>
-              <option value="4.60">4,60 kVA</option>
-              <option value="5.75">5,75 kVA</option>
-              <option value="6.90">6,90 kVA</option>
-              <option value="10.35">10,35 kVA</option>
-              <option value="13.80">13,80 kVA</option>
-              <option value="17.25">17,25 kVA</option>
-              <option value="20.70">20,70 kVA</option>
-              <option value="27.60">27,60 kVA</option>
-              <option value="34.50">34,50 kVA</option>
-              <option value="41.40">41,40 kVA</option>
-              <option value="69">69 kVA</option>
-              <option value="100">100 kVA</option>
-              <option value="150">150 kVA</option>
-              <option value="250">250 kVA</option>
-              <option value="400">+400 kVA</option>
-            </select>
-          </div>
-          <div class="fg"><label class="fl">Ciclo tarifário</label>
-            <select class="fs" id="fCiclo">
-              <option value="">Não sei</option>
-              <option value="Simples">Simples</option>
-              <option value="Bi-horário">Bi-horário</option>
-              <option value="Tri-horário">Tri-horário</option>
-            </select>
-          </div>
-        </div>
-        <div class="fg"><label class="fl">CPE Electricidade (opcional)</label><input class="fi" id="fCpe" placeholder="PT0002000XXXXXXXXXX"></div>
-        <!-- GAS FIELDS - shown conditionally -->
-        <div id="gasFields" style="display:block">
-          <div class="fg2">
-            <div class="fg"><label class="fl">Comercializadora gás</label>
-              <select class="fs" id="fComercGas">
-                <option value="">Seleccione</option>
-                <option>EDP Comercial</option><option>Galp Energia</option><option>Endesa</option>
-                <option>Iberdrola</option><option>Repsol</option><option>Goldenergy</option>
-                <option>Plenitude</option><option>Outro / Não sei</option>
-              </select>
-            </div>
-            <div class="fg"><label class="fl">Fatura gás/mês (€)</label>
-              <select class="fs" id="fFaturaGas">
-                <option value="">Seleccione</option>
-                <option value="20">Até €20</option><option value="50">€20–€50</option>
-                <option value="100">€50–€100</option><option value="300">€100–€300</option>
-                <option value="800">€300–€800</option><option value="2000">+€800</option>
-              </select>
-            </div>
-          </div>
-          <div class="fg"><label class="fl">CUI Gás (opcional)</label><input class="fi" id="fCui" placeholder="PT0023000XXXXXXXXXX"></div>
-        </div>
-        <button class="btn-nx" onclick="goStep(3)">Continuar →</button>
-      </div>
-
-      <!-- STEP 3 -->
-      <div id="step3" style="display:none;flex-direction:column;flex:1">
-        <button class="btn-bk" onclick="goStep(2)">← Voltar</button>
-        <div class="fg">
-          <label class="fl" style="margin-bottom:6px">Interesse solar</label>
-          <div class="chips">
-            <div class="chip" onclick="pickChip(this,&#39;sol&#39;)"><span class="chip-e">☀️</span><span class="chip-l">Sim, quero</span></div>
-            <div class="chip" onclick="pickChip(this,&#39;sol&#39;)"><span class="chip-e">🤔</span><span class="chip-l">Talvez</span></div>
-            <div class="chip" onclick="pickChip(this,&#39;sol&#39;)"><span class="chip-e">⚡</span><span class="chip-l">Só energia</span></div>
-          </div>
-        </div>
-        <div class="fg">
-          <label class="fl" style="margin-bottom:6px">Contacto preferido</label>
-          <div class="chips">
-            <div class="chip" onclick="pickChip(this,&#39;ct&#39;)"><span class="chip-e">💬</span><span class="chip-l">WhatsApp</span></div>
-            <div class="chip" onclick="pickChip(this,&#39;ct&#39;)"><span class="chip-e">📧</span><span class="chip-l">Email</span></div>
-            <div class="chip" onclick="pickChip(this,&#39;ct&#39;)"><span class="chip-e">📞</span><span class="chip-l">Chamada</span></div>
-          </div>
-        </div>
-        <div class="fg"><label class="fl">Notas (opcional)</label><textarea class="fi" id="fNotas" rows="2" placeholder="Informação adicional..." style="resize:none"></textarea></div>
-        <button class="btn-nx" onclick="submitForm()" id="submitBtn">⚡ Analisar agora — grátis</button>
-        <div class="fn">🔒 A ENERSIA consulta a ERSE em tempo real</div>
-        <div class="fn-err" id="formErr">Erro ao enviar. Contacte geralenersia@gmail.com</div>
-      </div>
-
-      <!-- SUCCESS -->
-      <div class="success-wrap" id="successWrap">
-        <div class="succ-ic">✅</div>
-        <div class="succ-t">Diagnóstico enviado!</div>
-        <p class="succ-s">Recebemos os seus dados. A nossa equipa contacta-o em menos de 2 horas com o diagnóstico completo.</p>
-        <a href="https://wa.me/351910322702?text=Ol%C3%A1%2C+acabei+de+submeter+o+diagn%C3%B3stico+ENERSIA." target="_blank" class="btn-wa-res">💬 Falar agora no WhatsApp</a>
-        <div class="succ-steps">
-          <div class="succ-steps-title">Próximos passos</div>
-          <div class="succ-step">1. Email de confirmação em minutos<br>2. ENERSIA analisa com dados reais da ERSE<br>3. Especialista contacta em menos de 2h</div>
-        </div>
-      </div>
-
-      <!-- LOADING -->
-      <div class="ld-wrap" id="ldWrap">
-        <div class="ld-orb">⚡</div>
-        <div class="ld-title" id="ldTitle">A iniciar diagnóstico...</div>
-        <div class="ld-sub">O agente IA está a analisar</div>
-        <div class="ld-steps">
-          <div class="ls" id="ls1"><div class="ls-dot"></div>A ler dados do contrato</div>
-          <div class="ls" id="ls2"><div class="ls-dot"></div>A identificar tarifa, potência e ciclo</div>
-          <div class="ls" id="ls3"><div class="ls-dot"></div>A ligar à ERSE em tempo real</div>
-          <div class="ls" id="ls4"><div class="ls-dot"></div>A comparar 8 comercializadoras</div>
-          <div class="ls" id="ls5"><div class="ls-dot"></div>A calcular poupança exacta</div>
-          <div class="ls" id="ls6"><div class="ls-dot"></div>A avaliar potencial solar</div>
-          <div class="ls" id="ls7"><div class="ls-dot"></div>A gerar diagnóstico personalizado</div>
-        </div>
-      </div>
-
-      <!-- RESULT -->
-      <div class="res-wrap" id="resWrap">
-        <div class="res-hero">
-          <div class="res-score"><div class="rs-n" id="rScore">—</div><div class="rs-l">SCORE IA</div></div>
-          <div>
-            <div class="res-sav" id="rSav">€0</div>
-            <div class="res-sav-sub" id="rSavSub">poupança anual estimada</div>
-          </div>
-        </div>
-        <div class="ia-box">
-          <div class="ia-title">Diagnóstico IA</div>
-          <div id="iaMsgsDiv"></div>
-        </div>
-        <div class="chart-wrap">
-          <div class="chart-lbl">Comparativo de preços</div>
-          <div class="chart-bars" id="chartBars"></div>
-          <div class="chart-spacer"></div>
-        </div>
-        <div class="rank-wrap">
-          <div class="rank-lbl">Ranking para o seu perfil</div>
-          <div id="rankDiv"></div>
-        </div>
-        <div class="res-rows">
-          <div class="rr"><span class="rr-l">Comercializadora actual</span><span class="rr-v r" id="rCur">—</span></div>
-          <div class="rr"><span class="rr-l">Melhor alternativa ERSE</span><span class="rr-v g" id="rBest">—</span></div>
-          <div class="rr"><span class="rr-l">Diferença de preço/kWh</span><span class="rr-v o" id="rDiff">—</span></div>
-          <div class="rr"><span class="rr-l">Potencial solar</span><span class="rr-v" id="rSol">—</span></div>
-          <div class="rr" id="rGasRow" style="display:none"><span class="rr-l">Gás — poupança adicional</span><span class="rr-v g" id="rGas">—</span></div>
-        </div>
-        <button class="btn-book" onclick="toggleBooking()">📅 Falar com especialista — agendar já</button>
-        <a href="https://wa.me/351910322702?text=Ol%C3%A1%2C+acabei+de+fazer+a+an%C3%A1lise+ENERSIA+e+gostaria+de+falar+sobre+os+resultados." target="_blank" class="btn-wa-res">💬 WhatsApp directo</a>
-        <button class="btn-pdf" onclick="document.getElementById(&#39;pdfOk&#39;).style.display=&#39;block&#39;;setTimeout(function(){document.getElementById(&#39;pdfOk&#39;).style.display=&#39;none&#39;},5000)">📄 Receber relatório por email</button>
-        <div id="pdfOk" style="display:none;font-size:11px;color:var(--teal);text-align:center;padding:7px;background:rgba(0,180,160,.07);border-radius:8px;margin-top:6px;font-weight:700">✓ Relatório enviado — verifique o email em 5 min</div>
-        <div class="bk-panel" id="bkPanel">
-          <div class="bk-head"><span style="font-size:18px">📅</span><div><div class="bk-title">Agendar com especialista ENERSIA</div><div class="bk-sub">Online · Google Meet · 30 min · grátis</div></div></div>
-          <div class="slots">
-            <div class="slot" onclick="pickSlot(this)"><div class="slot-d">SEG 19 MAI</div><div class="slot-t">10:00</div></div>
-            <div class="slot" onclick="pickSlot(this)"><div class="slot-d">SEG 19 MAI</div><div class="slot-t">15:00</div></div>
-            <div class="slot" onclick="pickSlot(this)"><div class="slot-d">TER 20 MAI</div><div class="slot-t">09:30</div></div>
-            <div class="slot" onclick="pickSlot(this)"><div class="slot-d">TER 20 MAI</div><div class="slot-t">14:00</div></div>
-            <div class="slot" onclick="pickSlot(this)"><div class="slot-d">QUA 21 MAI</div><div class="slot-t">11:00</div></div>
-            <div class="slot" onclick="pickSlot(this)"><div class="slot-d">QUI 22 MAI</div><div class="slot-t">10:00</div></div>
-          </div>
-          <button class="btn-conf" id="confBtn" onclick="confirmBook()">✓ Confirmar reunião</button>
-        </div>
-        <div class="confirmed" id="confirmedDiv">
-          <div class="conf-ic">✅</div>
-          <div class="conf-t">Reunião confirmada!</div>
-          <p class="conf-s">Receberá link Google Meet por email. O especialista já tem o seu diagnóstico.</p>
-        </div>
+      <div class="loading-msg" id="loadingMsg">A preparar análise...</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressBar"></div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- SOLAR SECTION -->
-<div style="background:linear-gradient(135deg,#FFFBF0,#F0F8FF);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-<div class="sec" id="solar-sec">
-  <div class="sec-tag">ENERGIA SOLAR</div>
-  <h2>Solar para <span class="g">empresa</span> e residencial</h2>
-  <p class="sec-sub">A IA calcula o ROI real da instalação solar para o seu perfil. Simulação gratuita. Sem visita técnica.</p>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
-    <div style="border-radius:var(--r2);overflow:hidden;position:relative;box-shadow:0 8px 32px rgba(8,14,28,.1)">
-      <img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1400&q=80" alt="Painéis solares" style="width:100%;height:340px;object-fit:cover;display:block">
-      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,14,28,.7),transparent 50%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px">
-        <div style="background:rgba(255,140,0,.9);border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;color:#fff;display:inline-block;margin-bottom:8px;width:fit-content">☀️ ROI médio em Portugal</div>
-        <div style="font-size:22px;font-weight:900;color:#fff;line-height:1.2">Retorno em 5–8 anos</div>
-        <div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:4px">Com incentivos fiscais e autoconsumo</div>
+  <!-- ERRO -->
+  <div id="erro">
+    <div class="erro-card">
+      ⚠️ <span id="erroMensagem">Ocorreu um erro ao processar a fatura. Por favor tente novamente ou contacte-nos.</span>
+    </div>
+    <button class="btn-nova" onclick="reiniciar()">↺ Tentar novamente</button>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="resultado">
+    <div class="resultado-header">
+      <h2 id="resComercializadora">—</h2>
+      <div class="periodo" id="resPeriodo">—</div>
+      <div class="poupanca-badge">💰 <span id="resPoupanca">—</span> poupança/mês</div>
+    </div>
+
+    <div class="metricas">
+      <div class="metrica">
+        <div class="label">Total Fatura</div>
+        <div class="valor" id="resTotal">—</div>
+      </div>
+      <div class="metrica">
+        <div class="label">Consumo</div>
+        <div class="valor" id="resConsumo">—</div>
+      </div>
+      <div class="metrica">
+        <div class="label">Poupança Estimada</div>
+        <div class="valor destaque" id="resPercentagem">—</div>
       </div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:12px">
-      <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;display:flex;align-items:flex-start;gap:12px;box-shadow:0 2px 8px rgba(8,14,28,.04)">
-        <div style="width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,rgba(255,180,0,.2),rgba(255,100,0,.1));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">☀️</div>
-        <div><div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px">Redução imediata na fatura</div><div style="font-size:13px;color:var(--mid);line-height:1.6">Autoconsumo directo reduz até 70–90% da fatura. A IA calcula exactamente para o seu consumo.</div></div>
-      </div>
-      <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;display:flex;align-items:flex-start;gap:12px;box-shadow:0 2px 8px rgba(8,14,28,.04)">
-        <div style="width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,rgba(0,166,81,.15),rgba(0,180,160,.1));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔋</div>
-        <div><div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px">Bateria — a IA decide se faz sentido</div><div style="font-size:13px;color:var(--mid);line-height:1.6">Para a maioria das PME, a bateria ainda não tem ROI positivo. A IA calcula o seu caso específico.</div></div>
-      </div>
-      <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;display:flex;align-items:flex-start;gap:12px;box-shadow:0 2px 8px rgba(8,14,28,.04)">
-        <div style="width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,rgba(0,102,255,.12),rgba(0,180,160,.08));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📊</div>
-        <div><div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px">Incentivos e financiamento incluídos</div><div style="font-size:13px;color:var(--mid);line-height:1.6">IFRRU, Portugal 2030, deduções IRS/IRC. A IA identifica automaticamente os incentivos disponíveis.</div></div>
-      </div>
-      <button class="btn-hero" onclick="document.getElementById(&#39;analise&#39;).scrollIntoView({behavior:&#39;smooth&#39;});setTimeout(function(){switchTab(&#39;solar&#39;)},400)" style="font-size:14px;padding:13px 24px;justify-content:center">☀️ Simular solar agora — grátis</button>
+
+    <div class="secao">
+      <h3>Análise Detalhada</h3>
+      <p id="resAnalise">—</p>
     </div>
+
+    <div class="secao" id="alertasSecao">
+      <h3>⚠️ Alertas</h3>
+      <ul class="alertas-lista" id="resAlertas"></ul>
+    </div>
+
+    <div class="recomendacao-card">
+      <h3>💡 Recomendação ENERSIA</h3>
+      <div class="nome-comercial">Mudar para <span id="resRecomendacao">—</span></div>
+      <p id="resMotivo">—</p>
+    </div>
+
+    <div class="cta-card">
+      <p>Quer mudar e poupar já? Gerimos tudo, sem custos de mudança.</p>
+      <a href="https://calendly.com/geralenersia/30min" class="btn-cta" target="_blank">Agendar Consulta →</a>
+    </div>
+
+    <button class="btn-nova" onclick="reiniciar()">↺ Analisar outra fatura</button>
   </div>
-</div>
+
 </div>
 
-<!-- PLATAFORMA -->
-<div class="sec" id="plataforma">
-  <div class="sec-tag">PLATAFORMA</div>
-  <h2>O que a ENERSIA<br><span class="g">faz por si</span></h2>
-  <p class="sec-sub">IA + humano. A plataforma filtra, aquece e diagnostica. O especialista fecha apenas os leads mais lucrativos.</p>
-  <div class="bento">
-    <div class="bc acc">
-      <div class="bc-tag">IA CONSULTIVA</div>
-      <span class="bc-icon">🤖</span>
-      <div class="bc-title">Agente IA energético 24/7</div>
-      <p class="bc-desc">Não é só um comparador. É um gestor energético que lê, interpreta, recomenda e acompanha automaticamente.</p>
-      <div class="bc-num">24/7</div><div class="bc-nl">sempre disponível</div>
-    </div>
-    <div class="bc">
-      <div class="bc-tag">DADOS LIVE</div>
-      <span class="bc-icon">📡</span>
-      <div class="bc-title">Ligação directa à ERSE</div>
-      <p class="bc-desc">Preços actualizados em tempo real. 8 comercializadoras. Nunca dados desactualizados.</p>
-      <div class="bc-num">8</div><div class="bc-nl">comercializadoras live</div>
-    </div>
-    <div class="bc">
-      <div class="bc-tag">LEAD SCORE</div>
-      <span class="bc-icon">🎯</span>
-      <div class="bc-title">Só os melhores leads chegam ao comercial</div>
-      <p class="bc-desc">A IA filtra, aquece e prioriza. O especialista recebe apenas leads quentes com diagnóstico completo.</p>
-    </div>
-    <div class="bc wide acc">
-      <div class="bc-tag">ANÁLISE INTELIGENTE</div>
-      <span class="bc-icon">⚡</span>
-      <div class="bc-title">A IA lê tudo e reporta tudo</div>
-      <p class="bc-desc">Identifica tarifa, potência, ciclos, custo/kWh, impostos e padrão. Compara com todo o mercado e gera insights accionáveis.</p>
-      <ul class="bc-list">
-        <li>"Pode poupar 18%. O seu contrato está inadequado."</li>
-        <li>"O seu ciclo tarifário não é ideal para o seu padrão."</li>
-        <li>"A sua potência contratada está 30% acima do real."</li>
-        <li>"Solar pode reduzir €X. Bateria não faz sentido agora."</li>
-      </ul>
-    </div>
-    <div class="bc">
-      <div class="bc-tag">BANCO DE DADOS</div>
-      <span class="bc-icon">🗄️</span>
-      <div class="bc-title">O ouro é o dado energético</div>
-      <p class="bc-desc">Cada análise gera dados reais de consumo e comportamento. Activo valioso para o futuro marketplace.</p>
-    </div>
-    <div class="bc">
-      <div class="bc-tag">MARKETPLACE</div>
-      <span class="bc-icon">🏪</span>
-      <div class="bc-title">O futuro: leilão de leads</div>
-      <p class="bc-desc">Com volume, as comercializadoras licitem pelo mesmo lead. Quem paga mais, fica com o cliente.</p>
-    </div>
-  </div>
-</div>
-
-<!-- AUTOMAÇÃO -->
-<div class="sec" style="padding-top:0">
-  <div class="sec-tag">AUTOMAÇÃO</div>
-  <h2>Todos os canais.<br><span class="g">Sem trabalho manual.</span></h2>
-  <p class="sec-sub">O agente comercial IA faz: WhatsApp, email, follow-up, agendamento e qualificação — automaticamente.</p>
-  <div class="social-grid">
-    <div class="sc sc-wa"><span class="sc-icon">💬</span><div class="sc-name">WhatsApp</div><p class="sc-desc">"Olá João, a sua análise indicou 14% de economia. Quer falar com um especialista amanhã?" — Enviado automaticamente.</p><span class="sc-auto">AUTOMÁTICO</span></div>
-    <div class="sc sc-ig"><span class="sc-icon">📸</span><div class="sc-name">Instagram</div><p class="sc-desc">Conteúdo educativo automático. Stories com dados de poupança real. DMs respondidos por IA.</p><span class="sc-auto">AUTOMÁTICO</span></div>
-    <div class="sc sc-li"><span class="sc-icon">💼</span><div class="sc-name">LinkedIn</div><p class="sc-desc">Outbound B2B automatizado para CFOs e gerentes. Artigos de autoridade energética.</p><span class="sc-auto">AUTOMÁTICO</span></div>
-    <div class="sc sc-em"><span class="sc-icon">📧</span><div class="sc-name">Email</div><p class="sc-desc">Relatório PDF automático pós-análise. Sequências de nurturing por sector. Newsletter quinzenal.</p><span class="sc-auto">AUTOMÁTICO</span></div>
-  </div>
-</div>
-
-<!-- TECH -->
-<div style="background:var(--off);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-<div class="sec" id="tech-sec">
-  <div class="sec-tag">TECNOLOGIA</div>
-  <h2>Stack de <span class="g">IA e automação</span></h2>
-  <p class="sec-sub">OpenAI + Claude + OCR + CRM + Automação. Arquitectura de elite, custo mínimo.</p>
-  <div class="tech-grid">
-    <div class="tech-card"><span class="tech-icon">🧠</span><div class="tech-name">GPT-4o Vision</div><div class="tech-role">OCR de faturas via foto</div><span class="tech-cat cat-ia">IA OCR</span></div>
-    <div class="tech-card"><span class="tech-icon">⚡</span><div class="tech-name">Claude API</div><div class="tech-role">Análise consultiva</div><span class="tech-cat cat-ia">IA ANALÍTICA</span></div>
-    <div class="tech-card"><span class="tech-icon">📄</span><div class="tech-name">OCR.space</div><div class="tech-role">OCR backup de PDFs</div><span class="tech-cat cat-ia">OCR</span></div>
-    <div class="tech-card"><span class="tech-icon">🗄️</span><div class="tech-name">Supabase</div><div class="tech-role">Base de dados</div><span class="tech-cat cat-db">DATABASE</span></div>
-    <div class="tech-card"><span class="tech-icon">📊</span><div class="tech-name">HubSpot</div><div class="tech-role">CRM e pipeline</div><span class="tech-cat cat-crm">CRM</span></div>
-    <div class="tech-card"><span class="tech-icon">🔲</span><div class="tech-name">Airtable</div><div class="tech-role">CRM visual</div><span class="tech-cat cat-crm">CRM</span></div>
-    <div class="tech-card"><span class="tech-icon">⚙️</span><div class="tech-name">n8n</div><div class="tech-role">Automação</div><span class="tech-cat cat-auto">AUTOMAÇÃO</span></div>
-    <div class="tech-card"><span class="tech-icon">🔗</span><div class="tech-name">Make.com</div><div class="tech-role">Integrações</div><span class="tech-cat cat-auto">AUTOMAÇÃO</span></div>
-    <div class="tech-card"><span class="tech-icon">📧</span><div class="tech-name">Formspree</div><div class="tech-role">Envio de leads</div><span class="tech-cat cat-auto">FORMS</span></div>
-    <div class="tech-card"><span class="tech-icon">🌐</span><div class="tech-name">Netlify</div><div class="tech-role">Hosting</div><span class="tech-cat cat-auto">INFRA</span></div>
-  </div>
-</div>
-</div>
-
-<!-- FOOTER -->
 <footer>
-  <div class="ft-inner">
-    <div class="ft-top">
-      <div>
-        <div class="ft-name">ENERSIA</div>
-        <div class="ft-sub">GESTOR ENERGÉTICO COM INTELIGÊNCIA ARTIFICIAL</div>
-        <p class="ft-desc">A primeira plataforma de IA energética de Portugal. Dados reais da ERSE. Diagnóstico instantâneo para empresas e famílias.</p>
-        <a href="https://wa.me/351910322702?text=Ol%C3%A1%2C+gostaria+de+analisar+a+minha+fatura+energ%C3%A9tica+gratuitamente." target="_blank" class="ft-wa">💬 +351 910 322 702</a>
-        <a href="mailto:geralenersia@gmail.com" class="ft-email">📧 geralenersia@gmail.com</a>
-      </div>
-      <div><div class="ft-ct">Plataforma</div><ul class="ft-links"><li><a href="/analisar-fatura.html">Análise de fatura</a></li><li><a href="/#comparador">Comparador ERSE</a></li><li><a href="/#solar-sec">Simulação solar</a></li><li><a href="/#plataforma">CRM energético</a></li></ul></div>
-      <div><div class="ft-ct">Empresa</div><ul class="ft-links"><li><a href="/analisar-fatura.html">Para empresas</a></li><li><a href="/analisar-fatura.html">Para famílias</a></li><li><a href="mailto:geralenersia@gmail.com">Parceiros</a></li><li><a href="/#comparador">Comercializadoras</a></li></ul></div>
-      <div><div class="ft-ct">Legal</div><ul class="ft-links"><li><a href="/">Privacidade</a></li><li><a href="/">Termos</a></li><li><a href="/">Cookies</a></li><li><a href="/">RGPD</a></li></ul></div>
-    </div>
-    <div class="ft-bot">
-      <span>© 2026 ENERSIA · Portugal</span>
-      <span>Dados da ERSE — Entidade Reguladora dos Serviços Energéticos</span>
-    </div>
-  </div>
+  © 2026 ENERSIA · <a href="https://enersia.pages.dev/">Voltar ao site</a> · Análise gratuita e confidencial
 </footer>
 
-<!-- CHATBOT -->
-<div class="chat-fab" onclick="toggleChat()">
-  <div class="chat-fab-btn" style="overflow:hidden;padding:0"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAgNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmdfayIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNEIyRDhGIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0Y3QTYwMCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxjbGlwUGF0aCBpZD0iY2lyY2xlX2siPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIi8+PC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9InVybCgjYmdfaykiLz4KICA8ZyBjbGlwLXBhdGg9InVybCgjY2lyY2xlX2spIj4KICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMTYiIHI9IjgiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC45NSkiLz4KICAgIDxlbGxpcHNlIGN4PSIyMCIgY3k9IjM2IiByeD0iMTMiIHJ5PSIxMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjkpIi8+CiAgICA8Y2lyY2xlIGN4PSIxNyIgY3k9IjE1IiByPSIxLjIiIGZpbGw9IiM0QjJEOEYiLz4KICAgIDxjaXJjbGUgY3g9IjIzIiBjeT0iMTUiIHI9IjEuMiIgZmlsbD0iIzRCMkQ4RiIvPgogICAgPHBhdGggZD0iTTE3IDE5IFEyMCAyMSAyMyAxOSIgc3Ryb2tlPSIjNEIyRDhGIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogICAgPHBhdGggZD0iTTE1IDEyIFExNyAxMC41IDE5IDEyIiBzdHJva2U9IiMyZDFhNWUiIHN0cm9rZS13aWR0aD0iMS4yIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICAgIDxwYXRoIGQ9Ik0yMSAxMiBRMjMgMTAuNSAyNSAxMiIgc3Ryb2tlPSIjMmQxYTVlIiBzdHJva2Utd2lkdGg9IjEuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8Y2lyY2xlIGN4PSIyOCIgY3k9IjEzIiByPSIzIiBmaWxsPSIjRjdBNjAwIiBvcGFjaXR5PSIwLjciLz4KICAgIDx0ZXh0IHg9IjI3LjUiIHk9IjE1IiBmb250LXNpemU9IjQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5BSTwvdGV4dD4KICA8L2c+Cjwvc3ZnPg==" width="40" height="40" style="border-radius:50%;display:block"><div class="chat-notif" style="position:absolute;top:-3px;right:-3px">1</div></div>
-</div>
-<div class="chat-win" id="chatWin">
-  <div class="cw-h">
-    <div class="cw-av"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNTYgNTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjU2IiBoZWlnaHQ9IjU2Ij4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmdfa2Fyb2wiIGN4PSI1MCUiIGN5PSIzMCUiIHI9IjcwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxYTNhNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMGQxZjNjIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJza2luX2siIGN4PSI1MCUiIGN5PSI0MCUiIHI9IjYwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmNWM1YTMiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZThhODgyIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGNsaXBQYXRoIGlkPSJjbGlwX2thcm9sIj48Y2lyY2xlIGN4PSIyOCIgY3k9IjI4IiByPSIyOCIvPjwvY2xpcFBhdGg+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImhhaXJfayIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMmMxODEwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzFhMGUwOCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ic3VpdF9rIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxZTNhNWYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMGYxZTMzIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJnbG93X2siIGN4PSI1MCUiIGN5PSI1MCUiIHI9IjUwJSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSIwIiB5MT0iMCIgeDI9IjU2IiB5Mj0iNTYiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMDBjOGZmIiBzdG9wLW9wYWNpdHk9IjAuMyIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM3YjJmZmYiIHN0b3Atb3BhY2l0eT0iMC4zIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8ZyBjbGlwLXBhdGg9InVybCgjY2xpcF9rYXJvbCkiPgogICAgPCEtLSBCYWNrZ3JvdW5kIC0tPgogICAgPGNpcmNsZSBjeD0iMjgiIGN5PSIyOCIgcj0iMjgiIGZpbGw9InVybCgjYmdfa2Fyb2wpIi8+CiAgICA8IS0tIEdsb3cgb3ZlcmxheSBJQSAtLT4KICAgIDxjaXJjbGUgY3g9IjI4IiBjeT0iMjgiIHI9IjI4IiBmaWxsPSJ1cmwoI2dsb3dfaykiIG9wYWNpdHk9IjAuNSIvPgogICAgPCEtLSBGYXRvL3JvdXBhIHByb2Zpc3Npb25hbCAtLT4KICAgIDxlbGxpcHNlIGN4PSIyOCIgY3k9IjU0IiByeD0iMjIiIHJ5PSIxNCIgZmlsbD0idXJsKCNzdWl0X2spIi8+CiAgICA8cmVjdCB4PSIyMSIgeT0iNDAiIHdpZHRoPSIxNCIgaGVpZ2h0PSIxOCIgZmlsbD0idXJsKCNzdWl0X2spIiByeD0iMiIvPgogICAgPCEtLSBDb2xhcmluaG8gYnJhbmNvIC0tPgogICAgPHBvbHlnb24gcG9pbnRzPSIyNiw0MCAyOCw0NCAzMCw0MCAzMiwzOCAyNCwzOCIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPgogICAgPCEtLSBQZXNjb8OnbyAtLT4KICAgIDxyZWN0IHg9IjI0LjUiIHk9IjMzIiB3aWR0aD0iNyIgaGVpZ2h0PSI5IiByeD0iMyIgZmlsbD0idXJsKCNza2luX2spIi8+CiAgICA8IS0tIENhYmXDp2EgLS0+CiAgICA8ZWxsaXBzZSBjeD0iMjgiIGN5PSIyNiIgcng9IjExIiByeT0iMTIuNSIgZmlsbD0idXJsKCNza2luX2spIi8+CiAgICA8IS0tIENhYmVsbyAtLT4KICAgIDxlbGxpcHNlIGN4PSIyOCIgY3k9IjE2IiByeD0iMTEuNSIgcnk9IjciIGZpbGw9InVybCgjaGFpcl9rKSIvPgogICAgPGVsbGlwc2UgY3g9IjE3LjUiIGN5PSIyNCIgcng9IjMiIHJ5PSI4IiBmaWxsPSJ1cmwoI2hhaXJfaykiLz4KICAgIDxlbGxpcHNlIGN4PSIzOC41IiBjeT0iMjQiIHJ4PSIzIiByeT0iOCIgZmlsbD0idXJsKCNoYWlyX2spIi8+CiAgICA8IS0tIFNvYnJhbmNlbGhhcyAtLT4KICAgIDxwYXRoIGQ9Ik0yMiAyMC41IFEyNSAxOS41IDI3IDIwLjUiIHN0cm9rZT0iIzJjMTgxMCIgc3Ryb2tlLXdpZHRoPSIxLjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogICAgPHBhdGggZD0iTTI5IDIwLjUgUTMxIDE5LjUgMzQgMjAuNSIgc3Ryb2tlPSIjMmMxODEwIiBzdHJva2Utd2lkdGg9IjEuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8IS0tIE9saG9zIC0tPgogICAgPGVsbGlwc2UgY3g9IjI0LjUiIGN5PSIyMyIgcng9IjIuNSIgcnk9IjIiIGZpbGw9IiMxYTBlMDgiLz4KICAgIDxlbGxpcHNlIGN4PSIzMS41IiBjeT0iMjMiIHJ4PSIyLjUiIHJ5PSIyIiBmaWxsPSIjMWEwZTA4Ii8+CiAgICA8IS0tIEJyaWxobyBvbGhvcyAtLT4KICAgIDxjaXJjbGUgY3g9IjI1LjMiIGN5PSIyMi4yIiByPSIwLjciIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgIDxjaXJjbGUgY3g9IjMyLjMiIGN5PSIyMi4yIiByPSIwLjciIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgIDwhLS0gTmFyaXogLS0+CiAgICA8cGF0aCBkPSJNMjcuNSAyNC41IFEyOCAyNi41IDI4LjUgMjQuNSIgc3Ryb2tlPSIjYzg4OTVlIiBzdHJva2Utd2lkdGg9IjAuOCIgZmlsbD0ibm9uZSIvPgogICAgPCEtLSBTb3JyaXNvIC0tPgogICAgPHBhdGggZD0iTTI0LjUgMjkgUTI4IDMxLjUgMzEuNSAyOSIgc3Ryb2tlPSIjYzA2MDQwIiBzdHJva2Utd2lkdGg9IjEuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8IS0tIEPDrXJjdWxvIElBIGRlY29yYXRpdm8gLS0+CiAgICA8Y2lyY2xlIGN4PSI0NCIgY3k9IjEyIiByPSI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMGM4ZmYiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC42Ii8+CiAgICA8Y2lyY2xlIGN4PSI0NCIgY3k9IjEyIiByPSI1IiBmaWxsPSIjMDBjOGZmIiBvcGFjaXR5PSIwLjIiLz4KICAgIDx0ZXh0IHg9IjQ0IiB5PSIxNSIgZm9udC1zaXplPSI2IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCI+QUk8L3RleHQ+CiAgICA8IS0tIFBhcnTDrWN1bGFzIElBIC0tPgogICAgPGNpcmNsZSBjeD0iOCIgY3k9IjgiIHI9IjEuNSIgZmlsbD0iIzdiMmZmZiIgb3BhY2l0eT0iMC43Ii8+CiAgICA8Y2lyY2xlIGN4PSIxMiIgY3k9IjQ0IiByPSIxIiBmaWxsPSIjMDBjOGZmIiBvcGFjaXR5PSIwLjYiLz4KICAgIDxjaXJjbGUgY3g9IjQ4IiBjeT0iMzgiIHI9IjEuNSIgZmlsbD0iIzAwYzhmZiIgb3BhY2l0eT0iMC41Ii8+CiAgPC9nPgogIDwhLS0gQm9yZGEgZ3JhZGllbnRlIElBIC0tPgogIDxjaXJjbGUgY3g9IjI4IiBjeT0iMjgiIHI9IjI3IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjZ2xvd19rKSIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjwvc3ZnPg==" width="40" height="40" style="border-radius:50%;display:block"></div>
-    <div><div class="cw-name">KAROL · Gestora Energética IA</div><div class="cw-st">Online · responde em segundos</div></div>
-    <button class="cw-close" onclick="toggleChat()">✕</button>
-  </div>
-  <div class="cw-msgs" id="cwMsgs">
-    <div class="cmsg cmsg-bot">
-      <div class="cmsg-av cmsg-av-b"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmdfa3MyIiBjeD0iNTAlIiBjeT0iMzAlIiByPSI3MCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMWEzYTZiIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzBkMWYzYyIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0ic2tpbl9rczIiIGN4PSI1MCUiIGN5PSI0MCUiIHI9IjYwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmNWM1YTMiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZThhODgyIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGNsaXBQYXRoIGlkPSJjbGlwX2tzMiI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTIiLz48L2NsaXBQYXRoPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJoYWlyX2tzMiIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMmMxODEwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzFhMGUwOCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXBfa3MyKSI+CiAgICA8Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMiIgZmlsbD0idXJsKCNiZ19rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSIyNCIgcng9IjEwIiByeT0iNyIgZmlsbD0iIzFlM2E1ZiIvPgogICAgPHJlY3QgY3g9IjkiIGN5PSIxNyIgd2lkdGg9IjYiIGhlaWdodD0iOCIgcng9IjEiIGZpbGw9IiMxZTNhNWYiLz4KICAgIDxyZWN0IHg9IjEwLjUiIHk9IjE0LjUiIHdpZHRoPSIzIiBoZWlnaHQ9IjQiIHJ4PSIxLjUiIGZpbGw9InVybCgjc2tpbl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSIxMSIgcng9IjQuNSIgcnk9IjUiIGZpbGw9InVybCgjc2tpbl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSI3IiByeD0iNSIgcnk9IjMiIGZpbGw9InVybCgjaGFpcl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iNy41IiBjeT0iMTAuNSIgcng9IjEuMyIgcnk9IjMuNSIgZmlsbD0idXJsKCNoYWlyX2tzMikiLz4KICAgIDxlbGxpcHNlIGN4PSIxNi41IiBjeT0iMTAuNSIgcng9IjEuMyIgcnk9IjMuNSIgZmlsbD0idXJsKCNoYWlyX2tzMikiLz4KICAgIDxlbGxpcHNlIGN4PSIxMC4yIiBjeT0iMTAiIHJ4PSIxLjEiIHJ5PSIwLjkiIGZpbGw9IiMxYTBlMDgiLz4KICAgIDxlbGxpcHNlIGN4PSIxMy44IiBjeT0iMTAiIHJ4PSIxLjEiIHJ5PSIwLjkiIGZpbGw9IiMxYTBlMDgiLz4KICAgIDxjaXJjbGUgY3g9IjEwLjYiIGN5PSI5LjYiIHI9IjAuMzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgIDxjaXJjbGUgY3g9IjE0LjIiIGN5PSI5LjYiIHI9IjAuMzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgIDxwYXRoIGQ9Ik0xMCAxMi41IFExMiAxMy41IDE0IDEyLjUiIHN0cm9rZT0iI2MwNjA0MCIgc3Ryb2tlLXdpZHRoPSIwLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwvZz4KPC9zdmc+" width="24" height="24" style="border-radius:50%;display:block"></div>
-      <div><div class="cmsg-bub">Olá! 👋 Sou a <strong>KAROL</strong>, a sua Gestora Energética com IA.<br><br>Estou aqui para analisar a sua fatura de energia, comparar com o mercado e dizer-lhe exactamente quanto está a perder. <strong>Gratuito. Sem compromisso.</strong><br><br>Prefere enviar a fatura ou prefere que eu lhe faça algumas perguntas rápidas? ⚡</div><div class="cmsg-t">Agora</div></div>
-    </div>
-  </div>
-  <div class="qrs" id="qrDiv">
-    <button class="qr" onclick="sendQR('Quero enviar a minha fatura para análise')">⚡ Analisar fatura</button>
-    <button class="qr" onclick="sendQR('Quanto posso poupar na minha factura de energia?')">💰 Calcular poupança</button>
-    <button class="qr" onclick="sendQR('Tenho interesse em energia solar')">☀️ Simular solar</button>
-    <button class="qr" onclick="window.open('https://wa.me/351910322702','_blank')">💬 WhatsApp directo</button>
-  </div>
-  <div class="cw-inp-row">
-    <input class="cw-inp" id="cwInp" placeholder="Escreva aqui..." onkeydown="if(event.key===&#39;Enter&#39;){sendChat()}">
-    <button class="cw-send" onclick="sendChat()">➤</button>
-  </div>
-</div>
-
 <script>
-// CLOCK
-(function tick(){
-  var n=new Date(),el=document.getElementById('liveClock');
-  if(el)el.textContent=[n.getHours(),n.getMinutes(),n.getSeconds()].map(function(x){return String(x).padStart(2,'0')}).join(':');
-  setTimeout(tick,1000);
-})();
+  const WEBHOOK_URL = 'https://hook.eu1.make.com/rc32bxy5vo23zg4vpt2mjrs10gep58la';
+  let ficheiroActual = null;
 
-// TABS
-var activeTab='empresa';
-function switchTab(t){
-  activeTab=t;
-  document.querySelectorAll('.main-tab').forEach(function(b,i){
-    b.classList.toggle('on',['empresa','residencial','solar'][i]===t);
+  // ─── UPLOAD ────────────────────────────────────────────────
+  const uploadArea = document.getElementById('uploadArea');
+  const fileInput  = document.getElementById('fileInput');
+
+  uploadArea.addEventListener('dragover',  e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+  uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+  uploadArea.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (f) definirFicheiro(f);
   });
-  var icon=document.getElementById('azIcon');
-  var title=document.getElementById('azTitle');
-  var sub=document.getElementById('azSub');
-  var lEmp=document.getElementById('lEmp');
-  var lSec=document.getElementById('lSec');
-  var secDiv=document.getElementById('secChips');
-  if(t==='empresa'){icon.textContent='🏢';title.textContent='Análise para Empresas';sub.textContent='Foto da fatura, PDF ou dados manuais. A IA extrai tudo.';lEmp.textContent='Nome / Empresa *';lSec.textContent='Sector';secDiv.innerHTML='<div class="chip" onclick="pickChip(this,\'sc\')"><span class="chip-e">🏨</span><span class="chip-l">Hotel</span></div><div class="chip" onclick="pickChip(this,\'sc\')"><span class="chip-e">🍕</span><span class="chip-l">Restauração</span></div><div class="chip" onclick="pickChip(this,\'sc\')"><span class="chip-e">🏭</span><span class="chip-l">Indústria</span></div><div class="chip" onclick="pickChip(this,\'sc\')"><span class="chip-e">🏥</span><span class="chip-l">Saúde</span></div><div class="chip" onclick="pickChip(this,\'sc\')"><span class="chip-e">🛒</span><span class="chip-l">Comércio</span></div><div class="chip" onclick="pickChip(this,\'sc\')"><span class="chip-e">🚛</span><span class="chip-l">Logística</span></div>';}
-  else if(t==='residencial'){icon.textContent='🏠';title.textContent='Análise Residencial';sub.textContent='Análise da fatura doméstica. Melhor tarifário e comercializadora para a sua casa.';lEmp.textContent='Nome do titular *';lSec.textContent='Tipo de habitação';secDiv.innerHTML='<div class="chip" onclick="pickChip(this,\'ht\')"><span class="chip-e">🏠</span><span class="chip-l">Moradia</span></div><div class="chip" onclick="pickChip(this,\'ht\')"><span class="chip-e">🏢</span><span class="chip-l">Apartamento</span></div><div class="chip" onclick="pickChip(this,\'ht\')"><span class="chip-e">🏡</span><span class="chip-l">Quinta/Rural</span></div>';}
-  else{icon.textContent='☀️';title.textContent='Simulação Solar';sub.textContent='Calculamos o ROI real da instalação solar — empresa ou casa.';lEmp.textContent='Nome / Empresa *';lSec.textContent='Tipo de telhado';secDiv.innerHTML='<div class="chip" onclick="pickChip(this,\'rf\')"><span class="chip-e">🏗️</span><span class="chip-l">Plano</span></div><div class="chip" onclick="pickChip(this,\'rf\')"><span class="chip-e">🏠</span><span class="chip-l">Inclinado</span></div><div class="chip" onclick="pickChip(this,\'rf\')"><span class="chip-e">🏭</span><span class="chip-l">Industrial</span></div>';}
-  resetForm();
-}
 
-function resetForm(){
-  showSteps();
-  goStep(1,true);
-  document.getElementById('ldWrap').classList.remove('show');
-  document.getElementById('resWrap').classList.remove('show');
-  document.getElementById('successWrap').classList.remove('show');
-  document.getElementById('stepBar').style.display='flex';
-}
-
-function showForm(){
-  document.getElementById('azLeft').style.display='none';
-  showSteps();
-}
-function showSteps(){
-  ['step1','step2','step3'].forEach(function(id,i){
-    document.getElementById(id).style.display=i===0?'flex':'none';
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) definirFicheiro(fileInput.files[0]); });
+  document.getElementById('cameraInput').addEventListener('change', function() {
+    if (this.files[0]) definirFicheiro(this.files[0]);
   });
-}
-function handleFile(){
-  showForm();
-  setTimeout(function(){
-    var f=document.getElementById('fEmp');
-    if(f)f.value='(OCR detectado automaticamente)';
-    var c=document.getElementById('fComerc');
-    if(c)c.value='EDP Comercial';
-    var co=document.getElementById('fConsumo');
-    if(co)co.value='8000';
-    var fa=document.getElementById('fFatura');
-    if(fa)fa.value='2500';
-  },700);
-}
 
-// LIMITE DE ANÁLISES POR EMAIL
-function checkEmailLimit(email) {
-  var key = 'enersia_usage_' + email.toLowerCase().replace(/[^a-z0-9]/g,'_');
-  var now = new Date();
-  var monthKey = now.getFullYear() + '_' + now.getMonth();
-  var stored = JSON.parse(localStorage.getItem(key) || '{}');
-  var count = stored.month === monthKey ? (stored.count || 0) : 0;
-  if (count >= 3) return false;
-  stored = { month: monthKey, count: count + 1 };
-  localStorage.setItem(key, JSON.stringify(stored));
-  return true;
-}
-
-// VALIDAÇÃO DE EMAIL
-function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) && email.length >= 6;
-}
-
-var curStep=1;
-function goStep(n,force){
-  if(!force){
-    if(curStep===1&&n===2){
-      var e=document.getElementById('fEmp').value.trim();
-      var no=document.getElementById('fNome').value.trim();
-      var em=document.getElementById('fEmail').value.trim();
-      var te=document.getElementById('fTel').value.trim();
-      var di=document.getElementById('fDistrito').value;
-
-      // Validação email
-      if(em && !isValidEmail(em)){
-        var elEm=document.getElementById('fEmail');
-        elEm.style.borderColor='rgba(220,50,50,.5)';
-        elEm.placeholder='Email inválido — ex: nome@empresa.pt';
-        elEm.addEventListener('input',function(){elEm.style.borderColor='';elEm.placeholder='email@empresa.pt';},{once:true});
-        document.getElementById('formErr').textContent='Por favor insira um email válido (ex: nome@empresa.pt)';
-        document.getElementById('formErr').classList.add('show');
-        setTimeout(function(){document.getElementById('formErr').classList.remove('show');},4000);
-        return;
-      }
-
-      // Limite por email
-      if(em && isValidEmail(em) && !checkEmailLimit(em)){
-        document.getElementById('formErr').textContent='⚠️ Limite de 3 análises gratuitas por mês atingido para este email. Contacte geralenersia@gmail.com para acesso ilimitado.';
-        document.getElementById('formErr').classList.add('show');
-        return;
-      }
-
-      if(!e||!no||!em||!te||!di){
-        [['fEmp',!e],['fNome',!no],['fEmail',!em],['fTel',!te],['fDistrito',!di]].forEach(function(p){
-          if(p[1]){var el=document.getElementById(p[0]);el.style.borderColor='rgba(220,50,50,.5)';el.addEventListener('input',function(){el.style.borderColor=''},{ once:true });el.addEventListener('change',function(){el.style.borderColor=''},{ once:true });}
-        });
-        return;
-      }
-    }
-    if(curStep===2&&n===3){
-      var c=document.getElementById('fComerc').value;
-      var co=document.getElementById('fConsumo').value;
-      if(!c||!co){
-        [['fComerc',!c],['fConsumo',!co]].forEach(function(p){
-          if(p[1]){var el=document.getElementById(p[0]);el.style.borderColor='rgba(220,50,50,.5)';el.addEventListener('change',function(){el.style.borderColor=''},{ once:true });}
-        });
-        return;
-      }
-    }
+  function definirFicheiro(f) {
+    if (f.size > 10 * 1024 * 1024) { alert('Ficheiro demasiado grande. Máximo 10MB.'); return; }
+    ficheiroActual = f;
+    document.getElementById('ficheiroNome').textContent = f.name;
+    document.getElementById('ficheiroTamanho').textContent = (f.size / 1024).toFixed(0) + ' KB';
+    document.getElementById('ficheiroSelec').style.display = 'flex';
+    document.getElementById('btnAnalisar').disabled = false;
   }
-  ['step1','step2','step3'].forEach(function(id,i){
-    document.getElementById(id).style.display=i===n-1?'flex':'none';
-  });
-  ['sb1','sb2','sb3'].forEach(function(id,i){
-    document.getElementById(id).className='sb '+(i<n-1?'dn':i===n-1?'act':'td');
-  });
-  curStep=n;
-}
 
-function pickChip(el,g){
-  document.querySelectorAll('[onclick*="pickChip"][onclick*="\''+g+'\'"]').forEach(function(c){c.classList.remove('on')});
-  el.classList.add('on');
-}
-function getChip(g){
-  var chips=document.querySelectorAll('[onclick*="pickChip"][onclick*="\''+g+'\'"]');
-  for(var i=0;i<chips.length;i++){if(chips[i].classList.contains('on')){return chips[i].querySelector('.chip-l').textContent;}}
-  return 'Não indicado';
-}
+  function removerFicheiro() {
+    ficheiroActual = null;
+    fileInput.value = '';
+    document.getElementById('ficheiroSelec').style.display = 'none';
+    document.getElementById('btnAnalisar').disabled = true;
+  }
 
-function submitForm(){
-  var btn=document.getElementById('submitBtn');
-  btn.disabled=true;btn.textContent='A enviar...';
-  var data={
-    tipo_analise:activeTab,
-    empresa:document.getElementById('fEmp').value,
-    nome:document.getElementById('fNome').value,
-    email:document.getElementById('fEmail').value,
-    telefone:document.getElementById('fTel').value,
-    distrito:document.getElementById('fDistrito').value,
-    comercializadora:document.getElementById('fComerc').value,
-    consumo_kwh:document.getElementById('fConsumo').value,
-    fatura_eur:document.getElementById('fFatura').value,
-    potencia_kva:document.getElementById('fPot').value,
-    ciclo:document.getElementById('fCiclo').value,
-    cpe:document.getElementById('fCpe').value,
-    tipo_contrato:getChip('tc'),
-    comercializadora_gas:document.getElementById('fComercGas')?document.getElementById('fComercGas').value:'',
-    fatura_gas_eur:document.getElementById('fFaturaGas')?document.getElementById('fFaturaGas').value:'',
-    cui_gas:document.getElementById('fCui')?document.getElementById('fCui').value:'',
-    notas:document.getElementById('fNotas').value,
-    data_hora:new Date().toLocaleString('pt-PT'),
-    fonte:'enersia.pages.dev'
-  };
-  // Make.com webhook principal (CRM: Google Sheets + Gmail)
-  fetch('https://hook.eu1.make.com/o1a2e1x4jm8nrqmnqw8vfocdtnwo6i48', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(data)
-  }).catch(function(){});
-
-  // Formspree backup (email imediato)
-  fetch('https://formspree.io/f/xdabvnlq',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Accept':'application/json'},
-    body:JSON.stringify(data)
-  })
-  .then(function(r){return r.json();})
-  .then(function(){showSuccess(data);})
-  .catch(function(){showSuccess(data);});
-}
-
-function showSuccess(data){
-  ['step1','step2','step3'].forEach(function(id){document.getElementById(id).style.display='none';});
-  document.getElementById('stepBar').style.display='none';
-  document.getElementById('successWrap').classList.add('show');
-  setTimeout(function(){
-    document.getElementById('successWrap').classList.remove('show');
-    runAnalysis(data);
-  },2500);
-}
-
-// PRICES
-var prices={"EDP Comercial":0.1817,"Galp Energia":0.1284,"Endesa":0.1310,"Iberdrola":0.1298,"Repsol":0.1302,"Goldenergy":0.1256,"Plenitude":0.1289,"Coopernico":0.1267};
-// ENERSIA AI — Carrega precos reais do GitHub automaticamente
-(function(){
-  var GITHUB_URL="https://raw.githubusercontent.com/geralenersia-source/enersia/principal/precos.json";
-  fetch(GITHUB_URL+"?t="+Date.now())
-    .then(function(r){return r.json();})
-    .then(function(d){
-      if(!d||!d.comercializadoras)return;
-      Object.entries(d.comercializadoras).forEach(function(e){
-        var nome=e[0], preco=e[1].preco_kwh;
-        if(!preco)return;
-        Object.keys(prices).forEach(function(ns){
-          if(ns.toLowerCase().indexOf(nome.toLowerCase())>=0||nome.toLowerCase().indexOf(ns.split(" ")[0].toLowerCase())>=0){
-            prices[ns]=preco;
-          }
-        });
-      });
-      var edpP=prices["EDP Comercial"]||0.1817;
-      document.querySelectorAll(".tk").forEach(function(tk){
-        var chip=tk.querySelector(".tk-chip");
-        var priceEl=tk.querySelector(".tk-price");
-        var badgeEl=tk.querySelector(".tk-d");
-        if(!chip||!priceEl)return;
-        var texto=chip.textContent.trim().toUpperCase();
-        Object.entries(prices).forEach(function(e){
-          if(e[0].toUpperCase().indexOf(texto)>=0||texto.indexOf(e[0].toUpperCase().split(" ")[0])>=0){
-            priceEl.textContent="€"+e[1].toFixed(4)+"/kWh";
-            var pct=Math.round((1-e[1]/edpP)*100);
-            if(e[0]!=="EDP Comercial"&&pct>0){badgeEl.textContent="−"+pct+"% SAVE";badgeEl.className="tk-d tk-save";}
-          }
-        });
-      });
-      console.log("[ENERSIA AI] Precos actualizados:",d.meta&&d.meta.actualizado_em);
-    })
-    .catch(function(){console.log("[ENERSIA AI] A usar precos locais");});
-})();
-var pColors={'EDP Comercial':'#E8001D','Galp Energia':'#004F8C','Endesa':'#00784A','Iberdrola':'#5800A0','Repsol':'#E85000','Goldenergy':'#D4A000','Plenitude':'#003E82','Coopernico':'#006830'};
-
-function runAnalysis(data){
-  var ldWrap=document.getElementById('ldWrap');
-  ldWrap.classList.add('show');
-  var steps=[
-    ['ls1','A ler dados do contrato...'],['ls2','A identificar tarifa, potência e ciclo...'],
-    ['ls3','A ligar à ERSE em tempo real...'],['ls4','A comparar 8 comercializadoras...'],
-    ['ls5','A calcular poupança exacta...'],['ls6','A avaliar potencial solar...'],
-    ['ls7','A gerar diagnóstico personalizado...']
+  // ─── FIO ELÉCTRICO — ANIMAÇÃO ──────────────────────────────
+  const STEPS_CONFIG = [
+    { no: 'no2', fio: 'fioE1', pulso: 'pulso1', progresso: 25, msg: 'A ler o documento PDF...' },
+    { no: 'no3', fio: 'fioE2', pulso: 'pulso2', progresso: 55, msg: 'A extrair dados de consumo...' },
+    { no: 'no4', fio: 'fioE3', pulso: 'pulso3', progresso: 80, msg: 'A comparar com o mercado...' },
   ];
-  steps.forEach(function(s,i){
-    setTimeout(function(){
-      if(i>0){var prev=document.getElementById(steps[i-1][0]);if(prev){prev.className='ls dn';prev.querySelector('.ls-dot').innerHTML='';}}
-      var el=document.getElementById(s[0]);
-      if(el){el.className='ls act';document.getElementById('ldTitle').textContent=s[1];}
-    },i*600);
-  });
-  setTimeout(function(){
-    var last=document.getElementById(steps[steps.length-1][0]);
-    if(last)last.className='ls dn';
-    setTimeout(function(){
-      ldWrap.classList.remove('show');
-      buildResult(data);
-    },400);
-  },steps.length*600);
-}
+  let stepTimer = null;
 
-function buildResult(data){
-  var cm=data.comercializadora||'EDP Comercial';
-  var con=parseInt(data.consumo_kwh)||2000;
-  var fat=parseInt(data.fatura_eur)||500;
-  var curP=prices[cm]||0.1817;
-  var sorted=Object.entries(prices).sort(function(a,b){return a[1]-b[1];});
-  var bestP=sorted[0][0];
-  var bestPr=sorted[0][1];
-  var savPct=Math.round(((curP-bestPr)/curP)*100);
-  var savAno=Math.round(fat*12*(savPct/100));
-  var score=savPct>25?95:savPct>18?82:savPct>10?68:50;
-  var solar=con>=8000?'Alto — recomendado':con>=2000?'Médio':'Baixo';
+  function animarFio(stepIdx) {
+    if (stepIdx >= STEPS_CONFIG.length) return;
+    const s = STEPS_CONFIG[stepIdx];
 
-  document.getElementById('rScore').textContent=score;
-  document.getElementById('rSav').textContent='€'+savAno.toLocaleString('pt-PT');
-  document.getElementById('rSavSub').textContent='saindo de '+cm+' para '+bestP;
-  document.getElementById('rCur').textContent=cm;
-  document.getElementById('rBest').textContent=bestP;
-  document.getElementById('rDiff').textContent='-'+savPct+'% no preço/kWh';
-  document.getElementById('rSol').textContent=solar;
+    // 1. Activar o fio (remover dashoffset → fio aparece)
+    const fioEl = document.getElementById(s.fio);
+    if (fioEl) {
+      fioEl.style.transition = 'stroke-dashoffset 0.7s cubic-bezier(0.4,0,0.2,1)';
+      fioEl.style.strokeDashoffset = '0';
+    }
 
-  // IA msgs
-  var msgs=[];
-  if(savPct>0)msgs.push({cls:'ia-warn',txt:'<b>Pode poupar '+savPct+'%.</b> O seu contrato com '+cm+' está acima da melhor oferta do mercado.'});
-  if(data.ciclo==='Simples'&&con>2000)msgs.push({cls:'ia-info',txt:'<b>O seu ciclo tarifário não é ideal.</b> Bi-horário pode gerar poupança adicional de 8–12%.'});
-  if(data.potencia_kva&&parseFloat(data.potencia_kva)>41.4)msgs.push({cls:'ia-warn',txt:'<b>Potência contratada pode estar acima do necessário.</b> Revisão pode poupar €200–€800/ano.'});
-  msgs.push({cls:'ia-ok',txt:'<b>Solar:</b> '+(con>=2000?'Potencial ALTO. ROI estimado de 6–8 anos. Recomendamos simulação.':'Potencial médio. Depende da exposição solar.')});
-  var tipoContrato=getChip('tc');
-  if(tipoContrato.includes('Gás')||tipoContrato.includes('Gas')){
-    var fatGas=parseInt(data.fatura_gas_eur)||0;
-    if(fatGas>0){
-      var gasSav=Math.round(fatGas*12*0.12);
-      msgs.push({cls:'ia-info',txt:'<b>Gás incluído na análise.</b> Poupança adicional estimada de €'+gasSav.toLocaleString('pt-PT')+'/ano na comercializadora de gás.'});
-      var gasRow=document.getElementById('rGasRow');
-      if(gasRow){gasRow.style.display='flex';document.getElementById('rGas').textContent='€'+gasSav.toLocaleString('pt-PT')+'/ano';}
+    // 2. Disparar o pulso branco
+    const pulsoEl = document.getElementById(s.pulso);
+    if (pulsoEl) {
+      pulsoEl.style.opacity = '0.9';
+      pulsoEl.style.transition = 'stroke-dashoffset 0.7s ease-out, opacity 0.4s 0.5s';
+      pulsoEl.style.strokeDashoffset = '0';
+      setTimeout(() => { pulsoEl.style.opacity = '0'; }, 500);
+    }
+
+    // 3. Activar o nó de destino
+    setTimeout(() => {
+      const noAnterior = document.getElementById(STEPS_CONFIG[stepIdx - 1]?.no || 'no1');
+      if (noAnterior && stepIdx > 0) {
+        noAnterior.classList.remove('activo');
+        noAnterior.classList.add('done');
+      }
+      const noEl = document.getElementById(s.no);
+      if (noEl) noEl.classList.add('activo');
+
+      // Atualizar mensagem
+      const msgEl = document.getElementById('loadingMsg');
+      if (msgEl) {
+        msgEl.classList.add('fade');
+        setTimeout(() => {
+          msgEl.textContent = s.msg;
+          msgEl.classList.remove('fade');
+        }, 200);
+      }
+
+      // Atualizar barra
+      const bar = document.getElementById('progressBar');
+      if (bar) bar.style.width = s.progresso + '%';
+
+    }, 400);
+  }
+
+  function animarSteps() {
+    // Reset visual
+    ['no1','no2','no3','no4'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.classList.remove('activo','done'); }
+    });
+    document.getElementById('no1').classList.add('activo');
+    ['fioE1','fioE2','fioE3'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.strokeDashoffset = el.getAttribute('stroke-dasharray') || '60';
+    });
+    ['pulso1','pulso2','pulso3'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.style.opacity = '0'; el.style.strokeDashoffset = el.getAttribute('stroke-dasharray')?.split(' ')[1] || '60'; }
+    });
+
+    const bar = document.getElementById('progressBar');
+    if (bar) bar.style.width = '8%';
+    const msg = document.getElementById('loadingMsg');
+    if (msg) msg.textContent = 'A preparar análise...';
+
+    // Disparar steps com intervalo
+    const intervalos = [1200, 3500, 6500];
+    intervalos.forEach((delay, idx) => {
+      setTimeout(() => animarFio(idx), delay);
+    });
+
+    // Mensagem final enquanto aguarda resposta
+    setTimeout(() => {
+      const msgEl = document.getElementById('loadingMsg');
+      if (msgEl) {
+        msgEl.classList.add('fade');
+        setTimeout(() => {
+          msgEl.textContent = 'A gerar recomendação personalizada...';
+          msgEl.classList.remove('fade');
+          const bar = document.getElementById('progressBar');
+          if (bar) bar.style.width = '92%';
+          // Marcar no4 como activo final
+          const no3 = document.getElementById('no3');
+          const no4 = document.getElementById('no4');
+          if (no3) { no3.classList.remove('activo'); no3.classList.add('done'); }
+          if (no4) no4.classList.add('activo');
+        }, 200);
+      }
+    }, 9000);
+  }
+
+  // ─── EXTRAIR JSON — BULLETPROOF ────────────────────────────
+  function extrairJSON(texto) {
+    if (!texto || typeof texto !== 'string') return null;
+
+    // Log para debug
+    console.log('RAW recebido:', texto.substring(0, 200));
+
+    // 1. Limpar caracteres de controlo inválidos em JSON
+    //    (tabs \t e newlines \n são permitidos mas outros control chars não)
+    //    Remove caracteres ASCII 0-8, 11-12, 14-31 que causam "Bad control character"
+    let t = texto
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')  // control chars ilegais
+      .replace(/\r\n/g, '\\n')                          // CRLF → \n literal
+      .replace(/\r/g, '\\n')                            // CR → \n literal
+      .trim();
+
+    // 2. Tentar parse directo
+    try { return JSON.parse(t); } catch(e) {
+      console.log('Parse directo falhou:', e.message);
+    }
+
+    // 3. Remover markdown backticks (todas as variações)
+    t = t.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
+    try { return JSON.parse(t); } catch(e) {}
+
+    // 4. Encontrar o primeiro { e último } e extrair
+    const start = t.indexOf('{');
+    const end   = t.lastIndexOf('}');
+    if (start !== -1 && end !== -1 && end > start) {
+      const candidate = t.slice(start, end + 1);
+      try { return JSON.parse(candidate); } catch(e) {}
+    }
+
+    // 5. Parser manual robusto (para JSON com conteúdo complexo)
+    if (start === -1) return null;
+    let depth = 0, inString = false, escape = false, i = start;
+    while (i < t.length) {
+      const c = t[i];
+      if (escape) { escape = false; i++; continue; }
+      if (c === '\\' && inString) { escape = true; i++; continue; }
+      if (c === '"') { inString = !inString; i++; continue; }
+      if (!inString) {
+        if (c === '{') depth++;
+        else if (c === '}') {
+          depth--;
+          if (depth === 0) {
+            const candidate = t.slice(start, i + 1);
+            try { return JSON.parse(candidate); } catch(e) { break; }
+          }
+        }
+      }
+      i++;
+    }
+
+    // 6. Última tentativa: extrair campos individualmente e reconstruir
+    try {
+      const campos = ['comercializadora','periodo','total_fatura','consumo_kwh',
+                      'poupanca_mensal_estimada','percentagem_poupanca','recomendacao_comercializador',
+                      'motivo_recomendacao','analise_detalhada','urgencia','alertas'];
+      const obj = {};
+      let encontrou = false;
+      campos.forEach(campo => {
+        // Regex para strings
+        const re = new RegExp('"' + campo + '"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)?"', 'i');
+        const m  = t.match(re);
+        if (m) { obj[campo] = m[1]; encontrou = true; }
+      });
+      if (encontrou) return obj;
+    } catch(e) {}
+
+    console.error('extrairJSON: falhou todas as tentativas');
+    return null;
+  }
+
+  // ─── ANALISAR ──────────────────────────────────────────────
+  async function analisar() {
+    if (!ficheiroActual) return;
+
+    // Validar campos de contacto
+    const nome     = document.getElementById('inputNome').value.trim();
+    const email    = document.getElementById('inputEmail').value.trim();
+    const telefone = document.getElementById('inputTelefone').value.trim();
+
+    let erroContacto = false;
+
+    ['inputNome','inputEmail','inputTelefone'].forEach(id => {
+      document.getElementById(id).classList.remove('campo-erro');
+    });
+
+    if (!nome) {
+      document.getElementById('inputNome').classList.add('campo-erro');
+      erroContacto = true;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      document.getElementById('inputEmail').classList.add('campo-erro');
+      erroContacto = true;
+    }
+    if (!telefone || telefone.length < 9) {
+      document.getElementById('inputTelefone').classList.add('campo-erro');
+      erroContacto = true;
+    }
+
+    if (erroContacto) {
+      // Scroll suave para o formulário
+      document.getElementById('inputNome').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // UI: mostrar loading
+    document.getElementById('upload-section').style.display = 'none';
+    document.getElementById('erro').style.display = 'none';
+    document.getElementById('resultado').style.display = 'none';
+    document.getElementById('loading').style.display = 'block';
+    animarSteps();
+
+    try {
+      // Converter para base64
+      const base64 = await lerBase64(ficheiroActual);
+      const mime   = ficheiroActual.type || 'application/pdf';
+
+      // Enviar para Make — com dados de contacto
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ficheiro_base64: base64,
+          mime_type: mime,
+          nome_ficheiro: ficheiroActual.name,
+          tipo: mime.startsWith('image/') ? 'imagem' : 'pdf',
+          nome: nome,
+          email: email,
+          telefone: telefone
+        })
+      });
+
+      if (!res.ok) throw new Error('Erro HTTP: ' + res.status);
+
+      // Usar res.text() em vez de res.json() para controlar o parse
+      // O Make pode devolver control characters dentro das strings que res.json() rejeita
+      const textoRaw = await res.text();
+      console.log('MAKE TEXT RAW (primeiros 300):', textoRaw.substring(0, 300));
+
+      // ── SANITIZAÇÃO COMPLETA ──────────────────────────────
+      // Problema: o Make devolve o JSON do Claude dentro do campo "raw"
+      // com newlines REAIS (\n) dentro das strings — JSON.parse rejeita isso.
+      // Solução: escapar todos os control chars dentro de strings JSON.
+
+      function sanitizarJSONTexto(str) {
+        // Percorre char a char, dentro de strings JSON escapa \n \r \t e outros
+        let resultado = '';
+        let emString = false;
+        let escapando = false;
+        for (let i = 0; i < str.length; i++) {
+          const c = str[i];
+          const code = str.charCodeAt(i);
+          if (escapando) { resultado += c; escapando = false; continue; }
+          if (c === '\\' && emString) { resultado += c; escapando = true; continue; }
+          if (c === '"') { emString = !emString; resultado += c; continue; }
+          if (emString) {
+            // Dentro de string: escapar control chars ilegais
+            if (code === 0x0A) { resultado += '\\n';  continue; } // newline
+            if (code === 0x0D) { resultado += '\\r';  continue; } // CR
+            if (code === 0x09) { resultado += '\\t';  continue; } // tab
+            if (code < 0x20)  { resultado += ' ';    continue; } // outros control
+          }
+          resultado += c;
+        }
+        return resultado;
+      }
+
+      const textoSanitizado = sanitizarJSONTexto(textoRaw.trim());
+      console.log('TEXTO SANITIZADO (300):', textoSanitizado.substring(0, 300));
+
+      // Parsear o envelope do Make {sucesso, raw}
+      let data;
+      try {
+        data = JSON.parse(textoSanitizado);
+      } catch(e) {
+        console.error('Parse envelope falhou:', e.message, '@ pos', e.message.match(/\d+/)?.[0]);
+        // Fallback: tentar extrair JSON directamente do texto bruto
+        const dadosDirectos = extrairJSON(textoSanitizado);
+        if (dadosDirectos) { mostrarResultado(dadosDirectos); return; }
+        throw new Error('Resposta inválida do servidor. Tente novamente.');
+      }
+
+      console.log('MAKE DATA parsed OK:', Object.keys(data));
+
+      // Extrair o campo raw (JSON do Claude)
+      let rawTexto = '';
+      if (typeof data.raw === 'string') {
+        rawTexto = data.raw;
+      } else if (data.raw !== undefined) {
+        rawTexto = JSON.stringify(data.raw);
+      } else {
+        rawTexto = textoSanitizado;
+      }
+
+      console.log('RAW TEXTO final:', rawTexto.substring(0, 300));
+
+      const dados = extrairJSON(rawTexto);
+      console.log('DADOS EXTRAÍDOS:', dados);
+
+      if (!dados) throw new Error('A IA não conseguiu extrair dados suficientes da fatura.');
+
+      mostrarResultado(dados);
+
+    } catch (err) {
+      console.error('ERRO DETALHADO:', err);
+      mostrarErro(err.message || 'Erro desconhecido. Tente novamente.');
     }
   }
-  var iDiv=document.getElementById('iaMsgsDiv');
-  iDiv.innerHTML='';
-  msgs.forEach(function(m){iDiv.innerHTML+='<div class="ia-msg"><div class="ia-ic '+m.cls+'">⚡</div><div>'+m.txt+'</div></div>';});
 
-  // Chart
-  var maxP=Math.max.apply(null,Object.values(prices));
-  var cb=document.getElementById('chartBars');cb.innerHTML='';
-  Object.entries(prices).forEach(function(e){
-    var prov=e[0],price=e[1];
-    var h=Math.round((price/maxP)*100);
-    var isCur=prov===cm;var isBest=prov===bestP;
-    var col=isBest?'#00B4A0':isCur?'rgba(220,50,50,.6)':'#B8C5D8';
-    var bar=document.createElement('div');
-    bar.className='cbar';
-    bar.style.background=col;
-    bar.style.height='0%';
-    bar.innerHTML='<span class="cbar-n">'+(isCur?'★':isBest?'🥇':'')+Object.keys(prices).indexOf(prov)+1+'</span>';
-    cb.appendChild(bar);
-    setTimeout(function(){bar.style.height=h+'%';},100);
-  });
-
-  // Ranking
-  var rd=document.getElementById('rankDiv');rd.innerHTML='';
-  sorted.forEach(function(e,i){
-    var prov=e[0],price=e[1];
-    var isCur=prov===cm;
-    var pos=i+1;
-    var pc=pos===1?'rp1':pos===2?'rp2':pos===3?'rp3':'rpn';
-    var sv=Math.round(((curP-price)/curP)*100);
-    var bw=Math.max(10,Math.round(((maxP-price)/(maxP-sorted[sorted.length-1][1]))*100));
-    rd.innerHTML+='<div class="rank-row'+(isCur?' rank-cur':'')+'"><div class="rank-pos '+pc+'">'+pos+'</div><div class="rank-chip-small" style="background:'+pColors[prov]+';color:#fff">'+prov.split(' ')[0].substring(0,6)+'</div><div class="rank-name">'+(isCur?prov+' (actual)':prov)+'</div><div class="rank-price">€'+price.toFixed(4)+'</div><div class="rank-bar-w"><div class="rank-bar-f" style="width:'+bw+'%"></div></div>'+(isCur?'':'<span class="rank-pct">-'+sv+'%</span>')+'</div>';
-  });
-
-  document.getElementById('resWrap').classList.add('show');
-}
-
-function toggleBooking(){
-  var p=document.getElementById('bkPanel');
-  p.classList.toggle('show');
-  if(p.classList.contains('show'))p.scrollIntoView({behavior:'smooth',block:'nearest'});
-}
-function pickSlot(el){
-  document.querySelectorAll('.slot').forEach(function(s){s.classList.remove('on')});
-  el.classList.add('on');
-  document.getElementById('confBtn').classList.add('show');
-}
-function confirmBook(){
-  document.getElementById('bkPanel').classList.remove('show');
-  var c=document.getElementById('confirmedDiv');
-  c.classList.add('show');
-  c.scrollIntoView({behavior:'smooth',block:'nearest'});
-}
-
-// CHAT
-var chatOpen=false;
-function toggleChat(){
-  chatOpen=!chatOpen;
-  document.getElementById('chatWin').classList.toggle('open',chatOpen);
-  if(chatOpen)document.querySelector('.chat-notif').style.display='none';
-}
-
-// KAROL abre automaticamente após 4 segundos na primeira visita
-(function(){
-  var seen=sessionStorage.getItem('karol_opened');
-  if(!seen){
-    setTimeout(function(){
-      if(!chatOpen){
-        toggleChat();
-        sessionStorage.setItem('karol_opened','1');
-      }
-    },4000);
-  }
-})();
-
-// KAROL — IA real via Claude API
-var karolHistory=[];
-var karolSystem=`És a KAROL, Gestora Energética IA da ENERSIA — a primeira plataforma de IA energética de Portugal. Respondes SEMPRE em português europeu (PT-PT), de forma profissional mas próxima e directa. O teu objectivo é ajudar empresas e famílias a poupar na factura de energia.
-
-CONHECIMENTO:
-- Comparas 8 comercializadoras certificadas pela ERSE: EDP Comercial (referência ~€0.18/kWh), Galp Energia (~€0.13/kWh), Endesa (~€0.13/kWh), Iberdrola (~€0.13/kWh), Repsol (~€0.13/kWh), GoldEnergy (~€0.13/kWh), Plenitude (~€0.13/kWh), Coopernico (~€0.13/kWh)
-- Poupança média identificada: 22% na factura mensal
-- Análise gratuita e sem compromisso — o cliente só muda se quiser
-- Para empresas: análise de potência, ciclo tarifário, sector, factura de gás
-- Para residencial: análise de consumo kWh, tarifa simples/bi-horária, potência kVA
-- Solar: ROI médio 6–8 anos em Portugal, autoconsumo reduz 70–90% da factura
-- Link para análise completa: https://enersia.pages.dev/analisar-fatura.html
-- WhatsApp directo: https://wa.me/351910322702
-- Calendly para reunião: https://calendly.com/geralenersia/30min
-
-COMPORTAMENTO:
-- Respostas curtas e directas (máx 3 parágrafos)
-- Faz UMA pergunta de cada vez para qualificar o cliente
-- Se o cliente mencionar o valor da factura ou comercializadora, calcula a poupança estimada
-- Encaminha para análise completa ou WhatsApp quando o cliente estiver qualificado
-- Nunca inventes preços — usa os valores acima como referência
-- Usa emojis com moderação (⚡ 💰 ☀️ ✅)`;
-
-async function karolResponde(mensagem){
-  karolHistory.push({role:'user',content:mensagem});
-  try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:400,
-        system:karolSystem,
-        messages:karolHistory
-      })
+  // ─── LER BASE64 ────────────────────────────────────────────
+  function lerBase64(ficheiro) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = () => reject(new Error('Erro ao ler ficheiro'));
+      reader.readAsDataURL(ficheiro);
     });
-    var data=await res.json();
-    var reply=data.content&&data.content[0]?data.content[0].text:'Ocorreu um erro. Tente novamente ou contacte-nos pelo WhatsApp. 💬';
-    karolHistory.push({role:'assistant',content:reply});
-    return reply;
-  }catch(e){
-    return 'Desculpe, tive um problema técnico. Pode contactar-nos directamente: ⚡ https://wa.me/351910322702';
   }
-}
 
-function sendQR(t){
-  addMsg(t,'u');
-  document.getElementById('qrDiv').style.display='none';
-  showTyping(async function(){
-    var reply=await karolResponde(t);
-    addMsg(reply,'bot');
-  });
-}
-function sendChat(){
-  var inp=document.getElementById('cwInp');
-  var t=inp.value.trim();
-  if(!t)return;
-  inp.value='';
-  addMsg(t,'u');
-  document.getElementById('qrDiv').style.display='none';
-  showTyping(async function(){
-    var reply=await karolResponde(t);
-    addMsg(reply,'bot');
-  });
-}
-function addMsg(txt,tp){
-  var m=document.getElementById('cwMsgs');
-  var d=document.createElement('div');
-  d.className='cmsg'+(tp==='u'?' u':' cmsg-bot');
-  var now=new Date();
-  var t=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-  var av=tp==='u'?'<div class="cmsg-av cmsg-av-u">👤</div>':'<div class="cmsg-av cmsg-av-b"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmdfa3MyIiBjeD0iNTAlIiBjeT0iMzAlIiByPSI3MCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMWEzYTZiIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzBkMWYzYyIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0ic2tpbl9rczIiIGN4PSI1MCUiIGN5PSI0MCUiIHI9IjYwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmNWM1YTMiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZThhODgyIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGNsaXBQYXRoIGlkPSJjbGlwX2tzMiI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTIiLz48L2NsaXBQYXRoPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJoYWlyX2tzMiIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMmMxODEwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzFhMGUwOCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXBfa3MyKSI+CiAgICA8Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMiIgZmlsbD0idXJsKCNiZ19rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSIyNCIgcng9IjEwIiByeT0iNyIgZmlsbD0iIzFlM2E1ZiIvPgogICAgPHJlY3QgY3g9IjkiIGN5PSIxNyIgd2lkdGg9IjYiIGhlaWdodD0iOCIgcng9IjEiIGZpbGw9IiMxZTNhNWYiLz4KICAgIDxyZWN0IHg9IjEwLjUiIHk9IjE0LjUiIHdpZHRoPSIzIiBoZWlnaHQ9IjQiIHJ4PSIxLjUiIGZpbGw9InVybCgjc2tpbl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSIxMSIgcng9IjQuNSIgcnk9IjUiIGZpbGw9InVybCgjc2tpbl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSI3IiByeD0iNSIgcnk9IjMiIGZpbGw9InVybCgjaGFpcl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iNy41IiBjeT0iMTAuNSIgcng9IjEuMyIgcnk9IjMuNSIgZmlsbD0idXJsKCNoYWlyX2tzMikiLz4KICAgIDxlbGxpcHNlIGN4PSIxNi41IiBjeT0iMTAuNSIgcng9IjEuMyIgcnk9IjMuNSIgZmlsbD0idXJsKCNoYWlyX2tzMikiLz4KICAgIDxlbGxpcHNlIGN4PSIxMC4yIiBjeT0iMTAiIHJ4PSIxLjEiIHJ5PSIwLjkiIGZpbGw9IiMxYTBlMDgiLz4KICAgIDxlbGxpcHNlIGN4PSIxMy44IiBjeT0iMTAiIHJ4PSIxLjEiIHJ5PSIwLjkiIGZpbGw9IiMxYTBlMDgiLz4KICAgIDxjaXJjbGUgY3g9IjEwLjYiIGN5PSI5LjYiIHI9IjAuMzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgIDxjaXJjbGUgY3g9IjE0LjIiIGN5PSI5LjYiIHI9IjAuMzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgIDxwYXRoIGQ9Ik0xMCAxMi41IFExMiAxMy41IDE0IDEyLjUiIHN0cm9rZT0iI2MwNjA0MCIgc3Ryb2tlLXdpZHRoPSIwLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwvZz4KPC9zdmc+" width="24" height="24" style="border-radius:50%;display:block"></div>';
-  d.innerHTML=av+'<div><div class="cmsg-bub">'+txt+'</div><div class="cmsg-t">'+t+'</div></div>';
-  m.appendChild(d);
-  m.scrollTop=m.scrollHeight;
-}
-function showTyping(cb){
-  var m=document.getElementById('cwMsgs');
-  var d=document.createElement('div');
-  d.className='cmsg cmsg-bot';d.id='typing-ind';
-  d.innerHTML='<div class="cmsg-av cmsg-av-b"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmdfa3MyIiBjeD0iNTAlIiBjeT0iMzAlIiByPSI3MCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMWEzYTZiIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzBkMWYzYyIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0ic2tpbl9rczIiIGN4PSI1MCUiIGN5PSI0MCUiIHI9IjYwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmNWM1YTMiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZThhODgyIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGNsaXBQYXRoIGlkPSJjbGlwX2tzMiI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTIiLz48L2NsaXBQYXRoPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJoYWlyX2tzMiIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMmMxODEwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzFhMGUwOCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXBfa3MyKSI+CiAgICA8Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMiIgZmlsbD0idXJsKCNiZ19rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSIyNCIgcng9IjEwIiByeT0iNyIgZmlsbD0iIzFlM2E1ZiIvPgogICAgPHJlY3QgY3g9IjkiIGN5PSIxNyIgd2lkdGg9IjYiIGhlaWdodD0iOCIgcng9IjEiIGZpbGw9IiMxZTNhNWYiLz4KICAgIDxyZWN0IHg9IjEwLjUiIHk9IjE0LjUiIHdpZHRoPSIzIiBoZWlnaHQ9IjQiIHJ4PSIxLjUiIGZpbGw9InVybCgjc2tpbl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSIxMSIgcng9IjQuNSIgcnk9IjUiIGZpbGw9InVybCgjc2tpbl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSI3IiByeD0iNSIgcnk9IjMiIGZpbGw9InVybCgjaGFpcl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iNy41IiBjeT0iMTAuNSIgcng9IjEuMyIgcnk9IjMuNSIgZmlsbD0idXJsKCNoYWlyX2tzMikiLz4KICAgIDxlbGxpcHNlIGN4PSIxNi41IiBjeT0iMTAuNSIgcng9IjEuMyIgcnk9IjMuNSIgZmlsbD0idXJsKCNoYWlyX2tzMikiLz4KICAgIDxlbGxpcHNlIGN4PSIxMC4yIiBjeT0iMTAiIHJ4PSIxLjEiIHJ5PSIwLjkiIGZpbGw9IiMxYTBlMDgiLz4KICAgIDxlbGxpcHNlIGN4PSIxMy44IiBjeT0iMTAiIHJ4PSIxLjEiIHJ5PSIwLjkiIGZpbGw9IiMxYTBlMDgiLz4KICAgIDxjaXJjbGUgY3g9IjEwLjYiIGN5PSI5LjYiIHI9IjAuMzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgIDxjaXJjbGUgY3g9IjE0LjIiIGN5PSI5LjYiIHI9IjAuMzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgIDxwYXRoIGQ9Ik0xMCAxMi41IFExMiAxMy41IDE0IDEyLjUiIHN0cm9rZT0iI2MwNjA0MCIgc3Ryb2tlLXdpZHRoPSIwLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwvZz4KPC9zdmc+" width="24" height="24" style="border-radius:50%;display:block"></div><div><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>';
-  m.appendChild(d);m.scrollTop=m.scrollHeight;
-  Promise.resolve(cb()).finally(function(){var t=document.getElementById('typing-ind');if(t)t.remove();});
-},1100);
-}
+  // ─── MOSTRAR RESULTADO ─────────────────────────────────────
+  function mostrarResultado(d) {
+    document.getElementById('loading').style.display = 'none';
+
+    // Preencher campos
+    document.getElementById('resComercializadora').textContent = d.comercializadora || '—';
+    document.getElementById('resPeriodo').textContent          = d.periodo           || '—';
+    document.getElementById('resTotal').textContent            = d.total_fatura       || '—';
+    document.getElementById('resConsumo').textContent          = d.consumo_kwh        || '—';
+    document.getElementById('resAnalise').textContent          = d.analise_detalhada  || '—';
+    document.getElementById('resRecomendacao').textContent     = d.recomendacao_comercializador || '—';
+    document.getElementById('resMotivo').textContent           = d.motivo_recomendacao || '—';
+
+    // Poupança
+    const poupanca = d.poupanca_mensal_estimada || '—';
+    document.getElementById('resPoupanca').textContent    = poupanca;
+    document.getElementById('resPercentagem').textContent = d.percentagem_poupanca || '—';
+
+    // Alertas
+    const alertasEl  = document.getElementById('resAlertas');
+    const alertasSec = document.getElementById('alertasSecao');
+    alertasEl.innerHTML = '';
+    if (d.alertas && d.alertas.trim() !== '') {
+      // Suporta alertas separados por \n, numerados (1) 2) etc) ou string simples
+      const linhas = d.alertas
+        .split(/\n|\d+\)/)
+        .map(l => l.trim())
+        .filter(l => l.length > 2);
+      if (linhas.length > 0) {
+        linhas.forEach(l => {
+          const li = document.createElement('li');
+          li.textContent = l;
+          alertasEl.appendChild(li);
+        });
+        alertasSec.style.display = 'block';
+      } else {
+        const li = document.createElement('li');
+        li.textContent = d.alertas;
+        alertasEl.appendChild(li);
+        alertasSec.style.display = 'block';
+      }
+    } else {
+      alertasSec.style.display = 'none';
+    }
+
+    document.getElementById('resultado').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ─── MOSTRAR ERRO ──────────────────────────────────────────
+  function mostrarErro(msg) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('erroMensagem').textContent = msg;
+    document.getElementById('erro').style.display = 'block';
+    document.getElementById('upload-section').style.display = 'block';
+  }
+
+  // ─── REINICIAR ─────────────────────────────────────────────
+  function reiniciar() {
+    ficheiroActual = null;
+    fileInput.value = '';
+    document.getElementById('ficheiroSelec').style.display = 'none';
+    document.getElementById('btnAnalisar').disabled = true;
+    document.getElementById('resultado').style.display = 'none';
+    document.getElementById('erro').style.display = 'none';
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('upload-section').style.display = 'block';
+    // Limpar campos de contacto
+    ['inputNome','inputEmail','inputTelefone'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.value = ''; el.classList.remove('campo-erro'); }
+    });
+    // Reset barra e nós
+    const bar = document.getElementById('progressBar');
+    if (bar) bar.style.width = '0%';
+    ['no1','no2','no3','no4'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('activo','done');
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 </script>
-
-
-</body></html>
+</body>
+</html>
