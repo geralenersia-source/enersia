@@ -266,20 +266,23 @@ function extrairJSON(texto) {
   const start = texto.indexOf('{');
   if (start === -1) return null;
 
-  let depth = 0, inString = false, escape = false;
+  // Percorre o texto encontrando o } que fecha o JSON correctamente
+  let depth = 0;
+  let inStr = false;
+  let prev = '';
   for (let i = start; i < texto.length; i++) {
     const ch = texto[i];
-    if (escape) { escape = false; continue; }
-    if (ch === '\' && inString) { escape = true; continue; }
-    if (ch === '"') { inString = !inString; continue; }
-    if (inString) continue;
-    if (ch === '{') depth++;
-    if (ch === '}') {
-      depth--;
-      if (depth === 0) {
-        try { return JSON.parse(texto.slice(start, i + 1)); } catch(e) { break; }
+    if (ch === '"' && prev !== '\\') inStr = !inStr;
+    if (!inStr) {
+      if (ch === '{') depth++;
+      if (ch === '}') {
+        depth--;
+        if (depth === 0) {
+          try { return JSON.parse(texto.slice(start, i + 1)); } catch(e) { break; }
+        }
       }
     }
+    prev = ch;
   }
 
   return null;
