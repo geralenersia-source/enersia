@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0054)file:///C:/Users/User/Downloads/analisar-fatura_3.html -->
+<!-- saved from url=(0052)file:///C:/Users/User/Downloads/analisar-fatura.html -->
 <html lang="pt"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -253,7 +253,8 @@ function extrairJSON(texto) {
   if (!texto) return null;
 
   // Tenta parse directo primeiro
-  try { return JSON.parse(texto.trim()); } catch(e) {}
+  const trimmed = texto.trim();
+  try { return JSON.parse(trimmed); } catch(e) {}
 
   // Tenta extrair de bloco markdown ```json ... ```
   const matchMd = texto.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -261,11 +262,19 @@ function extrairJSON(texto) {
     try { return JSON.parse(matchMd[1].trim()); } catch(e) {}
   }
 
-  // Tenta extrair entre { e } (último recurso)
+  // Encontra o primeiro { e tenta parsear progressivamente do último } para trás
   const start = texto.indexOf('{');
-  const end = texto.lastIndexOf('}');
-  if (start !== -1 && end !== -1 && end > start) {
-    try { return JSON.parse(texto.slice(start, end + 1)); } catch(e) {}
+  if (start === -1) return null;
+
+  // Percorre de trás para a frente procurando um } que feche JSON válido
+  for (let i = texto.length - 1; i >= start; i--) {
+    if (texto[i] === '}') {
+      try {
+        const candidate = texto.slice(start, i + 1);
+        const parsed = JSON.parse(candidate);
+        return parsed;
+      } catch(e) {}
+    }
   }
 
   return null;
