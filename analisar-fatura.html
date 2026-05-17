@@ -2,471 +2,999 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ENERSIA — Analisa a tua Fatura</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
-  :root{--verde:#00C896;--verde-escuro:#009970;--verde-claro:#E6FBF5;--azul-escuro:#0A1628;--azul-mid:#112240;--cinza:#8892A4;--cinza-claro:#F4F7FA;--branco:#fff;--laranja:#FF6B35;--vermelho:#FF4757;--sombra:0 4px 24px rgba(0,0,0,0.08)}
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:'DM Sans',sans-serif;background:#F0F4F8;color:var(--azul-escuro);min-height:100vh}
-  header{background:var(--azul-escuro);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100}
-  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--verde);text-decoration:none}
-  .logo span{color:#fff}
-  nav a{color:rgba(255,255,255,0.6);text-decoration:none;font-size:0.85rem;margin-left:1.5rem;transition:color .2s}
-  nav a:hover{color:var(--verde)}
-  .hero{background:linear-gradient(135deg,var(--azul-escuro),var(--azul-mid));padding:3rem 2rem 4rem;text-align:center;position:relative;overflow:hidden}
-  .hero::before{content:'';position:absolute;top:-50%;left:-20%;width:60%;height:200%;background:radial-gradient(circle,rgba(0,200,150,0.08),transparent 70%);pointer-events:none}
-  .badge-hero{display:inline-flex;align-items:center;gap:6px;background:rgba(0,200,150,0.15);border:1px solid rgba(0,200,150,0.3);color:var(--verde);padding:6px 14px;border-radius:100px;font-size:0.78rem;font-weight:500;margin-bottom:1.2rem}
-  .badge-hero::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--verde);animation:pulse 2s infinite}
-  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
-  .hero h1{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;color:#fff;line-height:1.15;margin-bottom:.8rem}
-  .hero h1 em{font-style:normal;color:var(--verde)}
-  .hero p{color:rgba(255,255,255,0.6);font-size:1rem;max-width:480px;margin:0 auto;line-height:1.6}
-  .main{max-width:760px;margin:-2rem auto 3rem;padding:0 1.5rem;position:relative}
-  .card{background:#fff;border-radius:20px;box-shadow:var(--sombra);padding:2rem;margin-bottom:1.5rem}
-  .how-steps{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem}
-  .how-step{flex:1;min-width:120px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
-  .how-num{width:36px;height:36px;background:var(--verde-claro);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;color:var(--verde-escuro)}
-  .how-step p{font-size:.78rem;color:var(--cinza);line-height:1.4}
-  .error-box{display:none;background:#FEF2F2;border:1.5px solid #FECACA;border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;color:#991B1B;font-size:.85rem}
-  .error-box.show{display:block}
-  .card h2{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:1.2rem}
-  .dropzone{border:2px dashed #D1D9E6;border-radius:14px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all .25s;background:var(--cinza-claro);position:relative}
-  .dropzone:hover,.dropzone.drag-over{border-color:var(--verde);background:var(--verde-claro)}
-  .dropzone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-  .dz-icon{width:52px;height:52px;background:rgba(0,200,150,0.12);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
-  .dz-icon svg{width:26px;height:26px;stroke:var(--verde);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-  .dropzone h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.4rem}
-  .dropzone p{font-size:.83rem;color:var(--cinza);margin-bottom:.8rem}
-  .btn-upload-label{display:inline-block;background:var(--verde);color:#fff;padding:9px 20px;border-radius:8px;font-size:.85rem;font-weight:500;pointer-events:none}
-  .file-preview{display:none;align-items:center;gap:12px;background:var(--verde-claro);border:1px solid rgba(0,200,150,0.25);border-radius:10px;padding:12px 16px;margin-top:1rem}
-  .file-preview.show{display:flex}
-  .fi{width:40px;height:40px;background:var(--verde);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .fi svg{width:20px;height:20px;fill:#fff}
-  .fn{flex:1;min-width:0}
-  .fn-name{font-size:.87rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .fn-size{font-size:.75rem;color:var(--cinza);margin-top:2px}
-  .btn-remove{background:none;border:none;cursor:pointer;color:var(--cinza);padding:4px;border-radius:4px;display:flex;transition:color .2s}
-  .btn-remove:hover{color:var(--vermelho)}
-  .btn-remove svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
-  .or-div{display:flex;align-items:center;gap:12px;margin:1.2rem 0;color:var(--cinza);font-size:.8rem}
-  .or-div::before,.or-div::after{content:'';flex:1;height:1px;background:#E2E8F0}
-  .btn-cam{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border:1.5px solid #D1D9E6;border-radius:10px;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.87rem;color:var(--azul-escuro);font-weight:500;transition:all .2s}
-  .btn-cam:hover{border-color:var(--verde);color:var(--verde);background:var(--verde-claro)}
-  .btn-cam svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-  .info-box{background:var(--verde-claro);border:1px solid rgba(0,200,150,0.2);border-radius:10px;padding:10px 14px;margin-top:1rem;font-size:.82rem;color:#1A4A3A;display:flex;gap:8px;align-items:center}
-  .info-box svg{width:16px;height:16px;flex-shrink:0;stroke:var(--verde-escuro);fill:none;stroke-width:2;stroke-linecap:round}
-  .btn-analisar{width:100%;padding:16px;background:var(--verde);color:#fff;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;margin-top:1.2rem;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px}
-  .btn-analisar:hover{background:var(--verde-escuro);transform:translateY(-1px)}
-  .btn-analisar:disabled{background:#9CA3AF;cursor:not-allowed;transform:none}
-  .btn-analisar svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-  .loading-card{display:none;text-align:center;padding:2.5rem 2rem}
-  .loading-card.show{display:block}
-  .spinner{width:48px;height:48px;border:3px solid var(--verde-claro);border-top-color:var(--verde);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 1.2rem}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .loading-card h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.4rem}
-  .loading-card p{font-size:.85rem;color:var(--cinza)}
-  .lst{list-style:none;margin-top:1.5rem;text-align:left;max-width:300px;margin-left:auto;margin-right:auto}
-  .lst li{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:.83rem;color:var(--cinza);transition:color .3s}
-  .lst li.done{color:var(--verde)}
-  .lst li.active{color:var(--azul-escuro);font-weight:500}
-  .sdot{width:20px;height:20px;border-radius:50%;border:2px solid #D1D9E6;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .3s}
-  li.done .sdot{border-color:var(--verde);background:var(--verde);color:#fff}
-  li.active .sdot{border-color:var(--verde);animation:pb 1s infinite}
-  @keyframes pb{0%,100%{box-shadow:0 0 0 0 rgba(0,200,150,0.4)}50%{box-shadow:0 0 0 4px rgba(0,200,150,0.1)}}
-  .res-card{display:none;overflow:hidden}
-  .res-card.show{display:block}
-  .res-header{background:var(--azul-escuro);padding:1.5rem 2rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
-  .res-header h2{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:.3rem}
-  .res-header p{font-size:.82rem;color:rgba(255,255,255,0.5)}
-  .poub{background:var(--verde);color:#fff;padding:8px 16px;border-radius:10px;text-align:center;flex-shrink:0}
-  .poub .val{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;display:block;line-height:1}
-  .poub .lbl{font-size:.7rem;opacity:.85;margin-top:2px;display:block}
-  .res-body{padding:1.5rem 2rem}
-  .dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:1.5rem}
-  .ditem{background:var(--cinza-claro);border-radius:10px;padding:12px 14px}
-  .dlabel{font-size:.72rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
-  .dval{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700}
-  .dval.d{color:var(--verde)}
-  .dval.a{color:var(--laranja)}
-  .stitle{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:.8rem;padding-bottom:.5rem;border-bottom:1px solid #EEF2F7}
-  .recbox{background:linear-gradient(135deg,#E6FBF5,#F0FDF9);border:1.5px solid rgba(0,200,150,0.2);border-radius:14px;padding:1.2rem 1.5rem;margin:1rem 0}
-  .recbox h4{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--verde-escuro);margin-bottom:.5rem}
-  .recbox p{font-size:.85rem;color:#1A4A3A;line-height:1.65}
-  .abox{background:#FFF8E7;border:1.5px solid #FFE082;border-radius:10px;padding:10px 14px;margin-top:8px;font-size:.83rem;color:#7A5C00;display:flex;gap:8px;align-items:flex-start}
-  .abox svg{width:16px;height:16px;flex-shrink:0;margin-top:1px}
-  .cta-b{background:var(--azul-escuro);border-radius:16px;padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:1.5rem}
-  .cta-b h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:#fff;margin-bottom:.2rem}
-  .cta-b p{font-size:.82rem;color:rgba(255,255,255,0.55)}
-  .btn-c{background:var(--verde);color:#fff;padding:12px 22px;border-radius:10px;border:none;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;white-space:nowrap;transition:all .2s;text-decoration:none;display:inline-block}
-  .btn-c:hover{background:var(--verde-escuro)}
-  .aitxt{font-size:.87rem;line-height:1.75;color:#374151}
-  .aitxt p{margin-bottom:.8rem}
-  .btn-nova{width:100%;padding:12px;background:#fff;border:1.5px solid #D1D9E6;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--cinza);cursor:pointer;transition:all .2s;margin-bottom:1rem}
-  .btn-nova:hover{border-color:var(--verde);color:var(--verde)}
-  footer{text-align:center;padding:2rem 1.5rem;font-size:.78rem;color:var(--cinza)}
-  footer a{color:var(--verde);text-decoration:none}
-  @media(max-width:480px){.res-header,.cta-b{flex-direction:column}.btn-c{width:100%;text-align:center}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ENERSIA — Analisa a tua Fatura</title>
+  <style>
+    :root {
+      --verde: #00c896;
+      --verde-escuro: #00a87a;
+      --azul-escuro: #0a1628;
+      --azul-medio: #112240;
+      --texto: #e8f0fe;
+      --texto-secundario: #8892a4;
+      --card-bg: #ffffff;
+      --card-borda: #e5e7eb;
+      --erro: #ef4444;
+      --aviso: #f59e0b;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--azul-escuro);
+      color: var(--texto);
+      min-height: 100vh;
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: rgba(10,22,40,0.95);
+      border-bottom: 1px solid rgba(0,200,150,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { font-size: 1.4rem; font-weight: 800; color: var(--verde); letter-spacing: 2px; }
+    .logo span { color: var(--texto); }
+    nav a { color: var(--texto-secundario); text-decoration: none; margin-left: 1.5rem; font-size: 0.9rem; }
+    nav a.active { color: var(--verde); }
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+      background: linear-gradient(180deg, #0a1628 0%, #112240 100%);
+    }
+    .hero h1 { font-size: 2.2rem; font-weight: 800; line-height: 1.2; margin-bottom: 1rem; }
+    .hero h1 em { color: var(--verde); font-style: normal; }
+    .hero p { color: var(--texto-secundario); font-size: 1rem; max-width: 480px; margin: 0 auto 2rem; }
+    .como-funciona {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .passo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      color: var(--texto-secundario);
+      max-width: 90px;
+      text-align: center;
+    }
+    .passo-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(0,200,150,0.15);
+      border: 1px solid var(--verde);
+      color: var(--verde);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.85rem;
+    }
+    .container { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 2rem;
+      color: #1a1a2e;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    }
+    .card h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
+    .upload-area {
+      border: 2px dashed #d1d5db;
+      border-radius: 12px;
+      padding: 2.5rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .upload-area:hover, .upload-area.dragover {
+      border-color: var(--verde-escuro);
+      background: rgba(0,200,150,0.04);
+    }
+    .upload-area input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .upload-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+    .upload-area h3 { font-size: 1rem; font-weight: 600; color: #1a1a2e; margin-bottom: 0.3rem; }
+    .upload-area p { font-size: 0.82rem; color: #6b7280; }
+    .btn-escolher {
+      display: inline-block;
+      background: var(--verde);
+      color: white;
+      padding: 0.6rem 1.4rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      margin-top: 1rem;
+      cursor: pointer;
+      border: none;
+      pointer-events: none;
+    }
+    .divisor { display: flex; align-items: center; gap: 1rem; margin: 1rem 0; color: #9ca3af; font-size: 0.82rem; }
+    .divisor::before, .divisor::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
+    .btn-camera {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: white;
+      color: #374151;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .ficheiro-selec {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      margin-top: 1rem;
+    }
+    .ficheiro-selec .icon { font-size: 1.6rem; }
+    .ficheiro-selec .info { flex: 1; }
+    .ficheiro-selec .nome { font-size: 0.88rem; font-weight: 600; color: #166534; }
+    .ficheiro-selec .tamanho { font-size: 0.78rem; color: #4ade80; }
+    .ficheiro-selec .remover { background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 1.1rem; padding: 0.2rem; }
+    .nota-privacidade {
+      text-align: center;
+      font-size: 0.78rem;
+      color: #9ca3af;
+      margin: 0.8rem 0 1.2rem;
+    }
+    .btn-analisar {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--verde), var(--verde-escuro));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.3px;
+    }
+    .btn-analisar:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,200,150,0.4); }
+    .btn-analisar:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* LOADING — FIO ELÉCTRICO */
+    #loading { display: none; }
+    .loading-card {
+      background: var(--azul-medio);
+      border-radius: 20px;
+      padding: 2.5rem 1.5rem 2rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(0,200,150,0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    .loading-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(0,200,150,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .loading-titulo {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--verde);
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+    }
+    .loading-subtitulo {
+      font-size: 0.88rem;
+      color: var(--texto-secundario);
+      margin-bottom: 2rem;
+    }
+
+    /* CIRCUITO SVG */
+    .circuito-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto 2rem;
+    }
+    .circuito-svg { width: 100%; height: auto; display: block; }
+
+    /* Nós do circuito */
+    .no-circulo {
+      transition: all 0.4s ease;
+    }
+    .no-circulo.activo circle {
+      fill: var(--verde);
+      filter: drop-shadow(0 0 8px rgba(0,200,150,0.8));
+    }
+    .no-circulo.activo .no-num { fill: #0a1628; }
+    .no-circulo.done circle { fill: var(--verde); opacity: 0.5; }
+    .no-circulo.done .no-num { fill: #0a1628; }
+
+    /* Linha base */
+    .fio-base { stroke: rgba(255,255,255,0.07); stroke-width: 2; fill: none; stroke-linecap: round; }
+
+    /* Fio carregado */
+    .fio-energia {
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .fio-energia.seg1 { stroke: url(#gradFio1); }
+    .fio-energia.seg2 { stroke: url(#gradFio2); }
+    .fio-energia.seg3 { stroke: url(#gradFio3); }
+
+    /* Pulso de energia que percorre o fio */
+    .pulso {
+      fill: none;
+      stroke: #fff;
+      stroke-width: 3;
+      stroke-linecap: round;
+      opacity: 0;
+    }
+    .pulso.a { animation: pulsoMover1 1.2s ease-in-out forwards; }
+    .pulso.b { animation: pulsoMover2 1.2s ease-in-out forwards; }
+    .pulso.c { animation: pulsoMover3 1.2s ease-in-out forwards; }
+
+    @keyframes pulsoMover1 {
+      0%   { stroke-dashoffset: 120; opacity: 0.9; }
+      100% { stroke-dashoffset: 0;   opacity: 0; }
+    }
+    @keyframes pulsoMover2 {
+      0%   { stroke-dashoffset: 120; opacity: 0.9; }
+      100% { stroke-dashoffset: 0;   opacity: 0; }
+    }
+    @keyframes pulsoMover3 {
+      0%   { stroke-dashoffset: 120; opacity: 0.9; }
+      100% { stroke-dashoffset: 0;   opacity: 0; }
+    }
+
+    /* Ícone check no nó */
+    .check-icon {
+      opacity: 0;
+      transition: opacity 0.3s 0.2s;
+    }
+    .no-circulo.activo .check-icon,
+    .no-circulo.done .check-icon { opacity: 1; }
+
+    /* Label do passo */
+    .step-label {
+      font-size: 11px;
+      fill: var(--texto-secundario);
+      text-anchor: middle;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      transition: fill 0.3s;
+    }
+    .no-circulo.activo .step-label,
+    .no-circulo.done  .step-label { fill: var(--verde); }
+
+    /* Mensagem dinâmica */
+    .loading-msg {
+      font-size: 0.9rem;
+      color: var(--texto);
+      font-weight: 500;
+      min-height: 1.4em;
+      transition: opacity 0.3s;
+    }
+    .loading-msg.fade { opacity: 0; }
+
+    /* Barra de progresso */
+    .progress-bar-wrap {
+      background: rgba(255,255,255,0.06);
+      border-radius: 99px;
+      height: 4px;
+      margin: 1rem auto 0;
+      max-width: 280px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--verde), #00ffb3);
+      width: 0%;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 8px rgba(0,200,150,0.6);
+    }
+
+    /* ERRO */
+    #erro { display: none; }
+    .erro-card {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      color: var(--erro);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+    }
+
+    /* RESULTADO */
+    #resultado { display: none; }
+    .resultado-header {
+      background: var(--azul-medio);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(0,200,150,0.2);
+    }
+    .resultado-header h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .resultado-header .periodo { font-size: 0.82rem; color: var(--texto-secundario); }
+    .poupanca-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--verde);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      margin-top: 0.8rem;
+    }
+    .metricas {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+    .metrica {
+      background: var(--azul-medio);
+      border-radius: 12px;
+      padding: 1rem;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .metrica .label { font-size: 0.72rem; color: var(--texto-secundario); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem; }
+    .metrica .valor { font-size: 1.1rem; font-weight: 700; color: var(--texto); }
+    .metrica .valor.destaque { color: var(--verde); }
+    .secao {
+      background: var(--azul-medio);
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 0.8rem;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .secao h3 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--texto-secundario); margin-bottom: 0.7rem; }
+    .secao p { font-size: 0.88rem; line-height: 1.6; color: var(--texto); }
+    .alertas-lista { list-style: none; }
+    .alertas-lista li {
+      font-size: 0.85rem;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      line-height: 1.5;
+    }
+    .alertas-lista li:last-child { border-bottom: none; }
+    .recomendacao-card {
+      background: linear-gradient(135deg, rgba(0,200,150,0.12), rgba(0,168,122,0.08));
+      border: 1px solid rgba(0,200,150,0.3);
+      border-radius: 14px;
+      padding: 1.4rem;
+      margin-bottom: 1rem;
+    }
+    .recomendacao-card h3 { color: var(--verde); font-size: 0.9rem; margin-bottom: 0.4rem; }
+    .recomendacao-card .nome-comercial { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.6rem; }
+    .recomendacao-card p { font-size: 0.85rem; line-height: 1.6; color: var(--texto-secundario); }
+    .cta-card {
+      background: var(--azul-medio);
+      border-radius: 14px;
+      padding: 1.4rem;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 1rem;
+    }
+    .cta-card p { font-size: 0.85rem; color: var(--texto-secundario); margin-bottom: 1rem; }
+    .btn-cta {
+      display: inline-block;
+      background: var(--verde);
+      color: white;
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    .btn-nova {
+      width: 100%;
+      padding: 0.75rem;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      color: var(--texto-secundario);
+      font-size: 0.88rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    .btn-nova:hover { border-color: var(--verde); color: var(--verde); }
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.78rem;
+      color: var(--texto-secundario);
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    footer a { color: var(--verde); text-decoration: none; }
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 1.6rem; }
+      .metricas { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <a href="/" class="logo">ENER<span>SIA</span></a>
-  <nav>
-    <a href="/">Início</a>
-    <a href="/#precos">Preços</a>
-    <a href="/analisar-fatura.html" style="color:var(--verde)">Analisar Fatura</a>
-  </nav>
-</header>
+<nav>
+  <div class="logo">ENER<span>SIA</span></div>
+  <div>
+    <a href="https://enersia.pages.dev/">Início</a>
+    <a href="https://enersia.pages.dev/#precos">Preços</a>
+    <a href="#" class="active">Analisar Fatura</a>
+  </div>
+</nav>
 
 <div class="hero">
-  <div class="badge-hero">IA a trabalhar para ti</div>
   <h1>A tua fatura analisada<br>em <em>15 segundos</em></h1>
   <p>Envia a tua fatura de energia. A nossa IA lê tudo, compara com o mercado e diz-te exatamente quanto podes poupar.</p>
+  <div class="como-funciona">
+    <div class="passo"><div class="passo-num">1</div>Upload do PDF ou foto</div>
+    <div class="passo"><div class="passo-num">2</div>IA extrai os dados</div>
+    <div class="passo"><div class="passo-num">3</div>Compara com o mercado</div>
+    <div class="passo"><div class="passo-num">4</div>Recomendação personalizada</div>
+  </div>
 </div>
 
-<div class="main">
+<div class="container">
 
-  <div class="card">
-    <h2 style="font-family:'Syne',sans-serif;font-size:.95rem">Como funciona</h2>
-    <div class="how-steps">
-      <div class="how-step"><div class="how-num">1</div><p>Upload do PDF ou foto</p></div>
-      <div class="how-step"><div class="how-num">2</div><p>IA extrai os dados</p></div>
-      <div class="how-step"><div class="how-num">3</div><p>Compara com o mercado</p></div>
-      <div class="how-step"><div class="how-num">4</div><p>Recomendação personalizada</p></div>
+  <!-- UPLOAD -->
+  <div id="upload-section">
+    <div class="card">
+      <h2>📄 Envia a tua fatura</h2>
+      <div class="upload-area" id="uploadArea">
+        <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,image/*" capture="environment">
+        <div class="upload-icon">⬆️</div>
+        <h3>Arrasta a fatura aqui</h3>
+        <p>PDF ou foto (JPG, PNG) — máximo 10MB</p>
+        <span class="btn-escolher">Escolher ficheiro</span>
+      </div>
+
+      <div class="divisor">ou</div>
+
+      <button class="btn-camera" onclick="document.getElementById('cameraInput').click()">
+        📷 Foto com o telemóvel
+      </button>
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
+
+      <div id="ficheiroSelec" style="display:none" class="ficheiro-selec">
+        <span class="icon">📄</span>
+        <div class="info">
+          <div class="nome" id="ficheiroNome"></div>
+          <div class="tamanho" id="ficheiroTamanho"></div>
+        </div>
+        <button class="remover" onclick="removerFicheiro()">✕</button>
+      </div>
+
+      <p class="nota-privacidade">🔒 Análise gratuita e confidencial. Os teus dados não são partilhados com terceiros.</p>
+
+      <button class="btn-analisar" id="btnAnalisar" onclick="analisar()" disabled>
+        Analisar Fatura com IA — Grátis
+      </button>
     </div>
   </div>
 
-  <div class="error-box" id="errorBox"></div>
+  <!-- LOADING — FIO ELÉCTRICO -->
+  <div id="loading">
+    <div class="loading-card">
+      <div class="loading-titulo">⚡ ENERSIA IA</div>
+      <div class="loading-subtitulo">A analisar a tua fatura de energia</div>
 
-  <div class="card" id="uploadCard">
-    <h2>📄 Envia a tua fatura</h2>
-    <div class="dropzone" id="dropzone">
-      <input type="file" id="fileInput" accept=".pdf,image/*">
-      <div class="dz-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></div>
-      <h3>Arrasta a fatura aqui</h3>
-      <p>PDF ou foto (JPG, PNG) — máximo 10MB</p>
-      <span class="btn-upload-label">Escolher ficheiro</span>
-    </div>
+      <div class="circuito-wrap">
+        <svg class="circuito-svg" viewBox="0 0 360 160" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Gradientes dos fios -->
+            <linearGradient id="gradFio1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#00c896"/>
+              <stop offset="100%" stop-color="#00ffb3"/>
+            </linearGradient>
+            <linearGradient id="gradFio2" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#00ffb3"/>
+              <stop offset="100%" stop-color="#00c896"/>
+            </linearGradient>
+            <linearGradient id="gradFio3" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#00c896"/>
+              <stop offset="100%" stop-color="#7fffd4"/>
+            </linearGradient>
+            <!-- Glow filter -->
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2.5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
 
-    <div class="file-preview" id="filePreview">
-      <div class="fi"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="none"></path></svg></div>
-      <div class="fn"><div class="fn-name" id="fileName">—</div><div class="fn-size" id="fileSize">—</div></div>
-      <button class="btn-remove" id="removeFile"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-    </div>
+          <!-- FIOS BASE (cinza escuro) -->
+          <!-- Seg 1: nó1 → nó2 (linha horizontal simples) -->
+          <path class="fio-base" d="M 68,80 L 128,80"/>
+          <!-- Seg 2: nó2 → nó3 -->
+          <path class="fio-base" d="M 168,80 L 192,80"/>
+          <!-- Seg 3: nó3 → nó4 -->
+          <path class="fio-base" d="M 232,80 L 292,80"/>
 
-    <div class="or-div">ou</div>
+          <!-- FIOS ENERGIA (animados, verde) -->
+          <path id="fioE1" class="fio-energia seg1" d="M 68,80 L 128,80" stroke-dasharray="60" stroke-dashoffset="60"/>
+          <path id="fioE2" class="fio-energia seg2" d="M 168,80 L 192,80 Q 212,80 212,80" stroke-dasharray="44" stroke-dashoffset="44"/>
+          <path id="fioE3" class="fio-energia seg3" d="M 232,80 L 292,80" stroke-dasharray="60" stroke-dashoffset="60"/>
 
-    <button class="btn-cam" onclick="document.getElementById('camInput').click()">
-      <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-      Foto com o telemóvel
-    </button>
-    <input type="file" id="camInput" accept="image/*" capture="environment" style="display:none">
+          <!-- PULSOS (faísca branca) -->
+          <path id="pulso1" class="pulso" d="M 68,80 L 128,80" stroke-dasharray="20 40" stroke-dashoffset="60"/>
+          <path id="pulso2" class="pulso" d="M 168,80 L 212,80" stroke-dasharray="20 24" stroke-dashoffset="44"/>
+          <path id="pulso3" class="pulso" d="M 232,80 L 292,80" stroke-dasharray="20 40" stroke-dashoffset="60"/>
 
-    <div class="info-box">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-      Análise gratuita e confidencial. Os teus dados não são partilhados com terceiros.
-    </div>
+          <!-- NÓ 1 — Upload -->
+          <g id="no1" class="no-circulo activo" filter="url(#glow)">
+            <circle cx="40" cy="80" r="22" fill="rgba(0,200,150,0.12)" stroke="#00c896" stroke-width="1.5"/>
+            <text class="no-num" x="40" y="85" text-anchor="middle" font-size="13" font-weight="800" fill="#00c896">1</text>
+            <text class="step-label" x="40" y="118">Upload</text>
+          </g>
 
-    <button class="btn-analisar" id="btnAnalisar" onclick="analisar()" disabled>
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
-      Analisar Fatura com IA — Grátis
-    </button>
-  </div>
+          <!-- NÓ 2 — Leitura -->
+          <g id="no2" class="no-circulo" filter="url(#glow)">
+            <circle cx="148" cy="80" r="22" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+            <text class="no-num" x="148" y="85" text-anchor="middle" font-size="13" font-weight="800" fill="#8892a4">2</text>
+            <text class="step-label" x="148" y="118">Leitura IA</text>
+          </g>
 
-  <div class="card loading-card" id="loadingCard">
-    <div class="spinner"></div>
-    <h3>A IA está a analisar a tua fatura...</h3>
-    <p>Aguarda uns segundos</p>
-    <ul class="lst">
-      <li id="s1"><span class="sdot">✓</span> A ler o documento</li>
-      <li id="s2"><span class="sdot">✓</span> A extrair dados de consumo</li>
-      <li id="s3"><span class="sdot">✓</span> A comparar com o mercado</li>
-      <li id="s4"><span class="sdot">✓</span> A gerar recomendação</li>
-    </ul>
-  </div>
+          <!-- NÓ 3 — Comparação -->
+          <g id="no3" class="no-circulo" filter="url(#glow)">
+            <circle cx="212" cy="80" r="22" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+            <text class="no-num" x="212" y="85" text-anchor="middle" font-size="13" font-weight="800" fill="#8892a4">3</text>
+            <text class="step-label" x="212" y="118">Mercado</text>
+          </g>
 
-  <div class="card res-card" id="resCard">
-    <div class="res-header">
-      <div><h2 id="rComercializadora">—</h2><p id="rPeriodo">—</p></div>
-      <div class="poub" id="poub" style="display:none"><span class="val" id="pVal">—</span><span class="lbl">poupança/mês</span></div>
-    </div>
-    <div class="res-body">
-      <p class="stitle">Dados extraídos</p>
-      <div class="dgrid" id="dgrid"></div>
-      <p class="stitle" style="margin-top:1.5rem">Análise detalhada</p>
-      <div class="aitxt" id="aitxt"></div>
-      <div class="cta-b">
-        <div><h3>Quer mudar e poupar já?</h3><p>Gerimos tudo, sem custos de mudança.</p></div>
-        <a href="https://calendly.com/geralenersia/30min" target="_blank" class="btn-c">Agendar Consulta →</a>
+          <!-- NÓ 4 — Resultado -->
+          <g id="no4" class="no-circulo" filter="url(#glow)">
+            <circle cx="320" cy="80" r="22" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+            <text class="no-num" x="320" y="85" text-anchor="middle" font-size="13" font-weight="800" fill="#8892a4">4</text>
+            <text class="step-label" x="320" y="118">Resultado</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="loading-msg" id="loadingMsg">A preparar análise...</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressBar"></div>
       </div>
     </div>
   </div>
 
-  <button class="btn-nova" id="btnNova" onclick="resetForm()" style="display:none">↺ Analisar outra fatura</button>
+  <!-- ERRO -->
+  <div id="erro">
+    <div class="erro-card">
+      ⚠️ <span id="erroMensagem">Ocorreu um erro ao processar a fatura. Por favor tente novamente ou contacte-nos.</span>
+    </div>
+    <button class="btn-nova" onclick="reiniciar()">↺ Tentar novamente</button>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="resultado">
+    <div class="resultado-header">
+      <h2 id="resComercializadora">—</h2>
+      <div class="periodo" id="resPeriodo">—</div>
+      <div class="poupanca-badge">💰 <span id="resPoupanca">—</span> poupança/mês</div>
+    </div>
+
+    <div class="metricas">
+      <div class="metrica">
+        <div class="label">Total Fatura</div>
+        <div class="valor" id="resTotal">—</div>
+      </div>
+      <div class="metrica">
+        <div class="label">Consumo</div>
+        <div class="valor" id="resConsumo">—</div>
+      </div>
+      <div class="metrica">
+        <div class="label">Poupança Estimada</div>
+        <div class="valor destaque" id="resPercentagem">—</div>
+      </div>
+    </div>
+
+    <div class="secao">
+      <h3>Análise Detalhada</h3>
+      <p id="resAnalise">—</p>
+    </div>
+
+    <div class="secao" id="alertasSecao">
+      <h3>⚠️ Alertas</h3>
+      <ul class="alertas-lista" id="resAlertas"></ul>
+    </div>
+
+    <div class="recomendacao-card">
+      <h3>💡 Recomendação ENERSIA</h3>
+      <div class="nome-comercial">Mudar para <span id="resRecomendacao">—</span></div>
+      <p id="resMotivo">—</p>
+    </div>
+
+    <div class="cta-card">
+      <p>Quer mudar e poupar já? Gerimos tudo, sem custos de mudança.</p>
+      <a href="https://calendly.com/geralenersia/30min" class="btn-cta" target="_blank">Agendar Consulta →</a>
+    </div>
+
+    <button class="btn-nova" onclick="reiniciar()">↺ Analisar outra fatura</button>
+  </div>
+
 </div>
 
 <footer>
-  <p>© 2026 ENERSIA · <a href="/">Voltar ao site</a> · Análise gratuita e confidencial</p>
+  © 2026 ENERSIA · <a href="https://enersia.pages.dev/">Voltar ao site</a> · Análise gratuita e confidencial
 </footer>
 
 <script>
-const WH = 'https://hook.eu1.make.com/rc32bxy5vo23zg4vpt2mjrs10gep58la';
-let file = null, fileB64 = null;
+  const WEBHOOK_URL = 'https://hook.eu1.make.com/rc32bxy5vo23zg4vpt2mjrs10gep58la';
+  let ficheiroActual = null;
 
-const fi = document.getElementById('fileInput');
-const ci = document.getElementById('camInput');
-const btn = document.getElementById('btnAnalisar');
+  // ─── UPLOAD ────────────────────────────────────────────────
+  const uploadArea = document.getElementById('uploadArea');
+  const fileInput  = document.getElementById('fileInput');
 
-fi.addEventListener('change', e => e.target.files[0] && handleFile(e.target.files[0]));
-ci.addEventListener('change', e => e.target.files[0] && handleFile(e.target.files[0]));
+  uploadArea.addEventListener('dragover',  e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+  uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+  uploadArea.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (f) definirFicheiro(f);
+  });
 
-const dz = document.getElementById('dropzone');
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
-dz.addEventListener('drop', e => {
-  e.preventDefault(); dz.classList.remove('drag-over');
-  e.dataTransfer.files[0] && handleFile(e.dataTransfer.files[0]);
-});
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) definirFicheiro(fileInput.files[0]); });
+  document.getElementById('cameraInput').addEventListener('change', function() {
+    if (this.files[0]) definirFicheiro(this.files[0]);
+  });
 
-document.getElementById('removeFile').addEventListener('click', () => {
-  file = null; fileB64 = null; fi.value = ''; ci.value = '';
-  document.getElementById('filePreview').classList.remove('show');
-  btn.disabled = true;
-});
+  function definirFicheiro(f) {
+    if (f.size > 10 * 1024 * 1024) { alert('Ficheiro demasiado grande. Máximo 10MB.'); return; }
+    ficheiroActual = f;
+    document.getElementById('ficheiroNome').textContent = f.name;
+    document.getElementById('ficheiroTamanho').textContent = (f.size / 1024).toFixed(0) + ' KB';
+    document.getElementById('ficheiroSelec').style.display = 'flex';
+    document.getElementById('btnAnalisar').disabled = false;
+  }
 
-function handleFile(f) {
-  if (f.size > 10*1024*1024) { showErr('Ficheiro demasiado grande. Máximo 10MB.'); return; }
-  file = f;
-  document.getElementById('fileName').textContent = f.name;
-  document.getElementById('fileSize').textContent = (f.size/1024).toFixed(0) + ' KB';
-  document.getElementById('filePreview').classList.add('show');
-  const reader = new FileReader();
-  reader.onload = e => { fileB64 = e.target.result.split(',')[1]; btn.disabled = false; };
-  reader.readAsDataURL(f);
-  clearErr();
-}
+  function removerFicheiro() {
+    ficheiroActual = null;
+    fileInput.value = '';
+    document.getElementById('ficheiroSelec').style.display = 'none';
+    document.getElementById('btnAnalisar').disabled = true;
+  }
 
-// Extrai JSON de texto — suporta JSON puro, markdown, e texto com lixo à volta
-function extrairJSON(texto) {
-  if (!texto) return null;
+  // ─── FIO ELÉCTRICO — ANIMAÇÃO ──────────────────────────────
+  const STEPS_CONFIG = [
+    { no: 'no2', fio: 'fioE1', pulso: 'pulso1', progresso: 25, msg: 'A ler o documento PDF...' },
+    { no: 'no3', fio: 'fioE2', pulso: 'pulso2', progresso: 55, msg: 'A extrair dados de consumo...' },
+    { no: 'no4', fio: 'fioE3', pulso: 'pulso3', progresso: 80, msg: 'A comparar com o mercado...' },
+  ];
+  let stepTimer = null;
 
-  // Limpa o texto
-  let t = texto.trim();
+  function animarFio(stepIdx) {
+    if (stepIdx >= STEPS_CONFIG.length) return;
+    const s = STEPS_CONFIG[stepIdx];
 
-  // Tenta parse directo
-  try { return JSON.parse(t); } catch(e) {}
+    // 1. Activar o fio (remover dashoffset → fio aparece)
+    const fioEl = document.getElementById(s.fio);
+    if (fioEl) {
+      fioEl.style.transition = 'stroke-dashoffset 0.7s cubic-bezier(0.4,0,0.2,1)';
+      fioEl.style.strokeDashoffset = '0';
+    }
 
-  // Extrai de bloco markdown ```json ... ```
-  const md = t.match(/`{3}(?:json)?[\r\n]+([\s\S]*?)`{3}/);
-  if (md) { try { return JSON.parse(md[1].trim()); } catch(e) {} }
+    // 2. Disparar o pulso branco
+    const pulsoEl = document.getElementById(s.pulso);
+    if (pulsoEl) {
+      pulsoEl.style.opacity = '0.9';
+      pulsoEl.style.transition = 'stroke-dashoffset 0.7s ease-out, opacity 0.4s 0.5s';
+      pulsoEl.style.strokeDashoffset = '0';
+      setTimeout(() => { pulsoEl.style.opacity = '0'; }, 500);
+    }
 
-  // Encontra o { de abertura
-  const start = t.indexOf('{');
-  if (start === -1) return null;
+    // 3. Activar o nó de destino
+    setTimeout(() => {
+      const noAnterior = document.getElementById(STEPS_CONFIG[stepIdx - 1]?.no || 'no1');
+      if (noAnterior && stepIdx > 0) {
+        noAnterior.classList.remove('activo');
+        noAnterior.classList.add('done');
+      }
+      const noEl = document.getElementById(s.no);
+      if (noEl) noEl.classList.add('activo');
 
-  // Percorre caracter a caracter contando chavetas, ignorando strings
-  let depth = 0, inString = false, i = start;
-  while (i < t.length) {
-    const c = t[i];
-    if (inString) {
-      if (c === '\\') { i += 2; continue; } // skip escaped char
-      if (c === '"') inString = false;
-    } else {
-      if (c === '"') { inString = true; }
-      else if (c === '{') { depth++; }
-      else if (c === '}') {
-        depth--;
-        if (depth === 0) {
-          const candidate = t.slice(start, i + 1);
-          try { return JSON.parse(candidate); } catch(e) { break; }
+      // Atualizar mensagem
+      const msgEl = document.getElementById('loadingMsg');
+      if (msgEl) {
+        msgEl.classList.add('fade');
+        setTimeout(() => {
+          msgEl.textContent = s.msg;
+          msgEl.classList.remove('fade');
+        }, 200);
+      }
+
+      // Atualizar barra
+      const bar = document.getElementById('progressBar');
+      if (bar) bar.style.width = s.progresso + '%';
+
+    }, 400);
+  }
+
+  function animarSteps() {
+    // Reset visual
+    ['no1','no2','no3','no4'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.classList.remove('activo','done'); }
+    });
+    document.getElementById('no1').classList.add('activo');
+    ['fioE1','fioE2','fioE3'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.strokeDashoffset = el.getAttribute('stroke-dasharray') || '60';
+    });
+    ['pulso1','pulso2','pulso3'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.style.opacity = '0'; el.style.strokeDashoffset = el.getAttribute('stroke-dasharray')?.split(' ')[1] || '60'; }
+    });
+
+    const bar = document.getElementById('progressBar');
+    if (bar) bar.style.width = '8%';
+    const msg = document.getElementById('loadingMsg');
+    if (msg) msg.textContent = 'A preparar análise...';
+
+    // Disparar steps com intervalo
+    const intervalos = [1200, 3500, 6500];
+    intervalos.forEach((delay, idx) => {
+      setTimeout(() => animarFio(idx), delay);
+    });
+
+    // Mensagem final enquanto aguarda resposta
+    setTimeout(() => {
+      const msgEl = document.getElementById('loadingMsg');
+      if (msgEl) {
+        msgEl.classList.add('fade');
+        setTimeout(() => {
+          msgEl.textContent = 'A gerar recomendação personalizada...';
+          msgEl.classList.remove('fade');
+          const bar = document.getElementById('progressBar');
+          if (bar) bar.style.width = '92%';
+          // Marcar no4 como activo final
+          const no3 = document.getElementById('no3');
+          const no4 = document.getElementById('no4');
+          if (no3) { no3.classList.remove('activo'); no3.classList.add('done'); }
+          if (no4) no4.classList.add('activo');
+        }, 200);
+      }
+    }, 9000);
+  }
+
+  // ─── EXTRAIR JSON — BULLETPROOF ────────────────────────────
+  function extrairJSON(texto) {
+    if (!texto || typeof texto !== 'string') return null;
+
+    // Log para debug
+    console.log('RAW recebido:', texto.substring(0, 200));
+
+    // 1. Limpar caracteres invisíveis e espaços extra
+    let t = texto.trim();
+
+    // 2. Tentar parse directo
+    try { return JSON.parse(t); } catch(e) {}
+
+    // 3. Remover markdown backticks (todas as variações)
+    t = t.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
+    try { return JSON.parse(t); } catch(e) {}
+
+    // 4. Encontrar o primeiro { e último } e extrair
+    const start = t.indexOf('{');
+    const end   = t.lastIndexOf('}');
+    if (start !== -1 && end !== -1 && end > start) {
+      const candidate = t.slice(start, end + 1);
+      try { return JSON.parse(candidate); } catch(e) {}
+    }
+
+    // 5. Parser manual robusto (para JSON com conteúdo complexo)
+    if (start === -1) return null;
+    let depth = 0, inString = false, escape = false, i = start;
+    while (i < t.length) {
+      const c = t[i];
+      if (escape) { escape = false; i++; continue; }
+      if (c === '\\' && inString) { escape = true; i++; continue; }
+      if (c === '"') { inString = !inString; i++; continue; }
+      if (!inString) {
+        if (c === '{') depth++;
+        else if (c === '}') {
+          depth--;
+          if (depth === 0) {
+            const candidate = t.slice(start, i + 1);
+            try { return JSON.parse(candidate); } catch(e) { break; }
+          }
         }
       }
+      i++;
     }
-    i++;
-  }
 
-  return null;
-}
-
-async function analisar() {
-  if (!fileB64) return;
-  document.getElementById('uploadCard').style.display = 'none';
-  document.getElementById('loadingCard').classList.add('show');
-  document.getElementById('resCard').classList.remove('show');
-  document.getElementById('btnNova').style.display = 'none';
-  clearErr();
-  animSteps();
-
-  try {
-    const res = await fetch(WH, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ficheiro_base64: fileB64,
-        mime_type: file.type || 'application/pdf',
-        nome_ficheiro: file.name || 'fatura.pdf',
-        tipo: file.type === 'application/pdf' ? 'pdf' : 'imagem'
-      })
-    });
-
-    if (!res.ok) throw new Error('Erro no servidor: ' + res.status);
-
-    // Lê como texto para máxima flexibilidade
-    const texto = await res.text();
-    console.log('MAKE RAW RESPONSE:', texto);
-
-    let r = null;
-
-    // Tenta parse do texto inteiro como JSON
+    // 6. Última tentativa: extrair campos individualmente e reconstruir
     try {
-      const data = JSON.parse(texto);
+      const campos = ['comercializadora','periodo','total_fatura','consumo_kwh',
+                      'poupanca_mensal_estimada','percentagem_poupanca','recomendacao_comercializador',
+                      'motivo_recomendacao','analise_detalhada','urgencia','alertas'];
+      const obj = {};
+      let encontrou = false;
+      campos.forEach(campo => {
+        // Regex para strings
+        const re = new RegExp('"' + campo + '"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)?"', 'i');
+        const m  = t.match(re);
+        if (m) { obj[campo] = m[1]; encontrou = true; }
+      });
+      if (encontrou) return obj;
+    } catch(e) {}
 
-      // Caso 1: Make devolveu { "raw": "...texto do claude..." }
+    console.error('extrairJSON: falhou todas as tentativas');
+    return null;
+  }
+
+  // ─── ANALISAR ──────────────────────────────────────────────
+  async function analisar() {
+    if (!ficheiroActual) return;
+
+    // UI: mostrar loading
+    document.getElementById('upload-section').style.display = 'none';
+    document.getElementById('erro').style.display = 'none';
+    document.getElementById('resultado').style.display = 'none';
+    document.getElementById('loading').style.display = 'block';
+    animarSteps();
+
+    try {
+      // Converter para base64
+      const base64 = await lerBase64(ficheiroActual);
+      const mime   = ficheiroActual.type || 'application/pdf';
+
+      // Enviar para Make
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ficheiro_base64: base64,
+          mime_type: mime,
+          nome_ficheiro: ficheiroActual.name,
+          tipo: mime.startsWith('image/') ? 'imagem' : 'pdf'
+        })
+      });
+
+      if (!res.ok) throw new Error('Erro HTTP: ' + res.status);
+
+      const data = await res.json();
+      console.log('MAKE RAW RESPONSE:', data);
+
+      // Extrair raw da resposta
+      let rawTexto = '';
       if (data.raw) {
-        r = extrairJSON(data.raw);
+        rawTexto = data.raw;
+      } else if (data.sucesso && data.raw !== undefined) {
+        rawTexto = data.raw;
+      } else if (typeof data === 'string') {
+        rawTexto = data;
+      } else {
+        rawTexto = JSON.stringify(data);
       }
-      // Caso 2: Make devolveu { "sucesso": true, "dados": {...} }
-      else if (data.dados) {
-        r = typeof data.dados === 'string' ? extrairJSON(data.dados) : data.dados;
-      }
-      // Caso 3: Make devolveu os campos directamente { "comercializadora": "...", ... }
-      else if (data.comercializadora) {
-        r = data;
-      }
-      // Caso 4: Make devolveu { "sucesso": true, "comercializadora": "..." }
-      else if (data.sucesso && Object.keys(data).length > 2) {
-        r = data;
-      }
-    } catch(e) {
-      // O texto não é JSON válido — tenta extrair JSON de dentro
-      r = extrairJSON(texto);
+
+      console.log('RAW TEXTO:', rawTexto.substring(0, 300));
+
+      const dados = extrairJSON(rawTexto);
+      console.log('DADOS EXTRAÍDOS:', dados);
+
+      if (!dados) throw new Error('A IA não conseguiu extrair dados suficientes da fatura.');
+
+      mostrarResultado(dados);
+
+    } catch (err) {
+      console.error('ERRO DETALHADO:', err);
+      mostrarErro(err.message || 'Erro desconhecido. Tente novamente.');
     }
-
-    console.log('DADOS EXTRAÍDOS:', r);
-
-    if (!r || (!r.comercializadora && !r.total_fatura)) {
-      throw new Error('A IA não conseguiu extrair dados suficientes da fatura.');
-    }
-
-    showResult(r);
-
-  } catch(e) {
-    document.getElementById('loadingCard').classList.remove('show');
-    document.getElementById('uploadCard').style.display = 'block';
-    showErr('Ocorreu um erro ao processar a fatura. Por favor tente novamente ou contacte-nos.');
-    console.error('ERRO DETALHADO:', e);
-  }
-}
-
-function animSteps() {
-  const steps = ['s1','s2','s3','s4'];
-  const delays = [0,3000,7000,11000];
-  steps.forEach((id,i) => setTimeout(() => {
-    if (i>0) {
-      document.getElementById(steps[i-1]).classList.remove('active');
-      document.getElementById(steps[i-1]).classList.add('done');
-    }
-    document.getElementById(id).classList.add('active');
-  }, delays[i]));
-}
-
-function showResult(r) {
-  document.getElementById('loadingCard').classList.remove('show');
-  document.getElementById('resCard').classList.add('show');
-  document.getElementById('btnNova').style.display = 'block';
-
-  document.getElementById('rComercializadora').textContent = r.comercializadora || 'Comercializadora';
-  document.getElementById('rPeriodo').textContent = 'Período: ' + (r.periodo || '—');
-
-  // Poupança — aceita número ou string
-  const poupanca = parseFloat(r.poupanca_mensal_estimada) || 0;
-  const poupancaStr = r.poupanca_mensal_estimada || '';
-  // Mostra sempre o bloco de poupança
-  document.getElementById('poub').style.display = 'block';
-  if (poupanca > 0) {
-    document.getElementById('pVal').textContent = '-' + poupanca.toFixed(0) + '€';
-  } else if (poupancaStr && poupancaStr !== '0' && poupancaStr !== '0,00') {
-    // Poupança em formato texto (ex: "8-12€", "20-35€")
-    document.getElementById('pVal').textContent = poupancaStr.startsWith('-') ? poupancaStr : '-' + poupancaStr;
-  } else {
-    document.getElementById('pVal').textContent = 'Ver análise';
   }
 
-  // Dados extraídos — estrutura flexível (directo ou dentro de eletricidade/gas)
-  const dados = [];
-  const totalFatura = parseFloat(r.total_fatura);
-  if (!isNaN(totalFatura)) dados.push({l:'Total fatura', v: totalFatura.toFixed(2)+'€', c:'a'});
-
-  // Consumo — aceita consumo_kwh directo ou dentro de eletricidade
-  const consumo = r.consumo_kwh || r.eletricidade?.consumo_kwh;
-  if (consumo) dados.push({l:'Consumo', v: consumo+' kWh'});
-
-  const tarifa = r.tarifa_atual || r.eletricidade?.tarifa_kwh;
-  if (tarifa) dados.push({l:'Tarifa', v: parseFloat(tarifa).toFixed(4)+'€/kWh'});
-
-  const potencia = r.eletricidade?.potencia_kva;
-  if (potencia) dados.push({l:'Potência', v: potencia+' kVA'});
-
-  const perc = parseFloat(r.percentagem_poupanca);
-  if (!isNaN(perc) && perc > 0) {
-    dados.push({l:'Poupança estimada', v: perc.toFixed(0)+'%', c:'d'});
-  } else if (r.percentagem_poupanca && r.percentagem_poupanca !== '0') {
-    dados.push({l:'Poupança estimada', v: r.percentagem_poupanca+'%', c:'d'});
-  }
-
-  document.getElementById('dgrid').innerHTML = dados.length
-    ? dados.map(d=>`<div class="ditem"><div class="dlabel">${d.l}</div><div class="dval ${d.c||''}">${d.v}</div></div>`).join('')
-    : '<div class="ditem"><div class="dlabel">Análise</div><div class="dval">Ver detalhes abaixo</div></div>';
-
-  // Análise detalhada
-  let html = '';
-  const analise = r.analise_detalhada || r.analise || '';
-  if (analise) {
-    analise.split(/\n+/).filter(p=>p.trim()).forEach(p => { html += `<p>${p.trim()}</p>`; });
-  }
-
-  // Alertas — aceita string ou array
-  const alertas = r.alertas;
-  if (alertas) {
-    const listaAlertas = Array.isArray(alertas) ? alertas : [alertas];
-    listaAlertas.filter(a=>a).forEach(a => {
-      html += `<div class="abox"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>${a}</span></div>`;
+  // ─── LER BASE64 ────────────────────────────────────────────
+  function lerBase64(ficheiro) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = () => reject(new Error('Erro ao ler ficheiro'));
+      reader.readAsDataURL(ficheiro);
     });
   }
 
-  // Recomendação — mostra sempre
-  const recComercializador = r.recomendacao_comercializador || '';
-  const poupancaDisplay = poupanca > 0 ? poupanca.toFixed(0)+'€/mês' : (r.poupanca_mensal_estimada && r.poupanca_mensal_estimada !== '0' ? r.poupanca_mensal_estimada+'€/mês' : 'valor a avaliar');
-  if (recComercializador && recComercializador.toLowerCase() !== 'manter' && !recComercializador.toLowerCase().includes('manter')) {
-    html += `<div class="recbox" style="margin-top:1rem"><h4>💡 Recomendação ENERSIA</h4><p>Mudar para <strong>${recComercializador}</strong> pode representar uma poupança de <strong>${poupancaDisplay}</strong>. ${r.motivo_recomendacao || 'Tratamos de tudo por ti, sem corte de fornecimento.'}</p></div>`;
-  } else {
-    html += `<div class="recbox" style="margin-top:1rem"><h4>💡 Análise ENERSIA</h4><p>${r.motivo_recomendacao || 'A tua fatura foi analisada. Contacta-nos para uma comparação completa com o mercado actual e identificar as melhores oportunidades de poupança.'}</p></div>`;
+  // ─── MOSTRAR RESULTADO ─────────────────────────────────────
+  function mostrarResultado(d) {
+    document.getElementById('loading').style.display = 'none';
+
+    // Preencher campos
+    document.getElementById('resComercializadora').textContent = d.comercializadora || '—';
+    document.getElementById('resPeriodo').textContent          = d.periodo           || '—';
+    document.getElementById('resTotal').textContent            = d.total_fatura       || '—';
+    document.getElementById('resConsumo').textContent          = d.consumo_kwh        || '—';
+    document.getElementById('resAnalise').textContent          = d.analise_detalhada  || '—';
+    document.getElementById('resRecomendacao').textContent     = d.recomendacao_comercializador || '—';
+    document.getElementById('resMotivo').textContent           = d.motivo_recomendacao || '—';
+
+    // Poupança
+    const poupanca = d.poupanca_mensal_estimada || '—';
+    document.getElementById('resPoupanca').textContent    = poupanca;
+    document.getElementById('resPercentagem').textContent = d.percentagem_poupanca || '—';
+
+    // Alertas
+    const alertasEl  = document.getElementById('resAlertas');
+    const alertasSec = document.getElementById('alertasSecao');
+    alertasEl.innerHTML = '';
+    if (d.alertas && d.alertas.trim() !== '') {
+      // Suporta alertas separados por \n, numerados (1) 2) etc) ou string simples
+      const linhas = d.alertas
+        .split(/\n|\d+\)/)
+        .map(l => l.trim())
+        .filter(l => l.length > 2);
+      if (linhas.length > 0) {
+        linhas.forEach(l => {
+          const li = document.createElement('li');
+          li.textContent = l;
+          alertasEl.appendChild(li);
+        });
+        alertasSec.style.display = 'block';
+      } else {
+        const li = document.createElement('li');
+        li.textContent = d.alertas;
+        alertasEl.appendChild(li);
+        alertasSec.style.display = 'block';
+      }
+    } else {
+      alertasSec.style.display = 'none';
+    }
+
+    document.getElementById('resultado').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  if (!html) html = '<p>Análise concluída. Contacte-nos para saber mais sobre as opções disponíveis para o seu perfil de consumo.</p>';
-  document.getElementById('aitxt').innerHTML = html;
-}
+  // ─── MOSTRAR ERRO ──────────────────────────────────────────
+  function mostrarErro(msg) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('erroMensagem').textContent = msg;
+    document.getElementById('erro').style.display = 'block';
+    document.getElementById('upload-section').style.display = 'block';
+  }
 
-function resetForm() {
-  file = null; fileB64 = null; fi.value = ''; ci.value = '';
-  document.getElementById('filePreview').classList.remove('show');
-  document.getElementById('resCard').classList.remove('show');
-  document.getElementById('btnNova').style.display = 'none';
-  document.getElementById('uploadCard').style.display = 'block';
-  btn.disabled = true; clearErr();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function showErr(msg) {
-  const b = document.getElementById('errorBox');
-  b.textContent = '⚠️ ' + msg;
-  b.classList.add('show');
-}
-function clearErr() { document.getElementById('errorBox').classList.remove('show'); }
+  // ─── REINICIAR ─────────────────────────────────────────────
+  function reiniciar() {
+    ficheiroActual = null;
+    fileInput.value = '';
+    document.getElementById('ficheiroSelec').style.display = 'none';
+    document.getElementById('btnAnalisar').disabled = true;
+    document.getElementById('resultado').style.display = 'none';
+    document.getElementById('erro').style.display = 'none';
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('upload-section').style.display = 'block';
+    // Reset barra e nós
+    const bar = document.getElementById('progressBar');
+    if (bar) bar.style.width = '0%';
+    ['no1','no2','no3','no4'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('activo','done');
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 </script>
-
 </body>
 </html>
