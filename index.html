@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
-<!-- saved from url=(0045)file:///C:/Users/User/Downloads/index_v5.html -->
+
 <html lang="pt"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ENERSIA — Gestor Energético com Inteligência Artificial</title>
-<link href="file:///C:/Users/User/Downloads/index_v3.4_files/css2" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -34,12 +35,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:999;height:66px;display:flex;ali
 .btn-wa:hover{transform:scale(1.08)}
 
 /* TICKER */
-.ticker{position:relative;z-index:1;background:#1A2340;padding:9px 0;overflow:hidden;margin-top:66px}
+.ticker{position:relative;z-index:1;background:#0d1729;padding:10px 0;overflow:hidden;margin-top:66px;border-bottom:1px solid rgba(255,255,255,.06)}
 .ticker-wrap{display:flex;animation:tkr 30s linear infinite;width:max-content}
 .ticker-wrap:hover{animation-play-state:paused}
 @keyframes tkr{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .tk{display:flex;align-items:center;gap:12px;padding:0 32px;border-right:1px solid rgba(255,255,255,.07);flex-shrink:0}
-.tk-chip{width:60px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;letter-spacing:.5px}
+.tk-chip{width:60px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;letter-spacing:.5px;overflow:hidden}
+.tk-chip img,.cc-chip img{width:100%;height:100%;object-fit:contain;padding:2px}
+.logo-pill{display:flex;align-items:center;justify-content:center;border-radius:4px;overflow:hidden}
 .edp{background:#E8001D;color:#fff}.galp{background:#004F8C;color:#fff}.endesa{background:#00784A;color:#fff}
 .iber{background:#5800A0;color:#fff}.repsol{background:#E85000;color:#fff}.golden{background:#D4A000;color:#1a0a00}
 .plenitude{background:#003E82;color:#fff}.coop{background:#006830;color:#fff}
@@ -78,7 +81,7 @@ h1{font-size:clamp(40px,6vw,80px);font-weight:900;line-height:.96;letter-spacing
 .comerc-track:hover{animation-play-state:paused}
 .cc{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 24px;border-right:1px solid var(--border);flex-shrink:0;min-width:140px;transition:background .2s}
 .cc:hover{background:var(--off)}
-.cc-chip{width:72px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;letter-spacing:.5px}
+.cc-chip{border-radius:8px;display:flex;align-items:center;justify-content:center}
 .cc-p{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--ink)}
 .cc-b{font-size:9px;font-weight:700;padding:2px 8px;border-radius:100px}
 .b-best{background:rgba(0,180,160,.12);color:#007A70;border:1px solid rgba(0,180,160,.3)}
@@ -311,7 +314,7 @@ h2 .g{background:linear-gradient(90deg,var(--sun),var(--sky));-webkit-background
 .cmsg{display:flex;gap:8px}
 .cmsg.u{flex-direction:row-reverse}
 .cmsg-av{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px}
-.cmsg-av-b{background:linear-gradient(135deg,var(--sun),var(--sky))}
+.cmsg-av-b{background:none;overflow:hidden}
 .cmsg-av-u{background:var(--off2);color:var(--muted)}
 .cmsg-bub{max-width:83%;padding:10px 12px;font-size:13px;line-height:1.6;border-radius:14px}
 .cmsg-bot .cmsg-bub{background:var(--off);border:1px solid var(--border);border-radius:4px 14px 14px 14px;color:var(--ink)}
@@ -384,7 +387,7 @@ footer{position:relative;z-index:1;background:var(--ink);padding:56px 32px 28px;
 
 <!-- NAV -->
 <nav>
-  <a class="logo" href="file:///C:/Users/User/Downloads/index_5.html#">
+  <a class="logo" href="/">
     <div class="logo-orb">⚡</div>
     <div>
       <div class="logo-name">ENER<span>SIA</span></div>
@@ -400,30 +403,62 @@ footer{position:relative;z-index:1;background:var(--ink);padding:56px 32px 28px;
   <div class="nav-r">
     <div class="live-tag"><div class="live-d"></div>ERSE LIVE</div>
     <a class="btn-wa" href="https://wa.me/351910322702?text=Ol%C3%A1%2C+gostaria+de+analisar+a+minha+fatura+energ%C3%A9tica+gratuitamente." target="_blank" title="WhatsApp">💬</a>
-    <button class="btn-nav" onclick="document.getElementById(&#39;analise&#39;).scrollIntoView({behavior:&#39;smooth&#39;})">⚡ Analisar grátis</button>
+    <a class="btn-nav" href="/analisar-fatura.html" style="text-decoration:none">⚡ Analisar grátis</a>
   </div>
 </nav>
 
 <!-- TICKER -->
 <div class="ticker">
   <div class="ticker-wrap">
-    <div class="tk"><div class="tk-chip edp">EDP</div><span class="tk-price">€0.1420/kWh</span><span class="tk-d tk-ref">REFERÊNCIA</span></div>
-    <div class="tk"><div class="tk-chip galp">GALP</div><span class="tk-price">€0.1542/kWh</span><span class="tk-d tk-save">−29% SAVE</span></div>
-    <div class="tk"><div class="tk-chip endesa">ENDESA</div><span class="tk-price">€0.1362/kWh</span><span class="tk-d tk-save">−4% SAVE</span></div>
-    <div class="tk"><div class="tk-chip iber">IBERDROLA</div><span class="tk-price">€0.1382/kWh</span><span class="tk-d tk-save">−3% SAVE</span></div>
-    <div class="tk"><div class="tk-chip repsol">REPSOL</div><span class="tk-price">€0.1480/kWh</span><span class="tk-d tk-save">−28% SAVE</span></div>
-    <div class="tk"><div class="tk-chip golden">GOLDENERGY</div><span class="tk-price">€0.1399/kWh</span><span class="tk-d tk-save">−1% SAVE</span></div>
-    <div class="tk"><div class="tk-chip plenitude">PLENITUDE</div><span class="tk-price">€0.1433/kWh</span><span class="tk-d tk-save">−29% SAVE</span></div>
-    <div class="tk"><div class="tk-chip coop">COOPERNICO</div><span class="tk-price">€0.1267/kWh</span><span class="tk-d tk-save">−11% SAVE</span></div>
+    <div class="tk"><div class="tk-chip edp" style="background:none;padding:0;border:none"><div style="background:#E8001D;border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:4px;min-width:64px;justify-content:center">
+        <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="white" opacity="0.25"/><text x="7" y="10.5" text-anchor="middle" font-size="7" font-weight="900" fill="white" font-family="Arial">EDP</text></svg>
+        <span style="color:white;font-size:9px;font-weight:900;letter-spacing:.5px;font-family:Arial Black,Arial">EDP</span></div></div><span class="tk-price">€0.1420/kWh</span><span class="tk-d tk-ref">REFERÊNCIA</span></div>
+    <div class="tk"><div class="tk-chip galp" style="background:none;padding:0;border:none"><div style="background:#004F8C;border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:4px;min-width:64px;justify-content:center">
+        <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="6,1 11,11 1,11" fill="#F7A600"/></svg>
+        <span style="color:white;font-size:9px;font-weight:900;letter-spacing:.5px;font-family:Arial Black,Arial">GALP</span></div></div><span class="tk-price">€0.1542/kWh</span><span class="tk-d tk-save">−29% SAVE</span></div>
+    <div class="tk"><div class="tk-chip endesa" style="background:none;padding:0;border:none"><div style="background:#00A0E3;border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:3px;min-width:68px;justify-content:center">
+        <svg width="10" height="12" viewBox="0 0 10 12"><path d="M5 1 L9 6 L5 11 L1 6 Z" fill="white" opacity="0.8"/></svg>
+        <span style="color:white;font-size:8.5px;font-weight:900;letter-spacing:.3px;font-family:Arial Black,Arial">ENDESA</span></div></div><span class="tk-price">€0.1362/kWh</span><span class="tk-d tk-save">−4% SAVE</span></div>
+    <div class="tk"><div class="tk-chip iber" style="background:none;padding:0;border:none"><div style="background:#5800A0;border-radius:6px;padding:3px 6px;display:flex;align-items:center;gap:3px;min-width:76px;justify-content:center">
+        <svg width="10" height="12" viewBox="0 0 10 12"><rect x="1" y="1" width="8" height="10" rx="2" fill="white" opacity="0.2"/><path d="M3 4 L7 4 L7 8 L3 8" stroke="white" stroke-width="1.2" fill="none"/></svg>
+        <span style="color:white;font-size:7px;font-weight:900;letter-spacing:.2px;font-family:Arial Black,Arial">IBERDROLA</span></div></div><span class="tk-price">€0.1382/kWh</span><span class="tk-d tk-save">−3% SAVE</span></div>
+    <div class="tk"><div class="tk-chip repsol" style="background:none;padding:0;border:none"><div style="background:linear-gradient(135deg,#F7A600,#E8001D);border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:4px;min-width:64px;justify-content:center">
+        <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="white" opacity="0.3"/><circle cx="6" cy="6" r="2.5" fill="white"/></svg>
+        <span style="color:white;font-size:9px;font-weight:900;letter-spacing:.5px;font-family:Arial Black,Arial">REPSOL</span></div></div><span class="tk-price">€0.1480/kWh</span><span class="tk-d tk-save">−28% SAVE</span></div>
+    <div class="tk"><div class="tk-chip golden" style="background:none;padding:0;border:none"><div style="background:linear-gradient(135deg,#D4A000,#B8860B);border-radius:6px;padding:3px 6px;display:flex;align-items:center;gap:3px;min-width:78px;justify-content:center">
+        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1 L8 5 L12 5 L9 8 L10 12 L6 9.5 L2 12 L3 8 L0 5 L4 5 Z" fill="white" opacity="0.9"/></svg>
+        <span style="color:white;font-size:7px;font-weight:900;letter-spacing:.2px;font-family:Arial Black,Arial">GOLDENERGY</span></div></div><span class="tk-price">€0.1399/kWh</span><span class="tk-d tk-save">−1% SAVE</span></div>
+    <div class="tk"><div class="tk-chip plenitude" style="background:none;padding:0;border:none"><div style="background:#003E82;border-radius:6px;padding:3px 6px;display:flex;align-items:center;gap:3px;min-width:76px;justify-content:center">
+        <svg width="10" height="12" viewBox="0 0 10 12"><ellipse cx="5" cy="6" rx="4" ry="5" fill="none" stroke="#00C8FF" stroke-width="1.5"/><line x1="5" y1="1" x2="5" y2="11" stroke="#00C8FF" stroke-width="1"/></svg>
+        <span style="color:white;font-size:7px;font-weight:900;letter-spacing:.2px;font-family:Arial Black,Arial">PLENITUDE</span></div></div><span class="tk-price">€0.1433/kWh</span><span class="tk-d tk-save">−29% SAVE</span></div>
+    <div class="tk"><div class="tk-chip coop" style="background:none;padding:0;border:none"><div style="background:#006830;border-radius:6px;padding:3px 6px;display:flex;align-items:center;gap:3px;min-width:80px;justify-content:center">
+        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1 C2 1 1 5 3 7 C5 9 7 9 9 7 C11 5 10 1 6 1" fill="none" stroke="#90EE90" stroke-width="1.5"/><circle cx="6" cy="6" r="1.5" fill="#90EE90"/></svg>
+        <span style="color:white;font-size:7px;font-weight:900;letter-spacing:.2px;font-family:Arial Black,Arial">COOPERNICO</span></div></div><span class="tk-price">€0.1267/kWh</span><span class="tk-d tk-save">−11% SAVE</span></div>
     <div class="tk" style="gap:6px;font-family:&#39;JetBrains Mono&#39;,monospace;font-size:10px;color:rgba(255,255,255,.35);letter-spacing:1px;padding:0 24px">ERSE · <span id="liveClock" style="color:rgba(255,255,255,.5)">14:20:38</span></div>
-    <div class="tk"><div class="tk-chip edp">EDP</div><span class="tk-price">€0.1420/kWh</span><span class="tk-d tk-ref">REFERÊNCIA</span></div>
-    <div class="tk"><div class="tk-chip galp">GALP</div><span class="tk-price">€0.1542/kWh</span><span class="tk-d tk-save">−29% SAVE</span></div>
-    <div class="tk"><div class="tk-chip endesa">ENDESA</div><span class="tk-price">€0.1362/kWh</span><span class="tk-d tk-save">−4% SAVE</span></div>
-    <div class="tk"><div class="tk-chip iber">IBERDROLA</div><span class="tk-price">€0.1382/kWh</span><span class="tk-d tk-save">−3% SAVE</span></div>
-    <div class="tk"><div class="tk-chip repsol">REPSOL</div><span class="tk-price">€0.1480/kWh</span><span class="tk-d tk-save">−28% SAVE</span></div>
-    <div class="tk"><div class="tk-chip golden">GOLDENERGY</div><span class="tk-price">€0.1399/kWh</span><span class="tk-d tk-save">−1% SAVE</span></div>
-    <div class="tk"><div class="tk-chip plenitude">PLENITUDE</div><span class="tk-price">€0.1433/kWh</span><span class="tk-d tk-save">−29% SAVE</span></div>
-    <div class="tk"><div class="tk-chip coop">COOPERNICO</div><span class="tk-price">€0.1267/kWh</span><span class="tk-d tk-save">−11% SAVE</span></div>
+    <div class="tk"><div class="tk-chip edp" style="background:none;padding:0;border:none"><div style="background:#E8001D;border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:4px;min-width:64px;justify-content:center">
+        <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="white" opacity="0.25"/><text x="7" y="10.5" text-anchor="middle" font-size="7" font-weight="900" fill="white" font-family="Arial">EDP</text></svg>
+        <span style="color:white;font-size:9px;font-weight:900;letter-spacing:.5px;font-family:Arial Black,Arial">EDP</span></div></div><span class="tk-price">€0.1420/kWh</span><span class="tk-d tk-ref">REFERÊNCIA</span></div>
+    <div class="tk"><div class="tk-chip galp" style="background:none;padding:0;border:none"><div style="background:#004F8C;border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:4px;min-width:64px;justify-content:center">
+        <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="6,1 11,11 1,11" fill="#F7A600"/></svg>
+        <span style="color:white;font-size:9px;font-weight:900;letter-spacing:.5px;font-family:Arial Black,Arial">GALP</span></div></div><span class="tk-price">€0.1542/kWh</span><span class="tk-d tk-save">−29% SAVE</span></div>
+    <div class="tk"><div class="tk-chip endesa" style="background:none;padding:0;border:none"><div style="background:#00A0E3;border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:3px;min-width:68px;justify-content:center">
+        <svg width="10" height="12" viewBox="0 0 10 12"><path d="M5 1 L9 6 L5 11 L1 6 Z" fill="white" opacity="0.8"/></svg>
+        <span style="color:white;font-size:8.5px;font-weight:900;letter-spacing:.3px;font-family:Arial Black,Arial">ENDESA</span></div></div><span class="tk-price">€0.1362/kWh</span><span class="tk-d tk-save">−4% SAVE</span></div>
+    <div class="tk"><div class="tk-chip iber" style="background:none;padding:0;border:none"><div style="background:#5800A0;border-radius:6px;padding:3px 6px;display:flex;align-items:center;gap:3px;min-width:76px;justify-content:center">
+        <svg width="10" height="12" viewBox="0 0 10 12"><rect x="1" y="1" width="8" height="10" rx="2" fill="white" opacity="0.2"/><path d="M3 4 L7 4 L7 8 L3 8" stroke="white" stroke-width="1.2" fill="none"/></svg>
+        <span style="color:white;font-size:7px;font-weight:900;letter-spacing:.2px;font-family:Arial Black,Arial">IBERDROLA</span></div></div><span class="tk-price">€0.1382/kWh</span><span class="tk-d tk-save">−3% SAVE</span></div>
+    <div class="tk"><div class="tk-chip repsol" style="background:none;padding:0;border:none"><div style="background:linear-gradient(135deg,#F7A600,#E8001D);border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:4px;min-width:64px;justify-content:center">
+        <svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="white" opacity="0.3"/><circle cx="6" cy="6" r="2.5" fill="white"/></svg>
+        <span style="color:white;font-size:9px;font-weight:900;letter-spacing:.5px;font-family:Arial Black,Arial">REPSOL</span></div></div><span class="tk-price">€0.1480/kWh</span><span class="tk-d tk-save">−28% SAVE</span></div>
+    <div class="tk"><div class="tk-chip golden" style="background:none;padding:0;border:none"><div style="background:linear-gradient(135deg,#D4A000,#B8860B);border-radius:6px;padding:3px 6px;display:flex;align-items:center;gap:3px;min-width:78px;justify-content:center">
+        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1 L8 5 L12 5 L9 8 L10 12 L6 9.5 L2 12 L3 8 L0 5 L4 5 Z" fill="white" opacity="0.9"/></svg>
+        <span style="color:white;font-size:7px;font-weight:900;letter-spacing:.2px;font-family:Arial Black,Arial">GOLDENERGY</span></div></div><span class="tk-price">€0.1399/kWh</span><span class="tk-d tk-save">−1% SAVE</span></div>
+    <div class="tk"><div class="tk-chip plenitude" style="background:none;padding:0;border:none"><div style="background:#003E82;border-radius:6px;padding:3px 6px;display:flex;align-items:center;gap:3px;min-width:76px;justify-content:center">
+        <svg width="10" height="12" viewBox="0 0 10 12"><ellipse cx="5" cy="6" rx="4" ry="5" fill="none" stroke="#00C8FF" stroke-width="1.5"/><line x1="5" y1="1" x2="5" y2="11" stroke="#00C8FF" stroke-width="1"/></svg>
+        <span style="color:white;font-size:7px;font-weight:900;letter-spacing:.2px;font-family:Arial Black,Arial">PLENITUDE</span></div></div><span class="tk-price">€0.1433/kWh</span><span class="tk-d tk-save">−29% SAVE</span></div>
+    <div class="tk"><div class="tk-chip coop" style="background:none;padding:0;border:none"><div style="background:#006830;border-radius:6px;padding:3px 6px;display:flex;align-items:center;gap:3px;min-width:80px;justify-content:center">
+        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1 C2 1 1 5 3 7 C5 9 7 9 9 7 C11 5 10 1 6 1" fill="none" stroke="#90EE90" stroke-width="1.5"/><circle cx="6" cy="6" r="1.5" fill="#90EE90"/></svg>
+        <span style="color:white;font-size:7px;font-weight:900;letter-spacing:.2px;font-family:Arial Black,Arial">COOPERNICO</span></div></div><span class="tk-price">€0.1267/kWh</span><span class="tk-d tk-save">−11% SAVE</span></div>
   </div>
 </div>
 
@@ -450,22 +485,22 @@ footer{position:relative;z-index:1;background:var(--ink);padding:56px 32px 28px;
   <div class="comerc-lbl">Comparamos todas as comercializadoras certificadas pela ERSE</div>
   <div class="comerc-fade">
     <div class="comerc-track">
-      <div class="cc"><div class="cc-chip edp" style="width:72px;height:26px">EDP</div><div class="cc-p">€0.1817/kWh</div><span class="cc-b b-high">REFERÊNCIA</span></div>
-      <div class="cc"><div class="cc-chip galp" style="width:72px;height:26px">GALP</div><div class="cc-p">€0.1284/kWh</div><span class="cc-b b-best">🥇 MELHOR</span></div>
-      <div class="cc"><div class="cc-chip endesa" style="width:72px;height:26px">ENDESA</div><div class="cc-p">€0.1310/kWh</div><span class="cc-b b-mid">−28%</span></div>
-      <div class="cc"><div class="cc-chip iber" style="width:72px;height:26px">IBERDROLA</div><div class="cc-p">€0.1298/kWh</div><span class="cc-b b-mid">−29%</span></div>
-      <div class="cc"><div class="cc-chip repsol" style="width:72px;height:26px">REPSOL</div><div class="cc-p">€0.1302/kWh</div><span class="cc-b b-mid">−28%</span></div>
-      <div class="cc"><div class="cc-chip golden" style="width:72px;height:26px">GOLDENERGY</div><div class="cc-p">€0.1256/kWh</div><span class="cc-b b-best">🥈 TOP 2</span></div>
-      <div class="cc"><div class="cc-chip plenitude" style="width:72px;height:26px">PLENITUDE</div><div class="cc-p">€0.1289/kWh</div><span class="cc-b b-mid">−29%</span></div>
-      <div class="cc"><div class="cc-chip coop" style="width:72px;height:26px">COOPERNICO</div><div class="cc-p">€0.1267/kWh</div><span class="cc-b b-best">🥉 TOP 3</span></div>
-      <div class="cc"><div class="cc-chip edp" style="width:72px;height:26px">EDP</div><div class="cc-p">€0.1817/kWh</div><span class="cc-b b-high">REFERÊNCIA</span></div>
-      <div class="cc"><div class="cc-chip galp" style="width:72px;height:26px">GALP</div><div class="cc-p">€0.1284/kWh</div><span class="cc-b b-best">🥇 MELHOR</span></div>
-      <div class="cc"><div class="cc-chip endesa" style="width:72px;height:26px">ENDESA</div><div class="cc-p">€0.1310/kWh</div><span class="cc-b b-mid">−28%</span></div>
-      <div class="cc"><div class="cc-chip iber" style="width:72px;height:26px">IBERDROLA</div><div class="cc-p">€0.1298/kWh</div><span class="cc-b b-mid">−29%</span></div>
-      <div class="cc"><div class="cc-chip repsol" style="width:72px;height:26px">REPSOL</div><div class="cc-p">€0.1302/kWh</div><span class="cc-b b-mid">−28%</span></div>
-      <div class="cc"><div class="cc-chip golden" style="width:72px;height:26px">GOLDENERGY</div><div class="cc-p">€0.1256/kWh</div><span class="cc-b b-best">🥈 TOP 2</span></div>
-      <div class="cc"><div class="cc-chip plenitude" style="width:72px;height:26px">PLENITUDE</div><div class="cc-p">€0.1289/kWh</div><span class="cc-b b-mid">−29%</span></div>
-      <div class="cc"><div class="cc-chip coop" style="width:72px;height:26px">COOPERNICO</div><div class="cc-p">€0.1267/kWh</div><span class="cc-b b-best">🥉 TOP 3</span></div>
+      <div class="cc"><div class="cc-chip edp" style="background:none;padding:0;border:none"><div style="background:#E8001D;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:4px"><svg width="14" height="14" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="white" opacity="0.2"/><circle cx="10" cy="10" r="4" fill="white" opacity="0.6"/></svg><span style="color:white;font-size:10px;font-weight:900;font-family:Arial Black">EDP</span></div></div><div class="cc-p">€0.1817/kWh</div><span class="cc-b b-high">REFERÊNCIA</span></div>
+      <div class="cc"><div class="cc-chip galp" style="background:none;padding:0;border:none"><div style="background:#004F8C;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:4px"><svg width="12" height="12" viewBox="0 0 12 12"><polygon points="6,1 11,11 1,11" fill="#F7A600"/></svg><span style="color:white;font-size:10px;font-weight:900;font-family:Arial Black">GALP</span></div></div><div class="cc-p">€0.1284/kWh</div><span class="cc-b b-best">🥇 MELHOR</span></div>
+      <div class="cc"><div class="cc-chip endesa" style="background:none;padding:0;border:none"><div style="background:#00A0E3;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:3px"><svg width="10" height="12" viewBox="0 0 10 12"><path d="M5 1 L9 6 L5 11 L1 6 Z" fill="white" opacity="0.8"/></svg><span style="color:white;font-size:9px;font-weight:900;font-family:Arial Black">ENDESA</span></div></div><div class="cc-p">€0.1310/kWh</div><span class="cc-b b-mid">−28%</span></div>
+      <div class="cc"><div class="cc-chip iber" style="background:none;padding:0;border:none"><div style="background:#5800A0;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center"><span style="color:white;font-size:7.5px;font-weight:900;font-family:Arial Black;letter-spacing:.2px">IBERDROLA</span></div></div><div class="cc-p">€0.1298/kWh</div><span class="cc-b b-mid">−29%</span></div>
+      <div class="cc"><div class="cc-chip repsol" style="background:none;padding:0;border:none"><div style="background:linear-gradient(135deg,#F7A600,#E8001D);border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:4px"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="white" opacity="0.3"/><circle cx="5" cy="5" r="2" fill="white"/></svg><span style="color:white;font-size:9px;font-weight:900;font-family:Arial Black">REPSOL</span></div></div><div class="cc-p">€0.1302/kWh</div><span class="cc-b b-mid">−28%</span></div>
+      <div class="cc"><div class="cc-chip golden" style="background:none;padding:0;border:none"><div style="background:linear-gradient(135deg,#D4A000,#B8860B);border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:3px"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1 L8 5 L12 5 L9 8 L10 12 L6 9.5 L2 12 L3 8 L0 5 L4 5 Z" fill="white" opacity="0.9"/></svg><span style="color:white;font-size:7px;font-weight:900;font-family:Arial Black">GOLDENERGY</span></div></div><div class="cc-p">€0.1256/kWh</div><span class="cc-b b-best">🥈 TOP 2</span></div>
+      <div class="cc"><div class="cc-chip plenitude" style="background:none;padding:0;border:none"><div style="background:#003E82;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center"><span style="color:white;font-size:7.5px;font-weight:900;font-family:Arial Black;letter-spacing:.2px">PLENITUDE</span></div></div><div class="cc-p">€0.1289/kWh</div><span class="cc-b b-mid">−29%</span></div>
+      <div class="cc"><div class="cc-chip coop" style="background:none;padding:0;border:none"><div style="background:#006830;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:3px"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 1 C2 1 1 4 3 6 C5 8 7 8 9 6 C11 4 8 1 5 1" fill="none" stroke="#90EE90" stroke-width="1.2"/><circle cx="5" cy="5" r="1.2" fill="#90EE90"/></svg><span style="color:white;font-size:7px;font-weight:900;font-family:Arial Black">COOPERNICO</span></div></div><div class="cc-p">€0.1267/kWh</div><span class="cc-b b-best">🥉 TOP 3</span></div>
+      <div class="cc"><div class="cc-chip edp" style="background:none;padding:0;border:none"><div style="background:#E8001D;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:4px"><svg width="14" height="14" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="white" opacity="0.2"/><circle cx="10" cy="10" r="4" fill="white" opacity="0.6"/></svg><span style="color:white;font-size:10px;font-weight:900;font-family:Arial Black">EDP</span></div></div><div class="cc-p">€0.1817/kWh</div><span class="cc-b b-high">REFERÊNCIA</span></div>
+      <div class="cc"><div class="cc-chip galp" style="background:none;padding:0;border:none"><div style="background:#004F8C;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:4px"><svg width="12" height="12" viewBox="0 0 12 12"><polygon points="6,1 11,11 1,11" fill="#F7A600"/></svg><span style="color:white;font-size:10px;font-weight:900;font-family:Arial Black">GALP</span></div></div><div class="cc-p">€0.1284/kWh</div><span class="cc-b b-best">🥇 MELHOR</span></div>
+      <div class="cc"><div class="cc-chip endesa" style="background:none;padding:0;border:none"><div style="background:#00A0E3;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:3px"><svg width="10" height="12" viewBox="0 0 10 12"><path d="M5 1 L9 6 L5 11 L1 6 Z" fill="white" opacity="0.8"/></svg><span style="color:white;font-size:9px;font-weight:900;font-family:Arial Black">ENDESA</span></div></div><div class="cc-p">€0.1310/kWh</div><span class="cc-b b-mid">−28%</span></div>
+      <div class="cc"><div class="cc-chip iber" style="background:none;padding:0;border:none"><div style="background:#5800A0;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center"><span style="color:white;font-size:7.5px;font-weight:900;font-family:Arial Black;letter-spacing:.2px">IBERDROLA</span></div></div><div class="cc-p">€0.1298/kWh</div><span class="cc-b b-mid">−29%</span></div>
+      <div class="cc"><div class="cc-chip repsol" style="background:none;padding:0;border:none"><div style="background:linear-gradient(135deg,#F7A600,#E8001D);border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:4px"><svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="white" opacity="0.3"/><circle cx="5" cy="5" r="2" fill="white"/></svg><span style="color:white;font-size:9px;font-weight:900;font-family:Arial Black">REPSOL</span></div></div><div class="cc-p">€0.1302/kWh</div><span class="cc-b b-mid">−28%</span></div>
+      <div class="cc"><div class="cc-chip golden" style="background:none;padding:0;border:none"><div style="background:linear-gradient(135deg,#D4A000,#B8860B);border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:3px"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1 L8 5 L12 5 L9 8 L10 12 L6 9.5 L2 12 L3 8 L0 5 L4 5 Z" fill="white" opacity="0.9"/></svg><span style="color:white;font-size:7px;font-weight:900;font-family:Arial Black">GOLDENERGY</span></div></div><div class="cc-p">€0.1256/kWh</div><span class="cc-b b-best">🥈 TOP 2</span></div>
+      <div class="cc"><div class="cc-chip plenitude" style="background:none;padding:0;border:none"><div style="background:#003E82;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center"><span style="color:white;font-size:7.5px;font-weight:900;font-family:Arial Black;letter-spacing:.2px">PLENITUDE</span></div></div><div class="cc-p">€0.1289/kWh</div><span class="cc-b b-mid">−29%</span></div>
+      <div class="cc"><div class="cc-chip coop" style="background:none;padding:0;border:none"><div style="background:#006830;border-radius:8px;width:72px;height:28px;display:flex;align-items:center;justify-content:center;gap:3px"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 1 C2 1 1 4 3 6 C5 8 7 8 9 6 C11 4 8 1 5 1" fill="none" stroke="#90EE90" stroke-width="1.2"/><circle cx="5" cy="5" r="1.2" fill="#90EE90"/></svg><span style="color:white;font-size:7px;font-weight:900;font-family:Arial Black">COOPERNICO</span></div></div><div class="cc-p">€0.1267/kWh</div><span class="cc-b b-best">🥉 TOP 3</span></div>
     </div>
   </div>
 </div>
@@ -781,7 +816,7 @@ footer{position:relative;z-index:1;background:var(--ink);padding:56px 32px 28px;
   <p class="sec-sub">A IA calcula o ROI real da instalação solar para o seu perfil. Simulação gratuita. Sem visita técnica.</p>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
     <div style="border-radius:var(--r2);overflow:hidden;position:relative;box-shadow:0 8px 32px rgba(8,14,28,.1)">
-      <img src="file:///C:/Users/User/Downloads/index_v3.4_files/photo-1509391366360-2e959784a276" alt="Painéis solares" style="width:100%;height:340px;object-fit:cover;display:block">
+      <img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1400&q=80" alt="Painéis solares" style="width:100%;height:340px;object-fit:cover;display:block">
       <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,14,28,.7),transparent 50%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px">
         <div style="background:rgba(255,140,0,.9);border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;color:#fff;display:inline-block;margin-bottom:8px;width:fit-content">☀️ ROI médio em Portugal</div>
         <div style="font-size:22px;font-weight:900;color:#fff;line-height:1.2">Retorno em 5–8 anos</div>
@@ -905,12 +940,12 @@ footer{position:relative;z-index:1;background:var(--ink);padding:56px 32px 28px;
         <a href="https://wa.me/351910322702?text=Ol%C3%A1%2C+gostaria+de+analisar+a+minha+fatura+energ%C3%A9tica+gratuitamente." target="_blank" class="ft-wa">💬 +351 910 322 702</a>
         <a href="mailto:geralenersia@gmail.com" class="ft-email">📧 geralenersia@gmail.com</a>
       </div>
-      <div><div class="ft-ct">Plataforma</div><ul class="ft-links"><li><a href="file:///C:/Users/User/Downloads/index_5.html#">Análise de fatura</a></li><li><a href="file:///C:/Users/User/Downloads/index_5.html#">Comparador ERSE</a></li><li><a href="file:///C:/Users/User/Downloads/index_5.html#">Simulação solar</a></li><li><a href="file:///C:/Users/User/Downloads/index_5.html#">CRM energético</a></li></ul></div>
-      <div><div class="ft-ct">Empresa</div><ul class="ft-links"><li><a href="file:///C:/Users/User/Downloads/index_5.html#">Para empresas</a></li><li><a href="file:///C:/Users/User/Downloads/index_5.html#">Para famílias</a></li><li><a href="file:///C:/Users/User/Downloads/index_5.html#">Parceiros</a></li><li><a href="file:///C:/Users/User/Downloads/index_5.html#">Comercializadoras</a></li></ul></div>
-      <div><div class="ft-ct">Legal</div><ul class="ft-links"><li><a href="file:///C:/Users/User/Downloads/index_5.html#">Privacidade</a></li><li><a href="file:///C:/Users/User/Downloads/index_5.html#">Termos</a></li><li><a href="file:///C:/Users/User/Downloads/index_5.html#">Cookies</a></li><li><a href="file:///C:/Users/User/Downloads/index_5.html#">RGPD</a></li></ul></div>
+      <div><div class="ft-ct">Plataforma</div><ul class="ft-links"><li><a href="/analisar-fatura.html">Análise de fatura</a></li><li><a href="/#comparador">Comparador ERSE</a></li><li><a href="/#solar-sec">Simulação solar</a></li><li><a href="/#plataforma">CRM energético</a></li></ul></div>
+      <div><div class="ft-ct">Empresa</div><ul class="ft-links"><li><a href="/analisar-fatura.html">Para empresas</a></li><li><a href="/analisar-fatura.html">Para famílias</a></li><li><a href="mailto:geralenersia@gmail.com">Parceiros</a></li><li><a href="/#comparador">Comercializadoras</a></li></ul></div>
+      <div><div class="ft-ct">Legal</div><ul class="ft-links"><li><a href="/">Privacidade</a></li><li><a href="/">Termos</a></li><li><a href="/">Cookies</a></li><li><a href="/">RGPD</a></li></ul></div>
     </div>
     <div class="ft-bot">
-      <span>© 2025 ENERSIA · Portugal</span>
+      <span>© 2026 ENERSIA · Portugal</span>
       <span>Dados da ERSE — Entidade Reguladora dos Serviços Energéticos</span>
     </div>
   </div>
@@ -918,25 +953,25 @@ footer{position:relative;z-index:1;background:var(--ink);padding:56px 32px 28px;
 
 <!-- CHATBOT -->
 <div class="chat-fab" onclick="toggleChat()">
-  <div class="chat-fab-btn">💬<div class="chat-notif">1</div></div>
+  <div class="chat-fab-btn" style="overflow:hidden;padding:0"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDAgNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmdfayIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNEIyRDhGIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0Y3QTYwMCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxjbGlwUGF0aCBpZD0iY2lyY2xlX2siPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjIwIi8+PC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9InVybCgjYmdfaykiLz4KICA8ZyBjbGlwLXBhdGg9InVybCgjY2lyY2xlX2spIj4KICAgIDxjaXJjbGUgY3g9IjIwIiBjeT0iMTYiIHI9IjgiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC45NSkiLz4KICAgIDxlbGxpcHNlIGN4PSIyMCIgY3k9IjM2IiByeD0iMTMiIHJ5PSIxMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjkpIi8+CiAgICA8Y2lyY2xlIGN4PSIxNyIgY3k9IjE1IiByPSIxLjIiIGZpbGw9IiM0QjJEOEYiLz4KICAgIDxjaXJjbGUgY3g9IjIzIiBjeT0iMTUiIHI9IjEuMiIgZmlsbD0iIzRCMkQ4RiIvPgogICAgPHBhdGggZD0iTTE3IDE5IFEyMCAyMSAyMyAxOSIgc3Ryb2tlPSIjNEIyRDhGIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogICAgPHBhdGggZD0iTTE1IDEyIFExNyAxMC41IDE5IDEyIiBzdHJva2U9IiMyZDFhNWUiIHN0cm9rZS13aWR0aD0iMS4yIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICAgIDxwYXRoIGQ9Ik0yMSAxMiBRMjMgMTAuNSAyNSAxMiIgc3Ryb2tlPSIjMmQxYTVlIiBzdHJva2Utd2lkdGg9IjEuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8Y2lyY2xlIGN4PSIyOCIgY3k9IjEzIiByPSIzIiBmaWxsPSIjRjdBNjAwIiBvcGFjaXR5PSIwLjciLz4KICAgIDx0ZXh0IHg9IjI3LjUiIHk9IjE1IiBmb250LXNpemU9IjQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5BSTwvdGV4dD4KICA8L2c+Cjwvc3ZnPg==" width="40" height="40" style="border-radius:50%;display:block"><div class="chat-notif" style="position:absolute;top:-3px;right:-3px">1</div></div>
 </div>
 <div class="chat-win" id="chatWin">
   <div class="cw-h">
-    <div class="cw-av">⚡</div>
-    <div><div class="cw-name">ARIA · Gestor Energético IA</div><div class="cw-st">Online · responde em segundos</div></div>
+    <div class="cw-av"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNTYgNTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjU2IiBoZWlnaHQ9IjU2Ij4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmdfa2Fyb2wiIGN4PSI1MCUiIGN5PSIzMCUiIHI9IjcwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxYTNhNmIiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMGQxZjNjIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJza2luX2siIGN4PSI1MCUiIGN5PSI0MCUiIHI9IjYwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmNWM1YTMiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZThhODgyIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGNsaXBQYXRoIGlkPSJjbGlwX2thcm9sIj48Y2lyY2xlIGN4PSIyOCIgY3k9IjI4IiByPSIyOCIvPjwvY2xpcFBhdGg+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImhhaXJfayIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMmMxODEwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzFhMGUwOCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ic3VpdF9rIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxZTNhNWYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMGYxZTMzIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJnbG93X2siIGN4PSI1MCUiIGN5PSI1MCUiIHI9IjUwJSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSIwIiB5MT0iMCIgeDI9IjU2IiB5Mj0iNTYiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMDBjOGZmIiBzdG9wLW9wYWNpdHk9IjAuMyIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM3YjJmZmYiIHN0b3Atb3BhY2l0eT0iMC4zIi8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8ZyBjbGlwLXBhdGg9InVybCgjY2xpcF9rYXJvbCkiPgogICAgPCEtLSBCYWNrZ3JvdW5kIC0tPgogICAgPGNpcmNsZSBjeD0iMjgiIGN5PSIyOCIgcj0iMjgiIGZpbGw9InVybCgjYmdfa2Fyb2wpIi8+CiAgICA8IS0tIEdsb3cgb3ZlcmxheSBJQSAtLT4KICAgIDxjaXJjbGUgY3g9IjI4IiBjeT0iMjgiIHI9IjI4IiBmaWxsPSJ1cmwoI2dsb3dfaykiIG9wYWNpdHk9IjAuNSIvPgogICAgPCEtLSBGYXRvL3JvdXBhIHByb2Zpc3Npb25hbCAtLT4KICAgIDxlbGxpcHNlIGN4PSIyOCIgY3k9IjU0IiByeD0iMjIiIHJ5PSIxNCIgZmlsbD0idXJsKCNzdWl0X2spIi8+CiAgICA8cmVjdCB4PSIyMSIgeT0iNDAiIHdpZHRoPSIxNCIgaGVpZ2h0PSIxOCIgZmlsbD0idXJsKCNzdWl0X2spIiByeD0iMiIvPgogICAgPCEtLSBDb2xhcmluaG8gYnJhbmNvIC0tPgogICAgPHBvbHlnb24gcG9pbnRzPSIyNiw0MCAyOCw0NCAzMCw0MCAzMiwzOCAyNCwzOCIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOSIvPgogICAgPCEtLSBQZXNjb8OnbyAtLT4KICAgIDxyZWN0IHg9IjI0LjUiIHk9IjMzIiB3aWR0aD0iNyIgaGVpZ2h0PSI5IiByeD0iMyIgZmlsbD0idXJsKCNza2luX2spIi8+CiAgICA8IS0tIENhYmXDp2EgLS0+CiAgICA8ZWxsaXBzZSBjeD0iMjgiIGN5PSIyNiIgcng9IjExIiByeT0iMTIuNSIgZmlsbD0idXJsKCNza2luX2spIi8+CiAgICA8IS0tIENhYmVsbyAtLT4KICAgIDxlbGxpcHNlIGN4PSIyOCIgY3k9IjE2IiByeD0iMTEuNSIgcnk9IjciIGZpbGw9InVybCgjaGFpcl9rKSIvPgogICAgPGVsbGlwc2UgY3g9IjE3LjUiIGN5PSIyNCIgcng9IjMiIHJ5PSI4IiBmaWxsPSJ1cmwoI2hhaXJfaykiLz4KICAgIDxlbGxpcHNlIGN4PSIzOC41IiBjeT0iMjQiIHJ4PSIzIiByeT0iOCIgZmlsbD0idXJsKCNoYWlyX2spIi8+CiAgICA8IS0tIFNvYnJhbmNlbGhhcyAtLT4KICAgIDxwYXRoIGQ9Ik0yMiAyMC41IFEyNSAxOS41IDI3IDIwLjUiIHN0cm9rZT0iIzJjMTgxMCIgc3Ryb2tlLXdpZHRoPSIxLjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogICAgPHBhdGggZD0iTTI5IDIwLjUgUTMxIDE5LjUgMzQgMjAuNSIgc3Ryb2tlPSIjMmMxODEwIiBzdHJva2Utd2lkdGg9IjEuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8IS0tIE9saG9zIC0tPgogICAgPGVsbGlwc2UgY3g9IjI0LjUiIGN5PSIyMyIgcng9IjIuNSIgcnk9IjIiIGZpbGw9IiMxYTBlMDgiLz4KICAgIDxlbGxpcHNlIGN4PSIzMS41IiBjeT0iMjMiIHJ4PSIyLjUiIHJ5PSIyIiBmaWxsPSIjMWEwZTA4Ii8+CiAgICA8IS0tIEJyaWxobyBvbGhvcyAtLT4KICAgIDxjaXJjbGUgY3g9IjI1LjMiIGN5PSIyMi4yIiByPSIwLjciIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgIDxjaXJjbGUgY3g9IjMyLjMiIGN5PSIyMi4yIiByPSIwLjciIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgIDwhLS0gTmFyaXogLS0+CiAgICA8cGF0aCBkPSJNMjcuNSAyNC41IFEyOCAyNi41IDI4LjUgMjQuNSIgc3Ryb2tlPSIjYzg4OTVlIiBzdHJva2Utd2lkdGg9IjAuOCIgZmlsbD0ibm9uZSIvPgogICAgPCEtLSBTb3JyaXNvIC0tPgogICAgPHBhdGggZD0iTTI0LjUgMjkgUTI4IDMxLjUgMzEuNSAyOSIgc3Ryb2tlPSIjYzA2MDQwIiBzdHJva2Utd2lkdGg9IjEuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgICA8IS0tIEPDrXJjdWxvIElBIGRlY29yYXRpdm8gLS0+CiAgICA8Y2lyY2xlIGN4PSI0NCIgY3k9IjEyIiByPSI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMGM4ZmYiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC42Ii8+CiAgICA8Y2lyY2xlIGN4PSI0NCIgY3k9IjEyIiByPSI1IiBmaWxsPSIjMDBjOGZmIiBvcGFjaXR5PSIwLjIiLz4KICAgIDx0ZXh0IHg9IjQ0IiB5PSIxNSIgZm9udC1zaXplPSI2IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXdlaWdodD0iYm9sZCI+QUk8L3RleHQ+CiAgICA8IS0tIFBhcnTDrWN1bGFzIElBIC0tPgogICAgPGNpcmNsZSBjeD0iOCIgY3k9IjgiIHI9IjEuNSIgZmlsbD0iIzdiMmZmZiIgb3BhY2l0eT0iMC43Ii8+CiAgICA8Y2lyY2xlIGN4PSIxMiIgY3k9IjQ0IiByPSIxIiBmaWxsPSIjMDBjOGZmIiBvcGFjaXR5PSIwLjYiLz4KICAgIDxjaXJjbGUgY3g9IjQ4IiBjeT0iMzgiIHI9IjEuNSIgZmlsbD0iIzAwYzhmZiIgb3BhY2l0eT0iMC41Ii8+CiAgPC9nPgogIDwhLS0gQm9yZGEgZ3JhZGllbnRlIElBIC0tPgogIDxjaXJjbGUgY3g9IjI4IiBjeT0iMjgiIHI9IjI3IiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjZ2xvd19rKSIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjwvc3ZnPg==" width="40" height="40" style="border-radius:50%;display:block"></div>
+    <div><div class="cw-name">KAROL · Gestora Energética IA</div><div class="cw-st">Online · responde em segundos</div></div>
     <button class="cw-close" onclick="toggleChat()">✕</button>
   </div>
   <div class="cw-msgs" id="cwMsgs">
     <div class="cmsg cmsg-bot">
-      <div class="cmsg-av cmsg-av-b">⚡</div>
-      <div><div class="cmsg-bub">Olá! 👋 Sou a ARIA, o seu Gestor Energético com IA.<br><br>Posso analisar a sua fatura agora — empresa ou residencial — e dizer-lhe exactamente quanto está a perder. Gratuito. 60 segundos.</div><div class="cmsg-t">Agora</div></div>
+      <div class="cmsg-av cmsg-av-b"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmdfa3MyIiBjeD0iNTAlIiBjeT0iMzAlIiByPSI3MCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMWEzYTZiIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzBkMWYzYyIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0ic2tpbl9rczIiIGN4PSI1MCUiIGN5PSI0MCUiIHI9IjYwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmNWM1YTMiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZThhODgyIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGNsaXBQYXRoIGlkPSJjbGlwX2tzMiI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTIiLz48L2NsaXBQYXRoPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJoYWlyX2tzMiIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMmMxODEwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzFhMGUwOCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXBfa3MyKSI+CiAgICA8Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMiIgZmlsbD0idXJsKCNiZ19rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSIyNCIgcng9IjEwIiByeT0iNyIgZmlsbD0iIzFlM2E1ZiIvPgogICAgPHJlY3QgY3g9IjkiIGN5PSIxNyIgd2lkdGg9IjYiIGhlaWdodD0iOCIgcng9IjEiIGZpbGw9IiMxZTNhNWYiLz4KICAgIDxyZWN0IHg9IjEwLjUiIHk9IjE0LjUiIHdpZHRoPSIzIiBoZWlnaHQ9IjQiIHJ4PSIxLjUiIGZpbGw9InVybCgjc2tpbl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSIxMSIgcng9IjQuNSIgcnk9IjUiIGZpbGw9InVybCgjc2tpbl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSI3IiByeD0iNSIgcnk9IjMiIGZpbGw9InVybCgjaGFpcl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iNy41IiBjeT0iMTAuNSIgcng9IjEuMyIgcnk9IjMuNSIgZmlsbD0idXJsKCNoYWlyX2tzMikiLz4KICAgIDxlbGxpcHNlIGN4PSIxNi41IiBjeT0iMTAuNSIgcng9IjEuMyIgcnk9IjMuNSIgZmlsbD0idXJsKCNoYWlyX2tzMikiLz4KICAgIDxlbGxpcHNlIGN4PSIxMC4yIiBjeT0iMTAiIHJ4PSIxLjEiIHJ5PSIwLjkiIGZpbGw9IiMxYTBlMDgiLz4KICAgIDxlbGxpcHNlIGN4PSIxMy44IiBjeT0iMTAiIHJ4PSIxLjEiIHJ5PSIwLjkiIGZpbGw9IiMxYTBlMDgiLz4KICAgIDxjaXJjbGUgY3g9IjEwLjYiIGN5PSI5LjYiIHI9IjAuMzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgIDxjaXJjbGUgY3g9IjE0LjIiIGN5PSI5LjYiIHI9IjAuMzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgIDxwYXRoIGQ9Ik0xMCAxMi41IFExMiAxMy41IDE0IDEyLjUiIHN0cm9rZT0iI2MwNjA0MCIgc3Ryb2tlLXdpZHRoPSIwLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwvZz4KPC9zdmc+" width="24" height="24" style="border-radius:50%;display:block"></div>
+      <div><div class="cmsg-bub">Olá! 👋 Sou a <strong>KAROL</strong>, a sua Gestora Energética com IA.<br><br>Estou aqui para analisar a sua fatura de energia, comparar com o mercado e dizer-lhe exactamente quanto está a perder. <strong>Gratuito. Sem compromisso.</strong><br><br>Prefere enviar a fatura ou prefere que eu lhe faça algumas perguntas rápidas? ⚡</div><div class="cmsg-t">Agora</div></div>
     </div>
   </div>
   <div class="qrs" id="qrDiv">
-    <button class="qr" onclick="sendQR(&#39;Analisar fatura&#39;)">⚡ Analisar fatura</button>
-    <button class="qr" onclick="sendQR(&#39;Poupar energia&#39;)">💰 Calcular poupança</button>
-    <button class="qr" onclick="sendQR(&#39;Solar&#39;)">☀️ Simular solar</button>
-    <button class="qr" onclick="window.open(&#39;https://wa.me/351910322702&#39;,&#39;_blank&#39;)">💬 WhatsApp directo</button>
+    <button class="qr" onclick="sendQR('Quero enviar a minha fatura para análise')">⚡ Analisar fatura</button>
+    <button class="qr" onclick="sendQR('Quanto posso poupar na minha factura de energia?')">💰 Calcular poupança</button>
+    <button class="qr" onclick="sendQR('Tenho interesse em energia solar')">☀️ Simular solar</button>
+    <button class="qr" onclick="window.open('https://wa.me/351910322702','_blank')">💬 WhatsApp directo</button>
   </div>
   <div class="cw-inp-row">
     <input class="cw-inp" id="cwInp" placeholder="Escreva aqui..." onkeydown="if(event.key===&#39;Enter&#39;){sendChat()}">
@@ -1109,16 +1144,16 @@ function submitForm(){
     cui_gas:document.getElementById('fCui')?document.getElementById('fCui').value:'',
     notas:document.getElementById('fNotas').value,
     data_hora:new Date().toLocaleString('pt-PT'),
-    fonte:'enersia.netlify.app'
+    fonte:'enersia.pages.dev'
   };
-  // Send to Make.com webhook
+  // Make.com webhook principal (CRM: Google Sheets + Gmail)
   fetch('https://hook.eu1.make.com/o1a2e1x4jm8nrqmnqw8vfocdtnwo6i48', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(data)
   }).catch(function(){});
 
-  // Send to Formspree (email backup)
+  // Formspree backup (email imediato)
   fetch('https://formspree.io/f/xdabvnlq',{
     method:'POST',
     headers:{'Content-Type':'application/json','Accept':'application/json'},
@@ -1143,7 +1178,7 @@ function showSuccess(data){
 var prices={"EDP Comercial":0.1817,"Galp Energia":0.1284,"Endesa":0.1310,"Iberdrola":0.1298,"Repsol":0.1302,"Goldenergy":0.1256,"Plenitude":0.1289,"Coopernico":0.1267};
 // ENERSIA AI — Carrega precos reais do GitHub automaticamente
 (function(){
-  var GITHUB_URL="https://raw.githubusercontent.com/geralenersia-source/enersia/main/precos.json";
+  var GITHUB_URL="https://raw.githubusercontent.com/geralenersia-source/enersia/principal/precos.json";
   fetch(GITHUB_URL+"?t="+Date.now())
     .then(function(r){return r.json();})
     .then(function(d){
@@ -1301,21 +1336,72 @@ function toggleChat(){
   document.getElementById('chatWin').classList.toggle('open',chatOpen);
   if(chatOpen)document.querySelector('.chat-notif').style.display='none';
 }
-var replies={
-  'analisar':'Óptimo! Pode enviar foto, PDF ou preencher os dados. Resultado em 60 segundos. 📊',
-  'poupar':'Em média identificamos 22% de poupança. Quer uma análise precisa? ⚡',
-  'solar':'Para consumo acima de 2.000 kWh/mês, o solar faz sentido — ROI de 6–8 anos. Calcular? ☀️',
-  'mercado':'O mercado livre permite escolher qualquer comercializadora ERSE. Diferença de 15–31%. 💡'
-};
+
+// KAROL abre automaticamente após 4 segundos na primeira visita
+(function(){
+  var seen=sessionStorage.getItem('karol_opened');
+  if(!seen){
+    setTimeout(function(){
+      if(!chatOpen){
+        toggleChat();
+        sessionStorage.setItem('karol_opened','1');
+      }
+    },4000);
+  }
+})();
+
+// KAROL — IA real via Claude API
+var karolHistory=[];
+var karolSystem=`És a KAROL, Gestora Energética IA da ENERSIA — a primeira plataforma de IA energética de Portugal. Respondes SEMPRE em português europeu (PT-PT), de forma profissional mas próxima e directa. O teu objectivo é ajudar empresas e famílias a poupar na factura de energia.
+
+CONHECIMENTO:
+- Comparas 8 comercializadoras certificadas pela ERSE: EDP Comercial (referência ~€0.18/kWh), Galp Energia (~€0.13/kWh), Endesa (~€0.13/kWh), Iberdrola (~€0.13/kWh), Repsol (~€0.13/kWh), GoldEnergy (~€0.13/kWh), Plenitude (~€0.13/kWh), Coopernico (~€0.13/kWh)
+- Poupança média identificada: 22% na factura mensal
+- Análise gratuita e sem compromisso — o cliente só muda se quiser
+- Para empresas: análise de potência, ciclo tarifário, sector, factura de gás
+- Para residencial: análise de consumo kWh, tarifa simples/bi-horária, potência kVA
+- Solar: ROI médio 6–8 anos em Portugal, autoconsumo reduz 70–90% da factura
+- Link para análise completa: https://enersia.pages.dev/analisar-fatura.html
+- WhatsApp directo: https://wa.me/351910322702
+- Calendly para reunião: https://calendly.com/geralenersia/30min
+
+COMPORTAMENTO:
+- Respostas curtas e directas (máx 3 parágrafos)
+- Faz UMA pergunta de cada vez para qualificar o cliente
+- Se o cliente mencionar o valor da factura ou comercializadora, calcula a poupança estimada
+- Encaminha para análise completa ou WhatsApp quando o cliente estiver qualificado
+- Nunca inventes preços — usa os valores acima como referência
+- Usa emojis com moderação (⚡ 💰 ☀️ ✅)`;
+
+async function karolResponde(mensagem){
+  karolHistory.push({role:'user',content:mensagem});
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:400,
+        system:karolSystem,
+        messages:karolHistory
+      })
+    });
+    var data=await res.json();
+    var reply=data.content&&data.content[0]?data.content[0].text:'Ocorreu um erro. Tente novamente ou contacte-nos pelo WhatsApp. 💬';
+    karolHistory.push({role:'assistant',content:reply});
+    return reply;
+  }catch(e){
+    return 'Desculpe, tive um problema técnico. Pode contactar-nos directamente: ⚡ https://wa.me/351910322702';
+  }
+}
+
 function sendQR(t){
   addMsg(t,'u');
   document.getElementById('qrDiv').style.display='none';
-  setTimeout(function(){
-    showTyping(function(){
-      var k=Object.keys(replies).find(function(r){return t.toLowerCase().includes(r)});
-      addMsg(k?replies[k]:'Para uma análise precisa, preciso dos seus dados. Quer iniciar? É gratuito ⚡','bot');
-    });
-  },500);
+  showTyping(async function(){
+    var reply=await karolResponde(t);
+    addMsg(reply,'bot');
+  });
 }
 function sendChat(){
   var inp=document.getElementById('cwInp');
@@ -1324,13 +1410,10 @@ function sendChat(){
   inp.value='';
   addMsg(t,'u');
   document.getElementById('qrDiv').style.display='none';
-  setTimeout(function(){
-    showTyping(function(){
-      var lower=t.toLowerCase();
-      var k=Object.keys(replies).find(function(r){return lower.includes(r.split(' ')[0])});
-      addMsg(k?replies[k]:'Para uma análise precisa, preciso dos dados do seu contrato. Quer iniciar a análise gratuita? ⚡','bot');
-    });
-  },600);
+  showTyping(async function(){
+    var reply=await karolResponde(t);
+    addMsg(reply,'bot');
+  });
 }
 function addMsg(txt,tp){
   var m=document.getElementById('cwMsgs');
@@ -1338,7 +1421,7 @@ function addMsg(txt,tp){
   d.className='cmsg'+(tp==='u'?' u':' cmsg-bot');
   var now=new Date();
   var t=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-  var av=tp==='u'?'<div class="cmsg-av cmsg-av-u">👤</div>':'<div class="cmsg-av cmsg-av-b">⚡</div>';
+  var av=tp==='u'?'<div class="cmsg-av cmsg-av-u">👤</div>':'<div class="cmsg-av cmsg-av-b"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmdfa3MyIiBjeD0iNTAlIiBjeT0iMzAlIiByPSI3MCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMWEzYTZiIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzBkMWYzYyIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0ic2tpbl9rczIiIGN4PSI1MCUiIGN5PSI0MCUiIHI9IjYwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmNWM1YTMiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZThhODgyIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGNsaXBQYXRoIGlkPSJjbGlwX2tzMiI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTIiLz48L2NsaXBQYXRoPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJoYWlyX2tzMiIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMmMxODEwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzFhMGUwOCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXBfa3MyKSI+CiAgICA8Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMiIgZmlsbD0idXJsKCNiZ19rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSIyNCIgcng9IjEwIiByeT0iNyIgZmlsbD0iIzFlM2E1ZiIvPgogICAgPHJlY3QgY3g9IjkiIGN5PSIxNyIgd2lkdGg9IjYiIGhlaWdodD0iOCIgcng9IjEiIGZpbGw9IiMxZTNhNWYiLz4KICAgIDxyZWN0IHg9IjEwLjUiIHk9IjE0LjUiIHdpZHRoPSIzIiBoZWlnaHQ9IjQiIHJ4PSIxLjUiIGZpbGw9InVybCgjc2tpbl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSIxMSIgcng9IjQuNSIgcnk9IjUiIGZpbGw9InVybCgjc2tpbl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSI3IiByeD0iNSIgcnk9IjMiIGZpbGw9InVybCgjaGFpcl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iNy41IiBjeT0iMTAuNSIgcng9IjEuMyIgcnk9IjMuNSIgZmlsbD0idXJsKCNoYWlyX2tzMikiLz4KICAgIDxlbGxpcHNlIGN4PSIxNi41IiBjeT0iMTAuNSIgcng9IjEuMyIgcnk9IjMuNSIgZmlsbD0idXJsKCNoYWlyX2tzMikiLz4KICAgIDxlbGxpcHNlIGN4PSIxMC4yIiBjeT0iMTAiIHJ4PSIxLjEiIHJ5PSIwLjkiIGZpbGw9IiMxYTBlMDgiLz4KICAgIDxlbGxpcHNlIGN4PSIxMy44IiBjeT0iMTAiIHJ4PSIxLjEiIHJ5PSIwLjkiIGZpbGw9IiMxYTBlMDgiLz4KICAgIDxjaXJjbGUgY3g9IjEwLjYiIGN5PSI5LjYiIHI9IjAuMzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgIDxjaXJjbGUgY3g9IjE0LjIiIGN5PSI5LjYiIHI9IjAuMzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgIDxwYXRoIGQ9Ik0xMCAxMi41IFExMiAxMy41IDE0IDEyLjUiIHN0cm9rZT0iI2MwNjA0MCIgc3Ryb2tlLXdpZHRoPSIwLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwvZz4KPC9zdmc+" width="24" height="24" style="border-radius:50%;display:block"></div>';
   d.innerHTML=av+'<div><div class="cmsg-bub">'+txt+'</div><div class="cmsg-t">'+t+'</div></div>';
   m.appendChild(d);
   m.scrollTop=m.scrollHeight;
@@ -1347,9 +1430,10 @@ function showTyping(cb){
   var m=document.getElementById('cwMsgs');
   var d=document.createElement('div');
   d.className='cmsg cmsg-bot';d.id='typing-ind';
-  d.innerHTML='<div class="cmsg-av cmsg-av-b">⚡</div><div><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>';
+  d.innerHTML='<div class="cmsg-av cmsg-av-b"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij4KICA8ZGVmcz4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0iYmdfa3MyIiBjeD0iNTAlIiBjeT0iMzAlIiByPSI3MCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMWEzYTZiIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzBkMWYzYyIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxyYWRpYWxHcmFkaWVudCBpZD0ic2tpbl9rczIiIGN4PSI1MCUiIGN5PSI0MCUiIHI9IjYwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNmNWM1YTMiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZThhODgyIi8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGNsaXBQYXRoIGlkPSJjbGlwX2tzMiI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTIiLz48L2NsaXBQYXRoPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJoYWlyX2tzMiIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMmMxODEwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzFhMGUwOCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXBfa3MyKSI+CiAgICA8Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMiIgZmlsbD0idXJsKCNiZ19rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSIyNCIgcng9IjEwIiByeT0iNyIgZmlsbD0iIzFlM2E1ZiIvPgogICAgPHJlY3QgY3g9IjkiIGN5PSIxNyIgd2lkdGg9IjYiIGhlaWdodD0iOCIgcng9IjEiIGZpbGw9IiMxZTNhNWYiLz4KICAgIDxyZWN0IHg9IjEwLjUiIHk9IjE0LjUiIHdpZHRoPSIzIiBoZWlnaHQ9IjQiIHJ4PSIxLjUiIGZpbGw9InVybCgjc2tpbl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSIxMSIgcng9IjQuNSIgcnk9IjUiIGZpbGw9InVybCgjc2tpbl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSI3IiByeD0iNSIgcnk9IjMiIGZpbGw9InVybCgjaGFpcl9rczIpIi8+CiAgICA8ZWxsaXBzZSBjeD0iNy41IiBjeT0iMTAuNSIgcng9IjEuMyIgcnk9IjMuNSIgZmlsbD0idXJsKCNoYWlyX2tzMikiLz4KICAgIDxlbGxpcHNlIGN4PSIxNi41IiBjeT0iMTAuNSIgcng9IjEuMyIgcnk9IjMuNSIgZmlsbD0idXJsKCNoYWlyX2tzMikiLz4KICAgIDxlbGxpcHNlIGN4PSIxMC4yIiBjeT0iMTAiIHJ4PSIxLjEiIHJ5PSIwLjkiIGZpbGw9IiMxYTBlMDgiLz4KICAgIDxlbGxpcHNlIGN4PSIxMy44IiBjeT0iMTAiIHJ4PSIxLjEiIHJ5PSIwLjkiIGZpbGw9IiMxYTBlMDgiLz4KICAgIDxjaXJjbGUgY3g9IjEwLjYiIGN5PSI5LjYiIHI9IjAuMzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgIDxjaXJjbGUgY3g9IjE0LjIiIGN5PSI5LjYiIHI9IjAuMzUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjkiLz4KICAgIDxwYXRoIGQ9Ik0xMCAxMi41IFExMiAxMy41IDE0IDEyLjUiIHN0cm9rZT0iI2MwNjA0MCIgc3Ryb2tlLXdpZHRoPSIwLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwvZz4KPC9zdmc+" width="24" height="24" style="border-radius:50%;display:block"></div><div><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>';
   m.appendChild(d);m.scrollTop=m.scrollHeight;
-  setTimeout(function(){var t=document.getElementById('typing-ind');if(t)t.remove();cb();},1100);
+  Promise.resolve(cb()).finally(function(){var t=document.getElementById('typing-ind');if(t)t.remove();});
+},1100);
 }
 </script>
 
