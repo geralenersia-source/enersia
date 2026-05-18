@@ -904,12 +904,27 @@ async function analisar() {
     let r = extrairJSON(texto);
     if (!r) {
       try {
-        const data = JSON.parse(texto);
-        if (data.raw) r = extrairJSON(data.raw);
+        var data = JSON.parse(texto);
+        if (data.raw) {
+          // raw pode ser string com newlines — usar sanitizarJSON
+          r = extrairJSON(data.raw);
+          if (!r) r = extrairJSON(sanitizarJSON(data.raw));
+        }
         else if (data.dados) r = typeof data.dados === 'string' ? extrairJSON(data.dados) : data.dados;
         else if (data.comercializadora) r = data;
+        else if (data.sucesso && data.raw) r = extrairJSON(sanitizarJSON(String(data.raw)));
         else if (data.sucesso) r = data;
-      } catch(e2) {}
+      } catch(e2) { console.log('Parse secundário falhou:', e2.message); }
+    }
+    // Último recurso: extrair JSON do raw directamente
+    if (!r && texto.includes('"raw"')) {
+      try {
+        var rawMatch = texto.match(/"raw"\s*:\s*"([\s\S]*?)(?:"\s*[,}])/);
+        if (rawMatch) {
+          var rawStr = rawMatch[1].replace(/\\n/g,'\n').replace(/\\"/g,'"');
+          r = extrairJSON(rawStr);
+        }
+      } catch(e3) {}
     }
 
     console.log('DADOS PARSE:', r);
@@ -935,13 +950,40 @@ async function analisar() {
   }
 }
 
+function sanitizarJSON(str) {
+  // Remove backticks e markdown
+  str = str.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
+  // Extrair apenas o bloco JSON
+  var s = str.indexOf('{'), e = str.lastIndexOf('}');
+  if (s !== -1 && e !== -1 && e > s) str = str.slice(s, e + 1);
+  // Parse char a char para escapar newlines dentro de strings
+  var out = '', inStr = false, esc = false;
+  for (var i = 0; i < str.length; i++) {
+    var c = str[i];
+    if (esc) { out += c; esc = false; continue; }
+    if (c === '\\') { esc = true; out += c; continue; }
+    if (c === '"') { inStr = !inStr; out += c; continue; }
+    if (inStr) {
+      if (c === '\n') { out += '\\n'; continue; }
+      if (c === '\r') { out += '\\r'; continue; }
+      if (c === '\t') { out += '\\t'; continue; }
+    }
+    out += c;
+  }
+  return out;
+}
+
 function extrairJSON(texto) {
   if (!texto) return null;
+  // Tentativa 1: parse directo
   try { return JSON.parse(texto.trim()); } catch(e) {}
-  const matchMd = texto.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if (matchMd) { try { return JSON.parse(matchMd[1].trim()); } catch(e) {} }
-  const start = texto.indexOf('{'); const end = texto.lastIndexOf('}');
-  if (start !== -1 && end !== -1 && end > start) { try { return JSON.parse(texto.slice(start, end + 1)); } catch(e) {} }
+  // Tentativa 2: sanitizar e fazer parse
+  try { return JSON.parse(sanitizarJSON(texto)); } catch(e) {}
+  // Tentativa 3: encontrar bloco JSON e sanitizar
+  var s = texto.indexOf('{'), e = texto.lastIndexOf('}');
+  if (s !== -1 && e !== -1 && e > s) {
+    try { return JSON.parse(sanitizarJSON(texto.slice(s, e + 1))); } catch(e2) {}
+  }
   return null;
 }
 
