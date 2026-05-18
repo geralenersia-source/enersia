@@ -878,8 +878,13 @@ async function analisar() {
   clearErr(); animSteps();
 
   try {
+    // Timeout de 90s para dar tempo ao Make.com processar
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 90000);
+
     const res = await fetch(WH, {
       method: 'POST',
+      signal: controller.signal,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ficheiro_base64: fileB64,
@@ -889,9 +894,13 @@ async function analisar() {
         tipo: file.type === 'application/pdf' ? 'pdf' : 'imagem'
       })
     });
-    if (!res.ok) throw new Error('Erro no servidor: ' + res.status);
+    clearTimeout(timeout);
+
     const texto = await res.text();
-    console.log('MAKE RAW:', texto);
+    console.log('HTTP status:', res.status);
+    console.log('MAKE RAW:', texto.substring(0, 500));
+
+    // Tentar parse mesmo se status != 200 (Make devolve 200 na maioria dos casos)
     let r = extrairJSON(texto);
     if (!r) {
       try {
@@ -899,16 +908,29 @@ async function analisar() {
         if (data.raw) r = extrairJSON(data.raw);
         else if (data.dados) r = typeof data.dados === 'string' ? extrairJSON(data.dados) : data.dados;
         else if (data.comercializadora) r = data;
-        else if (data.sucesso && Object.keys(data).length > 2) r = data;
-      } catch(e) {}
+        else if (data.sucesso) r = data;
+      } catch(e2) {}
     }
-    console.log('DADOS:', r);
-    if (!r || (!r.comercializadora && !r.total_fatura)) throw new Error('Dados insuficientes.');
+
+    console.log('DADOS PARSE:', r);
+
+    if (!r || (!r.comercializadora && !r.total_fatura && !r.analise_detalhada)) {
+      // Make.com pode ter devolvido mensagem de erro — mostrar para debug
+      console.error('Resposta Make.com:', texto);
+      throw new Error('Resposta inválida do servidor. Resposta: ' + texto.substring(0, 100));
+    }
     showResult(r);
   } catch(e) {
     document.getElementById('loadingCard').classList.remove('show');
     document.getElementById('uploadCard').style.display = 'block';
-    showErr('Ocorreu um erro ao processar a fatura. Por favor tente novamente.');
+    var errMsg = '';
+    if (e.name === 'AbortError') {
+      errMsg = 'A análise está a demorar mais que o esperado. O seu pedido foi registado — vamos contactá-lo por email em breve.';
+    } else {
+      errMsg = 'Erro ao processar a fatura. Verifique a consola para detalhes e contacte-nos pelo WhatsApp se o problema persistir.';
+      console.error('Erro completo:', e.message);
+    }
+    showErr(errMsg);
     console.error(e);
   }
 }
@@ -997,7 +1019,7 @@ function resetForm() {
 
 function showErr(msg) {
   const b = document.getElementById('errorBox');
-  b.textContent = '&#9888; ' + msg; b.classList.add('show');
+  b.textContent = '⚠ ' + msg; b.classList.add('show');
 }
 function clearErr() { document.getElementById('errorBox').classList.remove('show'); }
 
