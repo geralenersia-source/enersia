@@ -529,6 +529,45 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .fab-wrap { bottom: 16px; right: 14px; }
   .nav-inner { padding: 0 16px; }
 }
+
+/* RESULTADO SIMPLIFICADO */
+.res-saving-val {
+  font-family:'Syne',sans-serif;
+  font-size:clamp(2rem,6vw,3.2rem) !important;
+  font-weight:900;color:var(--green);line-height:1;
+}
+.res-saving-box {
+  background:rgba(0,229,155,.12) !important;
+  border:2px solid rgba(0,229,155,.3) !important;
+  border-radius:var(--r2);padding:18px 22px !important;
+  text-align:center;
+}
+.res-saving-lbl { font-size:11px;color:var(--t3);margin-top:5px }
+.res-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:10px;margin-bottom:20px;
+}
+.res-item { text-align:center;padding:18px 14px !important }
+.res-item-label { font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:8px }
+.res-item-val { font-family:'Syne',sans-serif;font-size:20px;font-weight:900 }
+.res-item-val.green { color:var(--green) }
+.res-item-val.amber { color:#fb923c }
+.rec-box {
+  background:linear-gradient(135deg,rgba(79,124,255,.08),rgba(0,194,255,.05)) !important;
+  border:1.5px solid rgba(79,124,255,.2) !important;
+  border-radius:var(--r3) !important;
+  padding:28px !important; margin:0 !important;
+}
+.rec-box h4 {
+  font-family:'Syne',sans-serif;font-size:18px;font-weight:900;
+  color:var(--t1) !important;margin-bottom:12px !important;
+}
+.rec-box p { font-size:15px;color:var(--t2);line-height:1.75 }
+.rec-box strong { color:var(--t1) }
+/* Esconder análise detalhada verbose */
+.res-sec-label { display:none !important }
+.res-detail > p:not(:last-child) { display:none }
 </style>
 </head>
 <body>
@@ -897,40 +936,51 @@ function showResult(r) {
   document.getElementById('loadingCard').classList.remove('show');
   document.getElementById('resCard').classList.add('show');
   document.getElementById('btnNova').style.display = 'block';
-  document.getElementById('rComercializadora').textContent = r.comercializadora || 'Comercializadora';
-  document.getElementById('rPeriodo').textContent = 'Per&#237;odo: ' + (r.periodo || '&#8212;');
-  const p = parseFloat(r.poupanca_mensal_estimada) || 0;
-  if (p > 0) {
+
+  // Valores principais
+  const pMes = parseFloat(r.poupanca_mensal_estimada) || 0;
+  const pAno = pMes * 12;
+  const perc = parseFloat(r.percentagem_poupanca) || 0;
+  const total = parseFloat(r.total_fatura) || 0;
+  const recom = r.recomendacao_comercializador || '';
+  const comerc = r.comercializadora || 'Actual';
+
+  // Header
+  document.getElementById('rComercializadora').textContent = comerc;
+  document.getElementById('rPeriodo').textContent = r.periodo || '';
+
+  // Caixa de poupança — só mostra se positiva
+  if (pMes > 0) {
     document.getElementById('resSavingBox').style.display = 'block';
-    document.getElementById('rPoupanca').textContent = '-' + p.toFixed(0) + '&#8364;';
+    document.getElementById('rPoupanca').textContent = '−' + pMes.toFixed(0) + '€';
   }
-  const dados = [];
-  const tot = parseFloat(r.total_fatura);
-  if (!isNaN(tot)) dados.push({l:'Total fatura', v: tot.toFixed(2)+'&#8364;', c:'amber'});
-  const consumo = r.consumo_kwh || (r.eletricidade && r.eletricidade.consumo_kwh);
-  if (consumo) dados.push({l:'Consumo', v: consumo+' kWh'});
-  const tarifa = r.tarifa_atual || (r.eletricidade && r.eletricidade.tarifa_kwh);
-  if (tarifa) dados.push({l:'Tarifa', v: parseFloat(tarifa).toFixed(4)+'&#8364;/kWh'});
-  const perc = parseFloat(r.percentagem_poupanca);
-  if (!isNaN(perc) && perc > 0) dados.push({l:'Poupan&#231;a', v: perc.toFixed(0)+'%', c:'green'});
-  document.getElementById('resGrid').innerHTML = dados.length
-    ? dados.map(d=>`<div class="res-item"><div class="res-item-label">${d.l}</div><div class="res-item-val ${d.c||''}">${d.v}</div></div>`).join('')
-    : '<div class="res-item"><div class="res-item-label">An&#225;lise</div><div class="res-item-val">Ver detalhes abaixo</div></div>';
-  let html = '';
-  const analise = r.analise_detalhada || r.analise || '';
-  if (analise) analise.split(/\n+/).filter(p=>p.trim()).forEach(p => { html += `<p>${p.trim()}</p>`; });
-  const alertas = r.alertas;
-  if (alertas) {
-    const lista = Array.isArray(alertas) ? alertas : [alertas];
-    lista.filter(a=>a).forEach(a => {
-      html += `<div class="alert-box"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>${a}</span></div>`;
-    });
+
+  // Grid simplificado: 3 valores chave
+  var grid = '';
+  if (total > 0)
+    grid += '<div class="res-item"><div class="res-item-label">Fatura actual</div><div class="res-item-val amber">' + total.toFixed(2) + '€/mês</div></div>';
+  if (pMes > 0)
+    grid += '<div class="res-item"><div class="res-item-label">Poupança mensal</div><div class="res-item-val green">−' + pMes.toFixed(0) + '€/mês</div></div>';
+  if (pAno > 0)
+    grid += '<div class="res-item"><div class="res-item-label">Poupança anual</div><div class="res-item-val green">−' + pAno.toFixed(0) + '€/ano</div></div>';
+  if (perc > 0)
+    grid += '<div class="res-item"><div class="res-item-label">Desconto</div><div class="res-item-val green">' + perc.toFixed(0) + '% mais barato</div></div>';
+  document.getElementById('resGrid').innerHTML = grid || '<div class="res-item"><div class="res-item-label">Análise</div><div class="res-item-val">Ver recomendação abaixo</div></div>';
+
+  // Resumo simples — só recomendação
+  var html = '';
+  if (recom) {
+    var motivo = r.motivo_recomendacao || '';
+    // Truncar motivo a 1 frase
+    if (motivo && motivo.length > 120) motivo = motivo.split('.')[0] + '.';
+    html += '<div class="rec-box">'
+      + '<h4>Recomendação ENERSIA</h4>'
+      + '<p>Mude para <strong>' + recom + '</strong>'
+      + (pMes > 0 ? ' e poupe <strong>' + pMes.toFixed(0) + '€ por mês</strong> (' + pAno.toFixed(0) + '€ por ano).' : '.')
+      + (motivo ? ' ' + motivo : '')
+      + '</p></div>';
   }
-  if (r.recomendacao_comercializador) {
-    const poupStr = p > 0 ? p.toFixed(0)+'&#8364;/m&#234;s' : 'valor significativo';
-    html += `<div class="rec-box"><h4>Recomenda&#231;&#227;o ENERSIA</h4><p>Mudar para <strong>${r.recomendacao_comercializador}</strong> pode representar uma poupan&#231;a de <strong>${poupStr}</strong>. ${r.motivo_recomendacao || 'Sem corte e tratamos de tudo por si.'}</p></div>`;
-  }
-  if (!html) html = '<p>An&#225;lise conclu&#237;da. Contacte-nos para saber mais sobre as op&#231;&#245;es dispon&#237;veis.</p>';
+  if (!html) html = '<p>Análise concluída. Fale com um especialista para conhecer as melhores opções para o seu perfil.</p>';
   document.getElementById('resDetail').innerHTML = html;
 }
 
