@@ -513,6 +513,22 @@ footer a:hover{color:var(--t1)}
   .page-hero{padding:36px 20px 32px}
   .card-body{padding:20px}
 }
+
+/* MOBILE OVERFLOW FIX */
+html, body { max-width: 100%; overflow-x: hidden; }
+@media (max-width: 480px) {
+  .page-hero h1 { font-size: clamp(1.5rem, 7vw, 2rem) !important; }
+  .how-steps { flex-wrap: wrap; }
+  .how-step { min-width: calc(50% - 1px); flex: none; }
+  .main { padding: 20px 14px 60px; }
+  .card-body { padding: 18px !important; }
+  .cta-box { flex-direction: column; }
+  .cta-btns { width: 100%; flex-direction: column; }
+  .btn-cta-main, .btn-cta-wa { justify-content: center; }
+  .chat-window { width: calc(100vw - 20px); right: 10px; }
+  .fab-wrap { bottom: 16px; right: 14px; }
+  .nav-inner { padding: 0 16px; }
+}
 </style>
 </head>
 <body>
@@ -987,6 +1003,36 @@ async function sendQ(msg) {
   addMsg(msg,'u'); showTyping();
   var r=await getReply(msg); var t=document.getElementById('typ'); if(t)t.remove(); addMsg(r,'bot');
 }
+
+/* AUTO-PREENCHIMENTO — vem do index com ?auto=1 */
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  if(params.get('auto') !== '1') return;
+  var raw = sessionStorage.getItem('enersia_pre');
+  if(!raw) return;
+  try {
+    var d = JSON.parse(raw);
+    sessionStorage.removeItem('enersia_pre');
+    // Preencher campos de contacto
+    if(d.nome) document.getElementById('f-nome').value = d.nome;
+    if(d.telefone) document.getElementById('f-tel').value = d.telefone;
+    if(d.email) document.getElementById('f-email').value = d.email;
+    if(d.distrito) document.getElementById('f-distrito').value = d.distrito;
+    // Simular ficheiro carregado
+    if(d.ficheiro_base64) {
+      fileB64 = d.ficheiro_base64;
+      file = { type: d.mime_type || 'application/pdf', name: d.nome_ficheiro || 'fatura.pdf', size: Math.round(d.ficheiro_base64.length * 0.75) };
+      document.getElementById('fileName').textContent = file.name;
+      document.getElementById('fileSize').textContent = Math.round(file.size/1024) + ' KB';
+      document.getElementById('fileSelected').classList.add('show');
+      document.getElementById('dropzone').style.display = 'none';
+      document.getElementById('btnAnalisar').disabled = false;
+      // Auto-arrancar análise após 800ms
+      setTimeout(function(){ analisar(); }, 800);
+    }
+  } catch(e) { console.error('Auto-preenchimento erro:', e); }
+})();
+
 </script>
 </body>
 </html>
