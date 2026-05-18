@@ -2409,6 +2409,44 @@ async function toBase64(file) {
 async function submitForm() {
   if(!validateForm()) return;
 
+  var nome = document.getElementById('f-nome').value.trim();
+  var tel = document.getElementById('f-tel').value.trim();
+  var email = document.getElementById('f-email').value.trim();
+  var distrito = document.getElementById('f-distrito').value;
+
+  // UPLOAD MODE — redireciona para analisar-fatura.html com dados em sessionStorage
+  if(currentMode === 'upload') {
+    if(!selectedFile) { showError('Por favor carregue a sua fatura.'); return; }
+
+    var btn = document.getElementById('formSubmitBtn');
+    var body = document.getElementById('formBody');
+    var loading = document.getElementById('formLoading');
+    btn.disabled = true;
+    body.style.display = 'none';
+    loading.classList.add('show');
+    animateLoadingSteps();
+
+    try {
+      var b64 = await toBase64(selectedFile);
+      // Guardar em sessionStorage para o analisar-fatura.html ler
+      sessionStorage.setItem('enersia_pre', JSON.stringify({
+        nome: nome, telefone: tel, email: email, distrito: distrito,
+        tipo_energia: selectedEnergy,
+        ficheiro_base64: b64,
+        mime_type: selectedFile.type || 'application/pdf',
+        nome_ficheiro: selectedFile.name
+      }));
+      setTimeout(function(){ window.location.href = '/analisar-fatura.html?auto=1'; }, 1500);
+    } catch(e) {
+      loading.classList.remove('show');
+      body.style.display = 'block';
+      btn.disabled = false;
+      showError('Erro ao processar ficheiro. Tente novamente.');
+    }
+    return;
+  }
+
+  // MANUAL MODE — envia dados para Make.com webhook manual
   var btn = document.getElementById('formSubmitBtn');
   var body = document.getElementById('formBody');
   var loading = document.getElementById('formLoading');
@@ -2419,40 +2457,19 @@ async function submitForm() {
   loading.classList.add('show');
   animateLoadingSteps();
 
-  var nome = document.getElementById('f-nome').value.trim();
-  var tel = document.getElementById('f-tel').value.trim();
-  var email = document.getElementById('f-email').value.trim();
-  var distrito = document.getElementById('f-distrito').value;
-
   var payload = {
-    nome: nome,
-    telefone: tel,
-    email: email,
-    distrito: distrito,
-    tipo_energia: selectedEnergy,
-    modo: currentMode,
+    nome: nome, telefone: tel, email: email, distrito: distrito,
+    tipo_energia: selectedEnergy, modo: 'manual',
+    comercializadora: document.getElementById('f-comerc').value,
+    valor_fatura: document.getElementById('f-valor').value,
+    consumo_elec: document.getElementById('f-kwh-elec') ? document.getElementById('f-kwh-elec').value : '',
+    consumo_gas: document.getElementById('f-kwh-gas') ? document.getElementById('f-kwh-gas').value : '',
+    potencia: document.getElementById('f-potencia').value,
+    tarifario: document.getElementById('f-tarifa').value,
+    observacoes: document.getElementById('f-obs').value,
+    cpe_cui: document.getElementById('f-cpe') ? document.getElementById('f-cpe').value : '',
     timestamp: new Date().toISOString()
   };
-
-  if(currentMode === 'upload' && selectedFile) {
-    try {
-      var b64 = await toBase64(selectedFile);
-      payload.ficheiro_base64 = b64;
-      payload.mime_type = selectedFile.type || 'application/octet-stream';
-      payload.nome_ficheiro = selectedFile.name;
-    } catch(e) {
-      console.error('Erro ao converter ficheiro:', e);
-    }
-  } else {
-    payload.comercializadora = document.getElementById('f-comerc').value;
-    payload.valor_fatura = document.getElementById('f-valor').value;
-    payload.consumo_elec = document.getElementById('f-kwh-elec') ? document.getElementById('f-kwh-elec').value : '';
-    payload.consumo_gas = document.getElementById('f-kwh-gas') ? document.getElementById('f-kwh-gas').value : '';
-    payload.potencia = document.getElementById('f-potencia').value;
-    payload.tarifario = document.getElementById('f-tarifa').value;
-    payload.observacoes = document.getElementById('f-obs').value;
-    payload.cpe_cui = document.getElementById('f-cpe') ? document.getElementById('f-cpe').value : '';
-  }
 
   try {
     await fetch('https://hook.eu1.make.com/o1a2e1x4jm8nrqmnqw8vfocdtnwo6i48', {
@@ -2460,14 +2477,12 @@ async function submitForm() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-  } catch(e) {
-    console.error('Webhook error:', e);
-  }
+  } catch(e) { console.error('Webhook error:', e); }
 
   setTimeout(function(){
     loading.classList.remove('show');
     success.classList.add('show');
-  }, 7000);
+  }, 5000);
 }
 
 </script>
