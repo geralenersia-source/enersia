@@ -1030,24 +1030,28 @@ function extrairDoRaw(rawStr) {
       'recomendacao_comercializador','motivo_recomendacao',
       'analise_detalhada','urgencia','alertas'
     ];
-    campos.forEach(function(campo) {
-      // Regex que captura tudo entre as aspas do valor, incluindo newlines
-      var rx = new RegExp('"' + campo + '"\s*:\s*"((?:[^"\\]|\\.|[\s\S])*?)"\s*(?:,|\})');
-      var m = rawStr.match(rx);
-      if (m && m[1]) {
-        obj[campo] = m[1]
-          .replace(/\n/g, ' ')
-          .replace(/\r/g, ' ')
-          .replace(/\t/g, ' ')
-          .replace(/\"/g, '"')
-          .replace(/
-/g, ' ')
-          .replace(/
-/g, ' ')
-          .trim();
-      }
+        campos.forEach(function(campo) {
+      try {
+        var key = '"' + campo + '"';
+        var keyIdx = rawStr.indexOf(key);
+        if (keyIdx === -1) return;
+        var colonIdx = rawStr.indexOf(':', keyIdx + key.length);
+        if (colonIdx === -1) return;
+        var after = rawStr.substring(colonIdx + 1).trimLeft ? rawStr.substring(colonIdx + 1).replace(/^\s+/, '') : rawStr.substring(colonIdx + 1);
+        if (after.charAt(0) !== '"') return;
+        var val = '';
+        var i = 1;
+        while (i < after.length) {
+          var ch = after.charAt(i);
+          if (ch === '\\') { val += after.charAt(i+1) || ''; i += 2; continue; }
+          if (ch === '"') break;
+          val += ch; i++;
+        }
+        val = val.replace(/\n/g, ' ').replace(/\r/g, ' ').replace(/\t/g, ' ').replace(/  +/g, ' ').trim();
+        if (val) obj[campo] = val;
+      } catch(ex) {}
     });
-    if (obj.comercializadora || obj.total_fatura) {
+        if (obj.comercializadora || obj.total_fatura) {
       console.log('REGEX EXTRACT OK:', obj.comercializadora, obj.total_fatura);
       return obj;
     }
