@@ -862,6 +862,24 @@ function validarContacto() {
 }
 
 /* ANALISAR */
+function normalizarMime(mimeType) {
+  if (!mimeType) return 'application/pdf';
+  var map = {
+    'application/pdf': 'application/pdf',
+    'image/jpeg': 'image/jpeg',
+    'image/jpg': 'image/jpeg',
+    'image/png': 'image/png',
+    'image/webp': 'image/webp',
+    'image/gif': 'image/gif',
+    // Versões em português/outros idiomas
+    'aplicacao/pdf': 'application/pdf',
+    'aplicação/pdf': 'application/pdf',
+    'imagem/jpeg': 'image/jpeg',
+    'imagem/png': 'image/png'
+  };
+  return map[mimeType.toLowerCase()] || mimeType;
+}
+
 async function analisar() {
   if (!fileB64) return;
   if (!validarContacto()) return;
@@ -888,7 +906,9 @@ async function analisar() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ficheiro_base64: fileB64,
-        mime_type: file.type || 'application/pdf',
+        tipo_mime: normalizarMime(file.type),
+        mime_type: normalizarMime(file.type),
+        base64: fileB64,
         nome_ficheiro: file.name || 'fatura.pdf',
         nome: nome, telefone: tel, email: email, distrito: distrito,
         tipo: file.type === 'application/pdf' ? 'pdf' : 'imagem'
