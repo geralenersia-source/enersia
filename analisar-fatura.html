@@ -901,30 +901,31 @@ async function analisar() {
     console.log('MAKE RAW:', texto.substring(0, 500));
 
     // Tentar parse mesmo se status != 200 (Make devolve 200 na maioria dos casos)
-    let r = extrairJSON(texto);
-    if (!r) {
+    // Parse da resposta Make.com
+    var r = null;
+    console.log('MAKE RAW:', texto.substring(0, 500));
+
+    // T1: parse directo
+    try { r = JSON.parse(texto.trim()); } catch(e) {}
+
+    // T2: se tem sucesso+raw, extrair o raw
+    if (!r || (!r.comercializadora && !r.total_fatura)) {
       try {
-        var data = JSON.parse(texto);
-        if (data.raw) {
-          // raw pode ser string com newlines — usar sanitizarJSON
-          r = extrairJSON(data.raw);
-          if (!r) r = extrairJSON(sanitizarJSON(data.raw));
+        var outer = null;
+        try { outer = JSON.parse(sanitizarJSON(texto)); } catch(e) {}
+        if (outer && outer.raw) {
+          r = extrairDoRaw(outer.raw);
+          console.log('DADOS DO RAW:', r);
+        } else if (outer && outer.comercializadora) {
+          r = outer;
         }
-        else if (data.dados) r = typeof data.dados === 'string' ? extrairJSON(data.dados) : data.dados;
-        else if (data.comercializadora) r = data;
-        else if (data.sucesso && data.raw) r = extrairJSON(sanitizarJSON(String(data.raw)));
-        else if (data.sucesso) r = data;
-      } catch(e2) { console.log('Parse secundário falhou:', e2.message); }
+      } catch(e2) { console.log('Parse raw falhou:', e2.message); }
     }
-    // Último recurso: extrair JSON do raw directamente
-    if (!r && texto.includes('"raw"')) {
-      try {
-        var rawMatch = texto.match(/"raw"\s*:\s*"([\s\S]*?)(?:"\s*[,}])/);
-        if (rawMatch) {
-          var rawStr = rawMatch[1].replace(/\\n/g,'\n').replace(/\\"/g,'"');
-          r = extrairJSON(rawStr);
-        }
-      } catch(e3) {}
+
+    // T3: extrairJSON geral
+    if (!r || (!r.comercializadora && !r.total_fatura)) {
+      r = extrairJSON(texto);
+      console.log('DADOS extrairJSON:', r);
     }
 
     console.log('DADOS PARSE:', r);
@@ -951,12 +952,10 @@ async function analisar() {
 }
 
 function sanitizarJSON(str) {
-  // Remove backticks e markdown
+  if (!str) return str;
   str = str.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
-  // Extrair apenas o bloco JSON
   var s = str.indexOf('{'), e = str.lastIndexOf('}');
   if (s !== -1 && e !== -1 && e > s) str = str.slice(s, e + 1);
-  // Parse char a char para escapar newlines dentro de strings
   var out = '', inStr = false, esc = false;
   for (var i = 0; i < str.length; i++) {
     var c = str[i];
@@ -973,13 +972,57 @@ function sanitizarJSON(str) {
   return out;
 }
 
+function extrairDoRaw(rawStr) {
+  // rawStr é uma string que contém JSON com newlines reais
+  // Estratégia: substituir newlines dentro do raw por \n usando regex
+  if (!rawStr) return null;
+  // Remover escape duplo se existir
+  var s = rawStr;
+  // Tentar parse directo primeiro
+  try { return JSON.parse(s); } catch(e) {}
+  // Sanitizar char a char
+  try { return JSON.parse(sanitizarJSON(s)); } catch(e) {}
+  // Último recurso: extrair campos via regex
+  try {
+    var obj = {};
+    var campos = ['comercializadora','periodo','total_fatura','consumo_kwh',
+      'poupanca_mensal_estimada','percentagem_poupanca','recomendacao_comercializador',
+      'motivo_recomendacao','analise_detalhada','urgencia','alertas'];
+    campos.forEach(function(campo) {
+      var rx = new RegExp('"' + campo + '"\s*:\s*"([^"]*(?:\\"[^"]*)*)"');
+      var m = s.match(rx);
+      if (m) obj[campo] = m[1].replace(/\\n/g, ' ').replace(/\\"/g, '"');
+    });
+    if (obj.comercializadora || obj.total_fatura) return obj;
+  } catch(e2) {}
+  return null;
+}
+
 function extrairJSON(texto) {
   if (!texto) return null;
-  // Tentativa 1: parse directo
+  // T1: parse directo
   try { return JSON.parse(texto.trim()); } catch(e) {}
-  // Tentativa 2: sanitizar e fazer parse
+  // T2: sanitizar
   try { return JSON.parse(sanitizarJSON(texto)); } catch(e) {}
-  // Tentativa 3: encontrar bloco JSON e sanitizar
+  // T3: se tem campo "raw", extrair e processar
+  try {
+    var outer = JSON.parse(sanitizarJSON(texto));
+    if (outer && outer.raw) return extrairDoRaw(outer.raw);
+  } catch(e) {}
+  // T4: extrair raw manualmente via indexOf
+  try {
+    var rawIdx = texto.indexOf('"raw"');
+    if (rawIdx !== -1) {
+      // Encontrar o início do valor do raw
+      var valStart = texto.indexOf('"', rawIdx + 6) + 1;
+      // Encontrar o fim — é complicado porque o raw tem " dentro
+      // Usar sanitizarJSON no texto todo primeiro
+      var sanitized = sanitizarJSON(texto);
+      var parsed = JSON.parse(sanitized);
+      if (parsed && parsed.raw) return extrairDoRaw(parsed.raw);
+    }
+  } catch(e) {}
+  // T5: extrair bloco JSON directamente do texto
   var s = texto.indexOf('{'), e = texto.lastIndexOf('}');
   if (s !== -1 && e !== -1 && e > s) {
     try { return JSON.parse(sanitizarJSON(texto.slice(s, e + 1))); } catch(e2) {}
