@@ -923,30 +923,50 @@ async function analisar() {
     // Tentar parse mesmo se status != 200 (Make devolve 200 na maioria dos casos)
     // Parse da resposta Make.com
     var r = null;
-    console.log('MAKE RAW:', texto.substring(0, 500));
+    console.log('MAKE RAW:', texto.substring(0, 300));
 
-    // T1: parse directo
-    try { r = JSON.parse(texto.trim()); } catch(e) {}
+    // T1: parse directo do texto completo
+    try {
+      var parsed = JSON.parse(texto.trim());
+      if (parsed && parsed.comercializadora) { r = parsed; }
+      else if (parsed && parsed.raw) { r = extrairDoRaw(parsed.raw); }
+      else if (parsed && parsed.sucesso && parsed.raw) { r = extrairDoRaw(parsed.raw); }
+    } catch(e) {}
 
-    // T2: se tem sucesso+raw, extrair o raw
+    // T2: sanitizar o texto e tentar de novo
     if (!r || (!r.comercializadora && !r.total_fatura)) {
       try {
-        var outer = null;
-        try { outer = JSON.parse(sanitizarJSON(texto)); } catch(e) {}
-        if (outer && outer.raw) {
-          r = extrairDoRaw(outer.raw);
-          console.log('DADOS DO RAW:', r);
-        } else if (outer && outer.comercializadora) {
-          r = outer;
-        }
-      } catch(e2) { console.log('Parse raw falhou:', e2.message); }
+        var parsed2 = JSON.parse(sanitizarJSON(texto));
+        if (parsed2 && parsed2.raw) { r = extrairDoRaw(parsed2.raw); }
+        else if (parsed2 && parsed2.comercializadora) { r = parsed2; }
+      } catch(e) {}
     }
 
-    // T3: extrairJSON geral
+    // T3: extrair o raw como string directamente do texto usando indexOf
+    if (!r || (!r.comercializadora && !r.total_fatura)) {
+      try {
+        var rawStart = texto.indexOf('"raw"');
+        if (rawStart !== -1) {
+          // Encontrar o início do valor string do raw
+          var valStart = texto.indexOf('"', rawStart + 5);
+          if (valStart !== -1) {
+            // O raw é uma string — extrair tudo depois da primeira aspa
+            var rawContent = texto.substring(valStart + 1);
+            // Remover o wrapper externo
+            r = extrairDoRaw(rawContent);
+            console.log('T3 raw extract:', r ? r.comercializadora : 'null');
+          }
+        }
+      } catch(e) { console.log('T3 falhou:', e.message); }
+    }
+
+    // T4: extrairJSON geral
     if (!r || (!r.comercializadora && !r.total_fatura)) {
       r = extrairJSON(texto);
-      console.log('DADOS extrairJSON:', r);
+      console.log('T4 extrairJSON:', r ? r.comercializadora : 'null');
     }
+
+    console.log('RESULTADO FINAL:', r ? r.comercializadora : 'null');
 
     console.log('DADOS PARSE:', r);
 
@@ -993,28 +1013,46 @@ function sanitizarJSON(str) {
 }
 
 function extrairDoRaw(rawStr) {
-  // rawStr é uma string que contém JSON com newlines reais
-  // Estratégia: substituir newlines dentro do raw por \n usando regex
   if (!rawStr) return null;
-  // Remover escape duplo se existir
-  var s = rawStr;
-  // Tentar parse directo primeiro
-  try { return JSON.parse(s); } catch(e) {}
-  // Sanitizar char a char
-  try { return JSON.parse(sanitizarJSON(s)); } catch(e) {}
-  // Último recurso: extrair campos via regex
+
+  // T1: parse directo
+  try { var r = JSON.parse(rawStr); if (r && r.comercializadora) return r; } catch(e) {}
+
+  // T2: sanitizar char a char
+  try { var r2 = JSON.parse(sanitizarJSON(rawStr)); if (r2 && r2.comercializadora) return r2; } catch(e) {}
+
+  // T3: regex campo a campo — funciona mesmo com newlines reais
   try {
     var obj = {};
-    var campos = ['comercializadora','periodo','total_fatura','consumo_kwh',
-      'poupanca_mensal_estimada','percentagem_poupanca','recomendacao_comercializador',
-      'motivo_recomendacao','analise_detalhada','urgencia','alertas'];
+    var campos = [
+      'comercializadora','periodo','total_fatura','consumo_kwh',
+      'poupanca_mensal_estimada','percentagem_poupanca',
+      'recomendacao_comercializador','motivo_recomendacao',
+      'analise_detalhada','urgencia','alertas'
+    ];
     campos.forEach(function(campo) {
-      var rx = new RegExp('"' + campo + '"\s*:\s*"([^"]*(?:\\"[^"]*)*)"');
-      var m = s.match(rx);
-      if (m) obj[campo] = m[1].replace(/\\n/g, ' ').replace(/\\"/g, '"');
+      // Regex que captura tudo entre as aspas do valor, incluindo newlines
+      var rx = new RegExp('"' + campo + '"\s*:\s*"((?:[^"\\]|\\.|[\s\S])*?)"\s*(?:,|\})');
+      var m = rawStr.match(rx);
+      if (m && m[1]) {
+        obj[campo] = m[1]
+          .replace(/\n/g, ' ')
+          .replace(/\r/g, ' ')
+          .replace(/\t/g, ' ')
+          .replace(/\"/g, '"')
+          .replace(/
+/g, ' ')
+          .replace(/
+/g, ' ')
+          .trim();
+      }
     });
-    if (obj.comercializadora || obj.total_fatura) return obj;
-  } catch(e2) {}
+    if (obj.comercializadora || obj.total_fatura) {
+      console.log('REGEX EXTRACT OK:', obj.comercializadora, obj.total_fatura);
+      return obj;
+    }
+  } catch(e2) { console.log('Regex extract falhou:', e2.message); }
+
   return null;
 }
 
