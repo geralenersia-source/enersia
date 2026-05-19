@@ -673,7 +673,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
       </div>
 
       <div class="dropzone" id="dropzone">
-        <input type="file" id="fileInput" accept=".pdf,image/*">
+        <input type="file" id="fileInput" accept=".pdf,image/*" multiple>
         <div class="dz-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         </div>
@@ -811,7 +811,15 @@ let file = null, fileB64 = null;
 /* FILE HANDLING */
 const fi = document.getElementById('fileInput');
 const ci = document.getElementById('camInput');
-fi.addEventListener('change', e => e.target.files[0] && handleFile(e.target.files[0]));
+fi.addEventListener('change', e => {
+  if (!e.target.files || !e.target.files[0]) return;
+  if (e.target.files.length === 1) {
+    handleFile(e.target.files[0]);
+  } else {
+    // Múltiplos ficheiros — usar o primeiro e mostrar contagem
+    handleFile(e.target.files[0], e.target.files.length);
+  }
+});
 ci.addEventListener('change', e => e.target.files[0] && handleFile(e.target.files[0]));
 
 const dz = document.getElementById('dropzone');
@@ -909,9 +917,10 @@ async function analisar() {
         tipo_mime: normalizarMime(file.type),
         mime_type: normalizarMime(file.type),
         base64: fileB64,
-        nome_ficheiro: file.name || 'fatura.pdf',
+        nome_ficheiro: file.name || 'fatura',
         nome: nome, telefone: tel, email: email, distrito: distrito,
-        tipo: file.type === 'application/pdf' ? 'pdf' : 'imagem'
+        tipo: (file.type === 'application/pdf') ? 'pdf' : 'imagem',
+        is_image: (file.type !== 'application/pdf')
       })
     });
     clearTimeout(timeout);
