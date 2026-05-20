@@ -255,13 +255,52 @@ nav{
 .info-tip svg{flex-shrink:0;width:15px;height:15px;color:var(--green)}
 
 /* ERROR */
-.error-box{
-  display:none;background:rgba(220,50,50,.08);
-  border:1px solid rgba(220,50,50,.2);border-radius:var(--r2);
-  padding:13px 16px;margin-bottom:16px;
-  font-size:13px;color:#ff8080;
-}
+.error-box{display:none;margin-bottom:20px}
 .error-box.show{display:block}
+.err-card{
+  background:linear-gradient(135deg,rgba(220,50,50,.10),rgba(180,30,30,.06));
+  border:1.5px solid rgba(220,50,50,.28);
+  border-radius:var(--r3);padding:28px 24px;
+}
+.err-icon-wrap{
+  width:52px;height:52px;border-radius:14px;
+  background:rgba(220,50,50,.12);border:1px solid rgba(220,50,50,.22);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 16px;
+}
+.err-title{
+  font-family:'Syne',sans-serif;font-size:18px;font-weight:800;
+  color:var(--t1);text-align:center;margin-bottom:8px;
+}
+.err-msg{
+  font-size:13.5px;color:var(--t2);text-align:center;
+  line-height:1.7;margin-bottom:20px;
+}
+.err-tips{
+  background:rgba(255,255,255,.04);border:1px solid var(--b1);
+  border-radius:var(--r2);padding:14px 16px;margin-bottom:20px;
+}
+.err-tips-title{
+  font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:10px;
+}
+.err-tip{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--t2);margin-bottom:6px}
+.err-tip:last-child{margin-bottom:0}
+.err-tip-dot{width:5px;height:5px;border-radius:50%;background:rgba(220,50,50,.6);flex-shrink:0}
+.err-btns{display:flex;gap:10px;flex-wrap:wrap}
+.err-btn-wa{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:#25D366;color:#fff;border-radius:var(--r2);
+  padding:12px 16px;font-size:13px;font-weight:700;
+  text-decoration:none;transition:all .2s;min-width:120px;
+}
+.err-btn-wa:hover{background:#1ebe5c;transform:translateY(-1px)}
+.err-btn-email{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--b1);color:var(--t2);border:1px solid var(--b2);
+  border-radius:var(--r2);padding:12px 16px;font-size:13px;font-weight:600;
+  text-decoration:none;transition:all .2s;min-width:120px;
+}
+.err-btn-email:hover{color:var(--t1);background:var(--b2)}
 
 /* SUBMIT */
 .btn-analisar{
@@ -990,12 +1029,13 @@ async function analisar() {
     document.getElementById('uploadCard').style.display = 'block';
     var errMsg = '';
     if (e.name === 'AbortError') {
-      errMsg = 'A análise está a demorar mais que o esperado. O seu pedido foi registado — vamos contactá-lo por email em breve.';
+      errMsg = 'A análise demorou mais que 90 segundos. O seu pedido foi registado e entraremos em contacto brevemente.';
+      showErr(errMsg, 'timeout');
     } else {
-      errMsg = 'Erro ao processar a fatura. Verifique a consola para detalhes e contacte-nos pelo WhatsApp se o problema persistir.';
+      errMsg = 'Não foi possível processar a fatura. Verifique a qualidade da imagem ou contacte-nos directamente.';
       console.error('Erro completo:', e.message);
+      showErr(errMsg, 'erro');
     }
-    showErr(errMsg);
     console.error(e);
   }
 }
@@ -1173,11 +1213,60 @@ function resetForm() {
   clearErr(); window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function showErr(msg) {
-  const b = document.getElementById('errorBox');
-  b.textContent = '⚠ ' + msg; b.classList.add('show');
+function showErr(msg, tipo) {
+  var b = document.getElementById('errorBox');
+  // Determinar tipo de erro
+  var titulo = 'Não foi possível analisar a fatura';
+  var icone = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ff6060" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+  var tips = '';
+
+  if (tipo === 'timeout' || (msg && msg.indexOf('demorar') !== -1)) {
+    titulo = 'A análise está a demorar mais que o esperado';
+    icone = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+    tips = '<div class="err-tips"><div class="err-tips-title">O que pode fazer</div>'
+      + '<div class="err-tip"><div class="err-tip-dot"></div>O seu pedido foi registado — contactamos em breve</div>'
+      + '<div class="err-tip"><div class="err-tip-dot"></div>Tente novamente em alguns minutos</div>'
+      + '<div class="err-tip"><div class="err-tip-dot"></div>Ou contacte-nos directamente pelo WhatsApp</div>'
+      + '</div>';
+  } else if (tipo === 'imagem' || (msg && (msg.indexOf('imagem') !== -1 || msg.indexOf('qualidade') !== -1))) {
+    titulo = 'Problema com a qualidade da imagem';
+    tips = '<div class="err-tips"><div class="err-tips-title">Como melhorar</div>'
+      + '<div class="err-tip"><div class="err-tip-dot"></div>Certifique-se que a fatura está bem iluminada</div>'
+      + '<div class="err-tip"><div class="err-tip-dot"></div>A imagem deve estar nítida e sem reflexos</div>'
+      + '<div class="err-tip"><div class="err-tip-dot"></div>Se possível, use o PDF original da fatura</div>'
+      + '<div class="err-tip"><div class="err-tip-dot"></div>Ou envie-nos a fatura directamente pelo WhatsApp</div>'
+      + '</div>';
+  } else {
+    tips = '<div class="err-tips"><div class="err-tips-title">Sugestões</div>'
+      + '<div class="err-tip"><div class="err-tip-dot"></div>Verifique a qualidade e nitidez da imagem</div>'
+      + '<div class="err-tip"><div class="err-tip-dot"></div>Tente usar o PDF original em vez de foto</div>'
+      + '<div class="err-tip"><div class="err-tip-dot"></div>Certifique-se que é uma fatura de energia</div>'
+      + '</div>';
+  }
+
+  b.innerHTML = '<div class="err-card">'
+    + '<div class="err-icon-wrap">' + icone + '</div>'
+    + '<div class="err-title">' + titulo + '</div>'
+    + '<div class="err-msg">' + msg + '</div>'
+    + tips
+    + '<div class="err-btns">'
+    + '<a class="err-btn-wa" href="https://wa.me/351910322702" target="_blank">'
+    + '<svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>'
+    + 'WhatsApp</a>'
+    + '<a class="err-btn-email" href="mailto:geral@enersia.pt" target="_blank">'
+    + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>'
+    + 'geral@enersia.pt</a>'
+    + '</div>'
+    + '</div>';
+
+  b.classList.add('show');
+  b.scrollIntoView({behavior:'smooth', block:'center'});
 }
-function clearErr() { document.getElementById('errorBox').classList.remove('show'); }
+function clearErr() {
+  var b = document.getElementById('errorBox');
+  b.classList.remove('show');
+  b.innerHTML = '';
+}
 
 /* KAROL CHAT */
 var chatOpen = false, hist = [];
