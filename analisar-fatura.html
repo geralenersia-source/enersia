@@ -488,7 +488,7 @@ footer a:hover{color:var(--t1)}
    ============================================================ */
 
 // ---- CONFIGURAÇÃO ----
-const CLAUDE_MODEL = 'claude-sonnet-4-5-20250929';
+const WORKER_URL = 'https://enersia-proxy.geralenersia.workers.dev';
 const MAKE_WH = 'https://hook.eu1.make.com/rc32bxy5vo23zg4vpt2mjrs10gep58la';
 
 // ---- ESTADO ----
@@ -564,57 +564,28 @@ async function analisar() {
   animSteps();
 
   try {
-    // -- CHAMADA DIRECTA À CLAUDE API --
+    // -- CHAMADA AO WORKER (proxy seguro — API key nunca exposta) --
     const mediaType = isPDF ? 'application/pdf' : normalizarMime(file.type);
-    const contentType = isPDF ? 'document' : 'image';
 
-    const msgContent = [
-      {
-        type: contentType,
-        source: { type: 'base64', media_type: mediaType, data: fileB64 }
-      },
-      {
-        type: 'text',
-        text: `Analisa esta fatura de energia portuguesa e devolve APENAS um objecto JSON válido, sem texto antes nem depois, sem crases markdown.
-
-O JSON deve ter exactamente estes campos (usa sempre aspas duplas, sem newlines dentro dos valores de string):
-{
-  "comercializadora": "nome da comercializadora actual",
-  "periodo": "período de facturação (ex: Mar-Abr 2026)",
-  "total_fatura": numero_sem_simbolo_euro,
-  "consumo_kwh": numero_total_kwh,
-  "poupanca_mensal_estimada": numero_euros_poupanca_mensal,
-  "percentagem_poupanca": numero_percentagem,
-  "recomendacao_comercializador": "nome da comercializadora recomendada ou Manter actual",
-  "motivo_recomendacao": "razao breve numa frase sem newlines",
-  "analise_detalhada": "analise completa em texto corrido sem newlines",
-  "urgencia": "Alta ou Media ou Baixa"
-}
-
-Para poupança: compara o preço actual com estas comercializadoras certificadas ERSE 2026: Endesa 0.1362€/kWh, Iberdrola 0.1382€/kWh, Goldenergy 0.1399€/kWh, EDP 0.1420€/kWh, Plenitude 0.1433€/kWh, Repsol 0.1480€/kWh, Galp 0.1542€/kWh. Se já tem o melhor preço, recomendacao_comercializador="Manter actual" e poupanca=0.
-
-IMPORTANTE: valores numéricos sem símbolo €, sem texto, apenas números. Strings sem newlines reais.`
-      }
-    ];
-
-    const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
+    const workerRes = await fetch(WORKER_URL + '/analisar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: CLAUDE_MODEL,
-        max_tokens: 1024,
-        messages: [{ role: 'user', content: msgContent }]
+        base64: fileB64,
+        mediaType: mediaType,
+        contentType: isPDF ? 'document' : 'image',
+        nome, email, tel, distrito
       })
     });
 
-    if (!claudeRes.ok) {
-      const errData = await claudeRes.json().catch(() => ({}));
-      throw new Error('Claude API: ' + (errData.error?.message || claudeRes.status));
+    if (!workerRes.ok) {
+      const errData = await workerRes.json().catch(() => ({}));
+      throw new Error('Erro no servidor: ' + (errData.error || workerRes.status));
     }
 
-    const claudeData = await claudeRes.json();
-    const textoRaw = claudeData.content?.[0]?.text || '';
-    console.log('Claude raw:', textoRaw.substring(0, 300));
+    const workerData = await workerRes.json();
+    const textoRaw = workerData.resultado || JSON.stringify(workerData);
+    console.log('Worker raw:', textoRaw.substring(0, 300));
 
     const r = parseClaudeJSON(textoRaw);
     if (!r || (!r.comercializadora && !r.total_fatura)) {
