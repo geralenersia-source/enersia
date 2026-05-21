@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <!-- saved from url=(0045)file:///C:/Users/User/Downloads/index_24.html -->
 <html lang="pt-PT"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -1209,6 +1208,62 @@ html, body {
   .chat-window { width: calc(100vw - 24px); right: 12px; }
   .fab-wrap { bottom: 16px; right: 16px; }
 }
+
+/* ============================================================ SEGMENTATION MODAL */
+.seg-overlay{
+  position:fixed;inset:0;z-index:10000;
+  background:rgba(7,11,20,.85);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s var(--ease);
+  padding:20px;
+}
+.seg-overlay.open{opacity:1;pointer-events:all}
+.seg-modal{
+  background:var(--bg1);border:1px solid var(--b2);border-radius:var(--r3);
+  padding:40px 36px 36px;max-width:680px;width:100%;
+  transform:translateY(28px) scale(.97);transition:transform .35s var(--ease);
+  position:relative;
+}
+.seg-overlay.open .seg-modal{transform:translateY(0) scale(1)}
+.seg-close{
+  position:absolute;top:16px;right:16px;
+  width:36px;height:36px;border-radius:50%;
+  background:var(--s1);border:1px solid var(--b1);
+  color:var(--t3);font-size:18px;line-height:36px;text-align:center;
+  cursor:pointer;transition:all .2s;
+}
+.seg-close:hover{background:var(--s2);color:var(--t1)}
+.seg-title{
+  font-family:'Syne',sans-serif;font-size:22px;font-weight:700;
+  color:var(--t1);text-align:center;margin-bottom:6px;
+}
+.seg-sub{
+  font-size:14px;color:var(--t3);text-align:center;margin-bottom:32px;
+}
+.seg-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:540px){.seg-cards{grid-template-columns:1fr}}
+.seg-card{
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  background:var(--s1);border:1.5px solid var(--b1);border-radius:var(--r2);
+  padding:28px 20px 24px;cursor:pointer;text-decoration:none;
+  transition:all .25s var(--ease);
+}
+.seg-card:hover{
+  border-color:var(--blue);background:var(--s2);
+  transform:translateY(-4px);box-shadow:0 12px 40px rgba(79,124,255,.18);
+}
+.seg-icon{
+  width:52px;height:52px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+}
+.seg-icon.emp{background:rgba(79,124,255,.12)}
+.seg-icon.fam{background:rgba(0,229,155,.10)}
+.seg-icon.sol{background:rgba(255,196,0,.10)}
+.seg-card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--t1)}
+.seg-card-desc{font-size:12.5px;color:var(--t3);text-align:center;line-height:1.5}
+.seg-card-arrow{margin-top:4px;font-size:18px;color:var(--blue);opacity:0;transition:opacity .2s,transform .2s;transform:translateX(-4px)}
+.seg-card:hover .seg-card-arrow{opacity:1;transform:translateX(0)}
 </style>
 <style>.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}.reveal.visible{opacity:1;transform:none}</style><style>.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}.reveal.visible{opacity:1;transform:none}</style></head>
 <body>
@@ -1262,7 +1317,7 @@ html, body {
     </ul>
     <div class="nav-right">
       <div class="erse-badge"><div class="erse-badge-dot"></div>ERSE LIVE</div>
-      <a class="btn-nav-cta" href="https://www.enersia.pt/#analisar">Analisar fatura</a>
+      <a class="btn-nav-cta" href="#" onclick="openSegModal();return false;">Analisar fatura</a>
       <button class="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
@@ -1278,7 +1333,7 @@ html, body {
   <a href="https://www.enersia.pt/#audiencias" onclick="toggleMobileMenu()">Empresas</a>
   <a href="https://www.enersia.pt/#seguranca" onclick="toggleMobileMenu()">Segurança</a>
   <a href="https://www.enersia.pt/#faq" onclick="toggleMobileMenu()">FAQ</a>
-  <a class="btn-nav-cta" href="https://www.enersia.pt/analisar-fatura.html" style="margin-top:12px">Analisar fatura</a>
+  <a class="btn-nav-cta" href="#" onclick="openSegModal();toggleMobileMenu();return false;" style="margin-top:12px">Analisar fatura</a>
 </div>
 
 <!-- HERO -->
@@ -1307,7 +1362,7 @@ html, body {
         pode poupar — com IA e acompanhamento humano.
       </p>
       <div class="hero-ctas">
-        <a class="btn-primary" href="https://www.enersia.pt/analisar-fatura.html">
+        <a class="btn-primary" href="#" onclick="openSegModal();return false;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="13,2 4,14 11,14 9,22 20,10 13,10"></polygon></svg>
           Analisar a minha fatura — grátis
         </a>
@@ -1374,7 +1429,7 @@ html, body {
         </div>
       </div>
       <p class="hc-note">* Valores simulados com base em dados ERSE públicos. A análise real requer upload da sua fatura.</p>
-      <a class="hc-cta" href="https://www.enersia.pt/analisar-fatura.html">Analisar a minha fatura agora →</a>
+      <a class="hc-cta" href="#" onclick="openSegModal();return false;">Analisar a minha fatura agora →</a>
     </div>
   </div>
 </section>
@@ -1856,7 +1911,7 @@ html, body {
     </div>
     <div class="solar-h">Solar compensa para si?<br>Descubra em 60 segundos.</div>
     <p class="solar-p">A IA analisa o seu consumo e calcula o ROI real da instalação solar — empresa ou residencial. Sem visita técnica.</p>
-    <a class="btn-solar" href="https://www.enersia.pt/analisar-fatura.html">
+    <a class="btn-solar" href="https://www.enersia.pt/solar.html">
       Simular agora
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
     </a>
@@ -1882,7 +1937,7 @@ html, body {
           <li><span class="aud-ck">✓</span> Gás natural e electricidade dual</li>
           <li><span class="aud-ck">✓</span> Acompanhamento humano pós-mudança</li>
         </ul>
-        <a class="btn-primary" href="https://www.enersia.pt/analisar-fatura.html">
+        <a class="btn-primary" href="https://www.enersia.pt/empresas.html">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="13,2 4,14 11,14 9,22 20,10 13,10"></polygon></svg>
           Análise para empresas
         </a>
@@ -1900,7 +1955,7 @@ html, body {
           <li><span class="aud-ck">✓</span> Mudança sem custos nem papelada</li>
           <li><span class="aud-ck">✓</span> Suporte humano disponível</li>
         </ul>
-        <a class="btn-primary" href="https://www.enersia.pt/analisar-fatura.html">
+        <a class="btn-primary" href="https://www.enersia.pt/familias.html">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="13,2 4,14 11,14 9,22 20,10 13,10"></polygon></svg>
           Análise gratuita
         </a>
@@ -2028,7 +2083,7 @@ html, body {
   <div class="sec-eyebrow" style="justify-content:center;display:flex;margin-bottom:20px">Comece agora</div>
   <h2>Descubra quanto está<br>a perder hoje.</h2>
   <p>Análise gratuita. Resultado em 60 segundos. Sem compromisso.</p>
-  <a class="btn-primary" href="https://www.enersia.pt/analisar-fatura.html" style="margin:0 auto;font-size:16px;padding:18px 44px">
+  <a class="btn-primary" href="#" onclick="openSegModal();return false;" style="margin:0 auto;font-size:16px;padding:18px 44px">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="13,2 4,14 11,14 9,22 20,10 13,10"></polygon></svg>
     Analisar a minha fatura — grátis
   </a>
@@ -2485,7 +2540,60 @@ async function submitForm() {
   }, 5000);
 }
 
+/* ---- Segmentation Modal ---- */
+function openSegModal() {
+  var el = document.getElementById('segOverlay');
+  if (!el) return;
+  el.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSegModal(e) {
+  // Allow close: called directly (no event) OR click was on the backdrop itself
+  if (e && e.target !== document.getElementById('segOverlay')) return;
+  var el = document.getElementById('segOverlay');
+  if (!el) return;
+  el.classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') {
+    var el = document.getElementById('segOverlay');
+    if (el && el.classList.contains('open')) {
+      el.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  }
+});
+
 </script>
 
+<!-- SEGMENTATION MODAL -->
+<div class="seg-overlay" id="segOverlay" onclick="closeSegModal(event)">
+  <div class="seg-modal" role="dialog" aria-modal="true" aria-labelledby="segTitle">
+    <button class="seg-close" onclick="closeSegModal()" aria-label="Fechar">✕</button>
+    <div class="seg-title" id="segTitle">Qual é o seu perfil?</div>
+    <div class="seg-sub">Escolha para receber a análise mais precisa para si</div>
+    <div class="seg-cards">
+      <a class="seg-card" href="https://www.enersia.pt/empresas.html">
+        <div class="seg-icon emp">🏢</div>
+        <div class="seg-card-title">Empresas</div>
+        <div class="seg-card-desc">Negócios, escritórios e comércio</div>
+        <div class="seg-card-arrow">→</div>
+      </a>
+      <a class="seg-card" href="https://www.enersia.pt/familias.html">
+        <div class="seg-icon fam">🏠</div>
+        <div class="seg-card-title">Famílias</div>
+        <div class="seg-card-desc">Casas, apartamentos e residências</div>
+        <div class="seg-card-arrow">→</div>
+      </a>
+      <a class="seg-card" href="https://www.enersia.pt/solar.html">
+        <div class="seg-icon sol">☀️</div>
+        <div class="seg-card-title">Solar</div>
+        <div class="seg-card-desc">Potencial de painéis fotovoltaicos</div>
+        <div class="seg-card-arrow">→</div>
+      </a>
+    </div>
+  </div>
+</div>
 
 </body></html>

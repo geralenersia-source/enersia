@@ -155,6 +155,14 @@ input[type=file]{display:none}
 .file-size{font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px}
 .file-remove{width:28px;height:28px;border-radius:50%;background:var(--b1);color:var(--t3);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:all .2s;flex-shrink:0;font-size:14px}
 .file-remove:hover{background:rgba(255,96,96,.15);color:var(--red)}
+/* TIPO DE SERVIÇO */
+.srv-row{margin:16px 0 20px}
+.srv-label{font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:8px}
+.srv-opts{display:flex;gap:8px;flex-wrap:wrap}
+.srv-opt{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r2);border:1.5px solid var(--b1);background:var(--bg2);cursor:pointer;transition:all .2s;font-size:13px;color:var(--t2);user-select:none}
+.srv-opt:hover{border-color:var(--b2);color:var(--t1)}
+.srv-opt:has(input:checked){border-color:rgba(0,123,255,.5);background:rgba(0,123,255,.07);color:var(--t1)}
+.srv-opt input[type=radio]{display:none}
 .multi-preview{display:none;margin-top:14px;border-radius:var(--r2);border:1.5px dashed rgba(0,123,255,.3);background:rgba(0,123,255,.04);padding:14px 16px}
 .multi-preview-hdr{font-size:11px;color:var(--t3);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
 .multi-list{display:flex;flex-direction:column;gap:8px}
@@ -432,6 +440,16 @@ input[type=file]{display:none}
                 <option>Porto</option><option>Santarém</option><option>Setúbal</option><option>Viana do Castelo</option>
                 <option>Vila Real</option><option>Viseu</option><option>Açores</option><option>Madeira</option>
               </select>
+            </div>
+          </div>
+
+          <!-- TIPO DE SERVIÇO -->
+          <div class="srv-row">
+            <span class="srv-label">Tipo de contrato</span>
+            <div class="srv-opts">
+              <label class="srv-opt"><input type="radio" name="servico" value="eletricidade" checked><span>⚡ Só Electricidade</span></label>
+              <label class="srv-opt"><input type="radio" name="servico" value="gas"><span>🔥 Só Gás</span></label>
+              <label class="srv-opt"><input type="radio" name="servico" value="eletricidade_gas"><span>⚡🔥 Elec. + Gás</span></label>
             </div>
           </div>
 
@@ -823,7 +841,7 @@ async function analisar() {
     if (!r || r.error) throw new Error(r && r.error ? r.error : 'Resposta inválida do servidor. Tente novamente.');
     if (!r.comercializadora && !r.total_fatura && !r.analise_detalhada) throw new Error('Análise incompleta. Verifique a nitidez da imagem ou use o PDF original.');
     showResult(r);
-    notificarMake({ nome, tel, email, distrito, isPDF, mediaType, fileB64, dados: r }).catch(e => console.warn('Make:', e));
+    notificarMake({ nome, tel, email, distrito, isPDF, mediaType, fileB64, dados: r, servico: getServico() }).catch(e => console.warn('Make:', e));
   } catch(e) {
     document.getElementById('loadingCard').classList.remove('show');
     document.getElementById('uploadCard').style.display = 'block';
@@ -833,8 +851,14 @@ async function analisar() {
   }
 }
 
+// ---- HELPER: tipo de serviço ----
+function getServico() {
+  const sel = document.querySelector('input[name="servico"]:checked');
+  return sel ? sel.value : 'eletricidade';
+}
+
 // ---- NOTIFICAR MAKE ----
-async function notificarMake({ nome, tel, email, distrito, isPDF, mediaType, fileB64, dados }) {
+async function notificarMake({ nome, tel, email, distrito, isPDF, mediaType, fileB64, dados, servico }) {
   const mType = mediaType || (isPDF ? 'application/pdf' : 'image/jpeg');
   await fetch(MAKE_WH, {
     method: 'POST',
@@ -842,6 +866,8 @@ async function notificarMake({ nome, tel, email, distrito, isPDF, mediaType, fil
     body: JSON.stringify({
       timestamp: new Date().toISOString(),
       tipo: LEAD_TIPO,
+      segmento: LEAD_TIPO,
+      servico: servico || 'eletricidade',
       formato: isPDF ? 'pdf' : 'imagem',
       mediaType: mType,
       fileName: (file && file.name) ? file.name : ('fatura.' + (isPDF ? 'pdf' : 'jpg')),
