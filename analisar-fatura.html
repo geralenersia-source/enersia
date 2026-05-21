@@ -112,6 +112,18 @@ input[type=file]{display:none}
 .file-remove{width:28px;height:28px;border-radius:50%;background:var(--b1);color:var(--t3);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:all .2s;flex-shrink:0;font-size:14px}
 .file-remove:hover{background:rgba(255,96,96,.15);color:var(--red)}
 
+/* MULTI-IMAGENS */
+.multi-preview{display:none;margin-top:14px;border-radius:var(--r2);border:1.5px dashed rgba(79,124,255,.3);background:rgba(79,124,255,.04);padding:14px 16px}
+.multi-preview-hdr{font-size:11px;color:var(--t3);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.multi-list{display:flex;flex-direction:column;gap:8px}
+.multi-item{display:flex;align-items:center;gap:10px;background:var(--bg2);border-radius:10px;padding:8px 10px;border:1px solid var(--b1)}
+.multi-thumb{width:36px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--s1)}
+.multi-name{flex:1;min-width:0;font-size:12px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.multi-sz{font-size:11px;color:var(--t4);font-family:'JetBrains Mono',monospace;flex-shrink:0;margin-right:4px}
+.multi-rm{width:24px;height:24px;border-radius:6px;background:rgba(255,96,96,.1);border:1px solid rgba(255,96,96,.2);color:var(--red);font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .2s;padding:0;line-height:1}
+.multi-rm:hover{background:rgba(255,96,96,.25)}
+.multi-converting{display:none;text-align:center;padding:8px 0;font-size:12px;color:var(--cyan);font-family:'JetBrains Mono',monospace;margin-top:8px;align-items:center;justify-content:center;gap:6px}
+
 /* BOTÃO ANALISAR */
 .btn-analisar{width:100%;padding:16px;border-radius:var(--r2);background:linear-gradient(135deg,var(--blue),#6b93ff);color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .25s;margin-top:20px;letter-spacing:-.01em}
 .btn-analisar:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(79,124,255,.35)}
@@ -346,8 +358,8 @@ footer a:hover{color:var(--t1)}
         <div class="dz-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
         </div>
-        <div class="dz-title">Arraste a fatura para aqui</div>
-        <div class="dz-sub">ou escolha o ficheiro abaixo</div>
+        <div class="dz-title">PDF ou até 5 fotos da mesma fatura</div>
+        <div class="dz-sub">Para várias páginas, seleccione as fotos pela ordem certa</div>
         <div class="dz-btns" onclick="event.stopPropagation()">
           <button class="dz-btn dz-btn-primary" onclick="document.getElementById('fileInput').click()">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -360,12 +372,25 @@ footer a:hover{color:var(--t1)}
         </div>
         <div class="dz-formats">PDF · JPEG · PNG · WebP · Máx. 4MB</div>
       </div>
-      <input type="file" id="fileInput" accept=".pdf,image/*">
+      <input type="file" id="fileInput" accept=".pdf,image/*" multiple>
       <input type="file" id="camInput" accept="image/*" capture="environment">
 
       <div style="text-align:center;font-size:11px;color:var(--t4);margin-top:8px;font-family:'JetBrains Mono',monospace">
         Para melhor desempenho utilize ficheiros até 4MB
         <!-- TODO: compressão automática de imagens grandes -->
+      </div>
+
+      <!-- MULTI-IMAGENS -->
+      <div class="multi-preview" id="multiPreview">
+        <div class="multi-preview-hdr">
+          <span style="color:var(--cyan);font-family:'JetBrains Mono',monospace" id="multiCount">0 imagens</span>
+          <button class="file-remove" onclick="clearFile()" title="Limpar tudo" style="border-radius:6px;width:auto;height:auto;padding:2px 8px;font-size:11px">✕ Limpar</button>
+        </div>
+        <div class="multi-list" id="multiList"></div>
+        <div class="multi-converting" id="multiConverting">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="animation:spin 1s linear infinite;display:inline-block;flex-shrink:0"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.37"/></svg>
+          A converter imagens para PDF...
+        </div>
       </div>
 
       <!-- FICHEIRO SELECCIONADO -->
@@ -488,6 +513,7 @@ footer a:hover{color:var(--t1)}
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 /* ============================================================
    ENERSIA — analisar-fatura.html
@@ -499,12 +525,17 @@ const WORKER_URL = 'https://enersia-proxy.geralenersia.workers.dev';
 const MAKE_WH = 'https://hook.eu1.make.com/rc32bxy5vo23zg4vpt2mjrs10gep58la';
 
 // ---- ESTADO ----
-let file = null, fileB64 = null;
+let file = null, fileB64 = null, multiFiles = [];
 
 // ---- FILE HANDLING ----
 const fi = document.getElementById('fileInput');
 const ci = document.getElementById('camInput');
-fi.addEventListener('change', e => e.target.files[0] && handleFile(e.target.files[0]));
+fi.addEventListener('change', e => {
+  const files = Array.from(e.target.files || []);
+  if (!files.length) return;
+  if (files.length === 1) { handleFile(files[0]); return; }
+  handleMultipleFiles(files);
+});
 ci.addEventListener('change', e => e.target.files[0] && handleFile(e.target.files[0]));
 
 const dz = document.getElementById('dropzone');
@@ -512,7 +543,10 @@ dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dra
 dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
 dz.addEventListener('drop', e => {
   e.preventDefault(); dz.classList.remove('drag-over');
-  e.dataTransfer.files[0] && handleFile(e.dataTransfer.files[0]);
+  const files = Array.from(e.dataTransfer.files || []);
+  if (!files.length) return;
+  if (files.length === 1) { handleFile(files[0]); return; }
+  handleMultipleFiles(files);
 });
 
 function handleFile(f) {
@@ -533,11 +567,158 @@ function handleFile(f) {
 }
 
 function clearFile() {
-  file = null; fileB64 = null;
+  file = null; fileB64 = null; multiFiles = [];
   fi.value = ''; ci.value = '';
   document.getElementById('fileSelected').classList.remove('show');
+  const mp = document.getElementById('multiPreview');
+  if (mp) { mp.style.display = 'none'; document.getElementById('multiList').innerHTML = ''; }
   dz.style.display = 'block';
   document.getElementById('btnAnalisar').disabled = true;
+}
+
+// ---- MULTI-IMAGENS: selecção múltipla + conversão para PDF ----
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function handleMultipleFiles(files) {
+  // Rejeitar se mistura PDF com imagens
+  const pdfs = files.filter(f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
+  if (pdfs.length) {
+    showErr('Para faturas em PDF, seleccione apenas um ficheiro. Para várias páginas, escolha as fotos da fatura.');
+    return;
+  }
+  if (files.length > 5) {
+    showErr('Máximo 5 imagens por análise. Seleccione as páginas mais relevantes.');
+    return;
+  }
+  const tiposOk = ['image/jpeg','image/jpg','image/png','image/webp','image/gif'];
+  const extsOk = ['jpg','jpeg','png','webp','gif'];
+  for (const f of files) {
+    if (f.size > 4 * 1024 * 1024) {
+      showErr('"' + escHtml(f.name) + '" excede 4MB. Reduza a qualidade da foto ou use PDF.');
+      return;
+    }
+    const ext = f.name.split('.').pop().toLowerCase();
+    if (!tiposOk.includes(f.type) && !extsOk.includes(ext)) {
+      showErr('"' + escHtml(f.name) + '" não é uma imagem suportada. Use JPEG, PNG ou WebP.');
+      return;
+    }
+  }
+  multiFiles = [...files];
+  clearErr();
+  dz.style.display = 'none';
+  document.getElementById('fileSelected').classList.remove('show');
+  showMultiPreview();
+  document.getElementById('btnAnalisar').disabled = false;
+}
+
+function showMultiPreview() {
+  const panel = document.getElementById('multiPreview');
+  const list  = document.getElementById('multiList');
+  const countEl = document.getElementById('multiCount');
+  const n = multiFiles.length;
+  panel.style.display = 'block';
+  if (countEl) countEl.textContent = n + (n === 1 ? ' imagem' : ' imagens') + ' — serão convertidas para PDF';
+  list.innerHTML = '';
+  multiFiles.forEach((f, i) => {
+    const item = document.createElement('div');
+    item.className = 'multi-item';
+    item.innerHTML =
+      '<img class="multi-thumb" src="" alt="p.' + (i + 1) + '">' +
+      '<span class="multi-name">Pág. ' + (i + 1) + ' — ' + escHtml(f.name) + '</span>' +
+      '<span class="multi-sz">' + (f.size / 1024).toFixed(0) + ' KB</span>' +
+      '<button class="multi-rm" onclick="removeFromMulti(' + i + ')" title="Remover esta imagem">✕</button>';
+    list.appendChild(item);
+    const thumb = item.querySelector('.multi-thumb');
+    const rd = new FileReader();
+    rd.onload = ev => { if (thumb) thumb.src = ev.target.result; };
+    rd.readAsDataURL(f);
+  });
+}
+
+function removeFromMulti(idx) {
+  multiFiles.splice(idx, 1);
+  if (multiFiles.length === 0) { clearFile(); return; }
+  if (multiFiles.length === 1) {
+    // Regressa ao modo single
+    const single = multiFiles[0];
+    multiFiles = [];
+    document.getElementById('multiPreview').style.display = 'none';
+    document.getElementById('multiList').innerHTML = '';
+    handleFile(single);
+    return;
+  }
+  showMultiPreview();
+}
+
+async function compressImage(f, maxDim, quality) {
+  return new Promise((resolve, reject) => {
+    const rd = new FileReader();
+    rd.onerror = reject;
+    rd.onload = ev => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.naturalWidth, h = img.naturalHeight;
+        if (w > maxDim || h > maxDim) {
+          const ratio = Math.min(maxDim / w, maxDim / h);
+          w = Math.round(w * ratio); h = Math.round(h * ratio);
+        }
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve({ b64: canvas.toDataURL('image/jpeg', quality).split(',')[1], w, h });
+      };
+      img.src = ev.target.result;
+    };
+    rd.readAsDataURL(f);
+  });
+}
+
+async function generatePDFFromImages() {
+  const conv = document.getElementById('multiConverting');
+  const btn  = document.getElementById('btnAnalisar');
+  if (conv) conv.style.display = 'flex';
+  btn.disabled = true;
+  try {
+    if (!window.jspdf) throw new Error('Biblioteca PDF não carregada. Recarregue a página e tente novamente.');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', compress: true });
+    const PW = pdf.internal.pageSize.getWidth();
+    const PH = pdf.internal.pageSize.getHeight();
+    const MARGIN = 10;
+    for (let i = 0; i < multiFiles.length; i++) {
+      if (i > 0) pdf.addPage();
+      const { b64, w: iw, h: ih } = await compressImage(multiFiles[i], 1400, 0.82);
+      const maxW = PW - MARGIN * 2, maxH = PH - MARGIN * 2;
+      const ratio = Math.min(maxW / iw, maxH / ih);
+      const fw = iw * ratio, fh = ih * ratio;
+      const x = (PW - fw) / 2, y = (PH - fh) / 2;
+      pdf.addImage(b64, 'JPEG', x, y, fw, fh);
+    }
+    const pdfB64 = pdf.output('datauristring').split(',')[1];
+    const approxBytes = Math.round(pdfB64.length * 0.75);
+    if (approxBytes > 4 * 1024 * 1024) {
+      if (conv) conv.style.display = 'none';
+      btn.disabled = false;
+      showErr('PDF gerado demasiado grande (' + (approxBytes / 1024 / 1024).toFixed(1) + ' MB). Use menos imagens ou tire as fotos com resolução mais baixa.');
+      return false;
+    }
+    fileB64 = pdfB64;
+    file = { name: 'fatura-' + multiFiles.length + 'pags.pdf', type: 'application/pdf', size: approxBytes };
+    if (conv) conv.style.display = 'none';
+    return true; // btn permanece disabled — analisar() continua para o Worker
+  } catch(e) {
+    if (conv) conv.style.display = 'none';
+    btn.disabled = false;
+    showErr('Erro ao converter imagens para PDF: ' + e.message);
+    return false;
+  }
 }
 
 // ---- VALIDAÇÃO ----
@@ -555,6 +736,12 @@ function validarContacto() {
 
 // ---- ANALISAR — LÓGICA PRINCIPAL ----
 async function analisar() {
+  // Multi-imagens: converter para PDF antes de enviar ao Worker
+  if (multiFiles.length > 1) {
+    if (!validarContacto()) return;
+    const ok = await generatePDFFromImages();
+    if (!ok) return;
+  }
   if (!fileB64 || !validarContacto()) return;
 
   const nome = document.getElementById('f-nome').value.trim();
