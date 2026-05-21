@@ -304,7 +304,7 @@ footer a:hover{color:var(--t1)}
       </div>
       <div>
         <div class="card-header-title">Envie a sua fatura de energia</div>
-        <div class="card-header-sub">PDF ou foto · Máximo 10MB</div>
+        <div class="card-header-sub">PDF ou foto · Máximo 4MB</div>
       </div>
     </div>
     <div class="card-body">
@@ -358,10 +358,15 @@ footer a:hover{color:var(--t1)}
             Câmara
           </button>
         </div>
-        <div class="dz-formats">PDF · JPEG · PNG · WebP</div>
+        <div class="dz-formats">PDF · JPEG · PNG · WebP · Máx. 4MB</div>
       </div>
       <input type="file" id="fileInput" accept=".pdf,image/*">
       <input type="file" id="camInput" accept="image/*" capture="environment">
+
+      <div style="text-align:center;font-size:11px;color:var(--t4);margin-top:8px;font-family:'JetBrains Mono',monospace">
+        Para melhor desempenho utilize ficheiros até 4MB
+        <!-- TODO: compressão automática de imagens grandes -->
+      </div>
 
       <!-- FICHEIRO SELECCIONADO -->
       <div class="file-selected" id="fileSelected">
@@ -511,7 +516,7 @@ dz.addEventListener('drop', e => {
 });
 
 function handleFile(f) {
-  if (f.size > 10 * 1024 * 1024) { showErr('Ficheiro demasiado grande. Máximo 10MB.'); return; }
+  if (f.size > 4 * 1024 * 1024) { showErr('Ficheiro demasiado grande. Máximo 4MB para garantir análise rápida e fiável.'); return; }
   const tipos = ['application/pdf','image/jpeg','image/jpg','image/png','image/webp','image/gif'];
   const ext = f.name.split('.').pop().toLowerCase();
   const extsOk = ['pdf','jpg','jpeg','png','webp','gif'];
