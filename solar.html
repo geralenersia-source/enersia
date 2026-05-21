@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>ENERSIA Solar — Descubra o Potencial Solar do seu Imóvel</title>
-<meta name="description" content="A ENERSIA calcula a poupança com painéis solares, payback do investimento e subsídios disponíveis em Portugal. Análise gratuita com IA.">
+<meta name="description" content="Pré-diagnóstico solar gratuito com IA. A ENERSIA analisa a sua fatura e um especialista avalia o potencial solar do seu imóvel em 24 horas. Portugal.">
 <meta name="theme-color" content="#0A0F1E">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230A0F1E'/><polygon points='18,3 7,18 16,18 14,29 25,14 16,14' fill='%2300C9A7'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -233,6 +233,29 @@ input[type=file]{display:none}
 .err-btn-retry{display:inline-flex;align-items:center;gap:7px;background:transparent;border:1.5px solid var(--b2);color:var(--t3);padding:10px 18px;border-radius:var(--r2);font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;margin-top:4px}
 .err-btn-retry:hover{border-color:rgba(0,123,255,.4);color:var(--t1);background:var(--b1)}
 
+/* ÁREA DISPONÍVEL */
+.area-row{margin:16px 0 20px}
+.area-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:380px){.area-opts{grid-template-columns:1fr}}
+.area-opt{display:flex;align-items:center;gap:8px;padding:10px 13px;border-radius:var(--r2);border:1.5px solid var(--b1);background:var(--bg2);cursor:pointer;transition:all .2s;font-size:12.5px;color:var(--t2);user-select:none;line-height:1.4}
+.area-opt:hover{border-color:var(--b2);color:var(--t1)}
+.area-opt:has(input:checked){border-color:rgba(0,201,167,.5);background:rgba(0,201,167,.06);color:var(--t1)}
+.area-opt input[type=radio]{display:none}
+.area-opt-ico{font-size:16px;flex-shrink:0}
+
+/* CONFIRMAÇÃO SOLAR PREMIUM */
+.res-confirm{padding:40px 28px 36px;text-align:center}
+.rc-checks{display:flex;flex-direction:column;gap:10px;margin:0 auto 30px;max-width:320px;text-align:left}
+.rc-item{display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--t2);line-height:1.4}
+.rc-check{width:24px;height:24px;border-radius:50%;background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;color:var(--teal);font-weight:800}
+.res-confirm-title{font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:var(--t1);margin-bottom:14px;letter-spacing:-.025em;line-height:1.25}
+.res-confirm-sub{font-size:13.5px;color:var(--t2);line-height:1.8;margin-bottom:30px;max-width:380px;margin-left:auto;margin-right:auto}
+.res-confirm-btns{display:flex;flex-direction:column;gap:12px;max-width:300px;margin:0 auto}
+.btn-wa-full{display:flex;align-items:center;justify-content:center;gap:10px;background:#25D366;color:#fff;padding:15px 24px;border-radius:var(--r2);font-family:'Sora',sans-serif;font-size:14.5px;font-weight:700;transition:all .25s;text-decoration:none;cursor:pointer;border:none}
+.btn-wa-full:hover{background:#1ebe5c;transform:translateY(-2px);box-shadow:0 10px 28px rgba(37,211,102,.3)}
+.btn-proposta{display:flex;align-items:center;justify-content:center;gap:8px;background:transparent;color:var(--teal);padding:14px 24px;border-radius:var(--r2);font-family:'Sora',sans-serif;font-size:13.5px;font-weight:600;border:1.5px solid rgba(0,201,167,.3);transition:all .25s;text-decoration:none;cursor:pointer}
+.btn-proposta:hover{background:rgba(0,201,167,.07);border-color:var(--teal);transform:translateY(-1px)}
+
 /* FOOTER */
 .footer{padding:40px 24px;border-top:1px solid rgba(255,255,255,.06);background:var(--bg1)}
 .footer-inner{max-width:1140px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
@@ -306,11 +329,11 @@ input[type=file]{display:none}
   <div class="hero-inner">
     <div class="hero-badge">☀️ Solar</div>
     <h1 class="hero-title">Descubra o potencial solar<br>do seu <span class="hl">imóvel com IA</span></h1>
-    <p class="hero-sub">A ENERSIA calcula a poupança com painéis solares, o payback do investimento e os subsídios disponíveis em Portugal.</p>
+    <p class="hero-sub">Envie a sua fatura de energia. A IA analisa o seu perfil e um especialista ENERSIA avalia o potencial solar do seu imóvel — resultado em menos de 24 horas.</p>
     <div class="hero-actions">
       <a href="#upload" class="btn-primary">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        Simular poupança solar
+        Pré-diagnóstico gratuito
       </a>
       <a href="#como-funciona" class="btn-ghost">
         Ver como funciona
@@ -362,16 +385,16 @@ input[type=file]{display:none}
         <div class="step-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M12 2v2M12 14v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
         </div>
-        <div class="step-title">IA calcula o potencial</div>
-        <div class="step-desc">Claude estima poupança, dimensionamento ideal, payback e subsídios IFRRU/PPEC disponíveis para o seu perfil.</div>
+        <div class="step-title">IA analisa o perfil</div>
+        <div class="step-desc">A IA lê a fatura, extrai o consumo energético e prepara o pré-diagnóstico com base no tipo de imóvel e localização.</div>
       </div>
       <div class="step-card reveal d2">
         <div class="step-num">PASSO 03</div>
         <div class="step-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
-        <div class="step-title">Recebe o relatório</div>
-        <div class="step-desc">Estimativa de poupança anual, retorno do investimento e próximos passos para avançar com painéis solares.</div>
+        <div class="step-title">Especialista valida em 24h</div>
+        <div class="step-desc">Um especialista ENERSIA analisa o seu perfil, valida o potencial solar real e entra em contacto com uma proposta personalizada.</div>
       </div>
     </div>
   </div>
@@ -398,9 +421,9 @@ input[type=file]{display:none}
 <section class="upload-section section-alt" id="upload">
   <div class="container">
     <div class="section-head text-center reveal">
-      <div class="section-label">Simulação gratuita</div>
-      <h2 class="section-title">Calcule o potencial solar do seu imóvel</h2>
-      <p class="section-sub">Resultado em 60 segundos. Sem registo. Sem compromisso.</p>
+      <div class="section-label">Pré-diagnóstico gratuito</div>
+      <h2 class="section-title">Avaliação solar personalizada</h2>
+      <p class="section-sub">A IA analisa a sua fatura. Um especialista ENERSIA valida e entra em contacto em 24 horas.</p>
     </div>
     <div class="upload-wrap">
 
@@ -410,8 +433,8 @@ input[type=file]{display:none}
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M12 2v2M12 14v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
           </div>
           <div>
-            <div class="card-header-title">Analise a fatura do seu imóvel</div>
-            <div class="card-header-sub">PDF ou foto · Máximo 4MB</div>
+            <div class="card-header-title">Pré-diagnóstico solar gratuito</div>
+            <div class="card-header-sub">PDF ou foto da fatura · Máximo 4MB</div>
           </div>
         </div>
         <div class="card-body">
@@ -438,6 +461,34 @@ input[type=file]{display:none}
                 <option>Porto</option><option>Santarém</option><option>Setúbal</option><option>Viana do Castelo</option>
                 <option>Vila Real</option><option>Viseu</option><option>Açores</option><option>Madeira</option>
               </select>
+            </div>
+          </div>
+
+          <!-- TIPO DE IMÓVEL -->
+          <div class="form-grid" style="margin-top:2px">
+            <div class="field-wrap field-full">
+              <label class="field-lbl" for="f-tipo-imovel">Tipo de imóvel *</label>
+              <select class="field-sel" id="f-tipo-imovel">
+                <option value="">Seleccione o tipo de imóvel...</option>
+                <option value="moradia">🏡 Moradia</option>
+                <option value="apartamento">🏠 Apartamento</option>
+                <option value="empresa">🏢 Empresa</option>
+                <option value="armazem">🏭 Armazém</option>
+                <option value="agricultura">🌾 Agricultura</option>
+                <option value="condominio">🏘️ Condomínio</option>
+                <option value="outro">📍 Outro</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- ÁREA DISPONÍVEL -->
+          <div class="area-row">
+            <span class="srv-label">Área aproximada disponível</span>
+            <div class="area-opts">
+              <label class="area-opt"><input type="radio" name="area_telhado" value="nao_sei" checked><span class="area-opt-ico">❓</span><span>Não sei</span></label>
+              <label class="area-opt"><input type="radio" name="area_telhado" value="pequeno"><span class="area-opt-ico">▫️</span><span>Pequeno · até 50m²</span></label>
+              <label class="area-opt"><input type="radio" name="area_telhado" value="medio"><span class="area-opt-ico">◾</span><span>Médio · 50–150m²</span></label>
+              <label class="area-opt"><input type="radio" name="area_telhado" value="grande"><span class="area-opt-ico">⬛</span><span>Grande · +150m²</span></label>
             </div>
           </div>
 
@@ -501,7 +552,7 @@ input[type=file]{display:none}
 
           <button class="btn-analisar" id="btnAnalisar" disabled onclick="analisar()">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            Simular com IA — Gratuito
+            Enviar para pré-diagnóstico — Gratuito
           </button>
           <div class="btn-legal">Ao simular, aceita os nossos <a href="/privacidade.html" style="color:var(--blue)">Termos de Privacidade</a>. Dados tratados com confidencialidade.</div>
         </div>
@@ -510,52 +561,52 @@ input[type=file]{display:none}
       <!-- LOADING -->
       <div class="card loading-card" id="loadingCard">
         <div class="loading-ring"></div>
-        <div class="loading-title">A IA está a calcular o potencial solar</div>
+        <div class="loading-title">A IA está a analisar o seu perfil</div>
         <div class="loading-sub">Aguarde alguns segundos...</div>
         <div class="loading-steps">
           <div class="ls" id="s1"><div class="ls-dot"></div>A ler a fatura</div>
-          <div class="ls" id="s2"><div class="ls-dot"></div>A extrair consumo e distrito</div>
-          <div class="ls" id="s3"><div class="ls-dot"></div>A calcular potencial solar</div>
-          <div class="ls" id="s4"><div class="ls-dot"></div>A preparar relatório</div>
+          <div class="ls" id="s2"><div class="ls-dot"></div>A extrair consumo e localização</div>
+          <div class="ls" id="s3"><div class="ls-dot"></div>A analisar perfil energético</div>
+          <div class="ls" id="s4"><div class="ls-dot"></div>A preparar pré-diagnóstico</div>
         </div>
       </div>
 
-      <!-- RESULTADO -->
+      <!-- RESULTADO — CONFIRMAÇÃO PREMIUM -->
       <div class="card res-card" id="resCard">
-        <div class="res-top">
-          <div>
-            <div class="res-company" id="rComercializadora">—</div>
-            <div class="res-period" id="rPeriodo">—</div>
-          </div>
-          <div class="res-saving-box" id="resSavingBox">
-            <div class="res-saving-val" id="rPoupanca">—</div>
-            <div class="res-saving-lbl">poupança/mês</div>
-          </div>
-        </div>
-        <div class="res-body">
-          <div class="res-sec-label">Resumo da Análise Solar</div>
-          <div class="res-grid" id="resGrid"></div>
-          <div class="res-detail" id="resDetail"></div>
-          <div class="cta-box">
-            <div>
-              <h3>Quer avançar com solar?</h3>
-              <p>Fale com um especialista ENERSIA — gratuito e sem compromisso.</p>
+        <div class="res-confirm">
+          <!-- Status checks -->
+          <div class="rc-checks">
+            <div class="rc-item">
+              <div class="rc-check">✓</div>
+              <span>Perfil recebido para pré-análise solar</span>
             </div>
-            <div class="cta-btns">
-              <a class="btn-cta-wa" href="https://wa.me/351910322702" target="_blank" rel="noopener">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                WhatsApp
-              </a>
-              <a class="btn-cta-main" href="https://calendly.com/geralenersia/30min" target="_blank" rel="noopener">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                Reunião Gratuita
-              </a>
+            <div class="rc-item">
+              <div class="rc-check">✓</div>
+              <span>Consumo energético enviado com sucesso</span>
             </div>
+            <div class="rc-item">
+              <div class="rc-check">✓</div>
+              <span>Elegível para validação por especialista</span>
+            </div>
+          </div>
+          <!-- Title + description -->
+          <div class="res-confirm-title">O seu pré-diagnóstico solar foi recebido</div>
+          <p class="res-confirm-sub">A nossa IA analisou o seu perfil energético inicial. Um especialista ENERSIA irá validar o potencial solar do seu imóvel e entrar em contacto consigo em menos de 24 horas.</p>
+          <!-- CTAs -->
+          <div class="res-confirm-btns">
+            <a class="btn-wa-full" href="https://wa.me/351910322702" target="_blank" rel="noopener">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Falar agora no WhatsApp
+            </a>
+            <a class="btn-proposta" href="https://wa.me/351910322702?text=Ol%C3%A1%20ENERSIA!%20Quero%20receber%20a%20minha%20pr%C3%A9-proposta%20solar%20gratuita." target="_blank" rel="noopener">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Receber pré-proposta gratuita
+            </a>
           </div>
         </div>
       </div>
 
-      <button class="btn-nova" id="btnNova" onclick="resetForm()">↩ Simular outro imóvel</button>
+      <button class="btn-nova" id="btnNova" onclick="resetForm()">↩ Enviar outro imóvel</button>
       <div class="error-box" id="errorBox"></div>
     </div>
   </div>
@@ -799,10 +850,12 @@ function validarContacto() {
   const tel = document.getElementById('f-tel').value.trim();
   const email = document.getElementById('f-email').value.trim();
   const distrito = document.getElementById('f-distrito').value;
+  const tipoImovel = document.getElementById('f-tipo-imovel').value;
   if (!nome) { showErr('Por favor insira o seu nome.'); return false; }
   if (!tel) { showErr('Por favor insira o seu telefone.'); return false; }
   if (!email || !email.includes('@')) { showErr('Por favor insira um email válido.'); return false; }
   if (!distrito) { showErr('Por favor seleccione o seu distrito.'); return false; }
+  if (!tipoImovel) { showErr('Por favor seleccione o tipo de imóvel.'); return false; }
   return true;
 }
 
@@ -818,6 +871,8 @@ async function analisar() {
   const tel  = document.getElementById('f-tel').value.trim();
   const email = document.getElementById('f-email').value.trim();
   const distrito = document.getElementById('f-distrito').value;
+  const tipoImovel = document.getElementById('f-tipo-imovel').value;
+  const areaTelhado = getAreaTelhado();
   const isPDF = (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'));
   document.getElementById('uploadCard').style.display = 'none';
   document.getElementById('loadingCard').classList.add('show');
@@ -839,7 +894,7 @@ async function analisar() {
     if (!r || r.error) throw new Error(r && r.error ? r.error : 'Resposta inválida do servidor. Tente novamente.');
     if (!r.comercializadora && !r.total_fatura && !r.analise_detalhada) throw new Error('Análise incompleta. Verifique a nitidez da imagem ou use o PDF original.');
     showResult(r);
-    notificarMake({ nome, tel, email, distrito, isPDF, mediaType, fileB64, dados: r, servico: getServico() }).catch(e => console.warn('Make:', e));
+    notificarMake({ nome, tel, email, distrito, tipoImovel, areaTelhado, isPDF, mediaType, fileB64, dados: r, servico: getServico() }).catch(e => console.warn('Make:', e));
   } catch(e) {
     document.getElementById('loadingCard').classList.remove('show');
     document.getElementById('uploadCard').style.display = 'block';
@@ -849,23 +904,30 @@ async function analisar() {
   }
 }
 
-// ---- HELPER: tipo de serviço ----
+// ---- HELPERS: tipo de serviço / área ----
 function getServico() {
   const sel = document.querySelector('input[name="servico"]:checked');
   return sel ? sel.value : 'eletricidade';
 }
+function getAreaTelhado() {
+  const sel = document.querySelector('input[name="area_telhado"]:checked');
+  return sel ? sel.value : 'nao_sei';
+}
 
 // ---- NOTIFICAR MAKE ----
-async function notificarMake({ nome, tel, email, distrito, isPDF, mediaType, fileB64, dados, servico }) {
+async function notificarMake({ nome, tel, email, distrito, tipoImovel, areaTelhado, isPDF, mediaType, fileB64, dados, servico }) {
   const mType = mediaType || (isPDF ? 'application/pdf' : 'image/jpeg');
   await fetch(MAKE_WH, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       timestamp: new Date().toISOString(),
-      tipo: LEAD_TIPO,
-      segmento: LEAD_TIPO,
+      tipo: LEAD_TIPO,              // preservado para compatibilidade Make.com
+      segmento: LEAD_TIPO,          // = 'solar'
       servico: servico || 'eletricidade',
+      tipo_imovel: tipoImovel || '',
+      area_telhado: areaTelhado || 'nao_sei',
+      urgencia: 'Alta',             // leads solares são sempre Alta prioridade
       formato: isPDF ? 'pdf' : 'imagem',
       mediaType: mType,
       fileName: (file && file.name) ? file.name : ('fatura.' + (isPDF ? 'pdf' : 'jpg')),
@@ -878,44 +940,25 @@ async function notificarMake({ nome, tel, email, distrito, isPDF, mediaType, fil
       percentagem_poupanca: dados.percentagem_poupanca || 0,
       recomendacao_comercializador: dados.recomendacao_comercializador || '',
       motivo_recomendacao: dados.motivo_recomendacao || '',
-      analise_detalhada: dados.analise_detalhada || '',
-      urgencia: dados.urgencia || ''
+      analise_detalhada: dados.analise_detalhada || ''
     })
   });
 }
 
-// ---- MOSTRAR RESULTADO ----
+// ---- MOSTRAR CONFIRMAÇÃO (dados da IA vão para Make.com / Telegram / Sheets) ----
 function showResult(r) {
+  // Os dados da IA (r) são enviados via notificarMake para o back-end.
+  // O cliente vê apenas a confirmação premium — sem números automáticos.
   document.getElementById('loadingCard').classList.remove('show');
   document.getElementById('resCard').classList.add('show');
   document.getElementById('btnNova').style.display = 'block';
-  const pMes = parseFloat(r.poupanca_mensal_estimada) || 0;
-  const pAno = pMes * 12;
-  const perc = parseFloat(r.percentagem_poupanca) || 0;
-  const total = parseFloat(r.total_fatura) || 0;
-  document.getElementById('rComercializadora').textContent = r.comercializadora || 'Actual';
-  document.getElementById('rPeriodo').textContent = r.periodo || '';
-  if (pMes > 0) { document.getElementById('resSavingBox').style.display = 'block'; document.getElementById('rPoupanca').textContent = '−' + pMes.toFixed(0) + '€'; }
-  let grid = '';
-  if (total > 0) grid += '<div class="res-item"><div class="res-item-label">Fatura actual</div><div class="res-item-val amber">' + total.toFixed(2) + '€/mês</div></div>';
-  if (pMes > 0) grid += '<div class="res-item"><div class="res-item-label">Poupança mensal</div><div class="res-item-val green">−' + pMes.toFixed(0) + '€/mês</div></div>';
-  if (pAno > 0) grid += '<div class="res-item"><div class="res-item-label">Poupança anual</div><div class="res-item-val green">−' + pAno.toFixed(0) + '€/ano</div></div>';
-  if (perc > 0) grid += '<div class="res-item"><div class="res-item-label">Potencial solar</div><div class="res-item-val green">' + perc.toFixed(0) + '% do consumo</div></div>';
-  document.getElementById('resGrid').innerHTML = grid || '<div class="res-item"><div class="res-item-label">Análise</div><div class="res-item-val">Ver recomendação abaixo</div></div>';
-  let html = '';
-  const recom = r.recomendacao_comercializador || '';
-  if (recom && recom.toLowerCase() !== 'manter actual' && pMes > 0) html += '<div class="rec-box"><h4>Recomendação ENERSIA Solar</h4><p>Com painéis solares pode poupar <strong>' + pMes.toFixed(0) + '€ por mês</strong>.' + (r.motivo_recomendacao ? ' ' + r.motivo_recomendacao : '') + '</p></div>';
-  else if (recom) html += '<div class="rec-box"><h4>Recomendação ENERSIA Solar</h4><p>' + (r.motivo_recomendacao || 'Análise concluída. Fale com um especialista para o dimensionamento ideal.') + '</p></div>';
-  if (r.analise_detalhada) html += '<div class="analise-box">' + r.analise_detalhada + '</div>';
-  if (!html) html = '<p>Análise concluída. Fale com um especialista para as melhores opções solares para o seu imóvel.</p>';
-  document.getElementById('resDetail').innerHTML = html;
+  document.getElementById('resCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ---- RESET ----
 function resetForm() {
   clearFile();
   document.getElementById('resCard').classList.remove('show');
-  document.getElementById('resSavingBox').style.display = 'none';
   document.getElementById('btnNova').style.display = 'none';
   document.getElementById('uploadCard').style.display = 'block';
   clearErr();
