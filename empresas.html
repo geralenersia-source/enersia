@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="/assets/brand/enersia-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;900&family=Sora:wght@400;600;700;800;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg0:#0A0F1E;--bg1:#0D1526;--bg2:#111E35;
@@ -29,34 +29,33 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg0);color:var(--
 a{text-decoration:none;color:inherit}
 button{font-family:inherit;cursor:pointer;border:none;outline:none}
 img{max-width:100%}
-.nav-logo-img{height:52px;width:auto;display:block;object-fit:contain}@media(max-width:768px){.nav-logo-img{height:40px}}
-
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
-.reveal{opacity:0;transform:translateY(28px);transition:opacity .65s var(--ease),transform .65s var(--ease)}
-.reveal.visible{opacity:1;transform:translateY(0)}
-.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
-
-/* NAVBAR */
-.navbar{position:sticky;top:0;z-index:100;background:rgba(10,15,30,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);height:64px;display:flex;align-items:center;padding:0 24px}
-.nav-inner{max-width:1140px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.nav-logo{display:flex;align-items:center;gap:10px}
-.nav-logo-text{font-family:'Sora',sans-serif;font-weight:800;font-size:17px;color:var(--t1);letter-spacing:-.02em;display:flex;align-items:center;gap:2px}
-.nav-bolt{color:var(--teal);display:inline-flex;align-items:center}
-.nav-links{display:flex;align-items:center;gap:4px}
-.nav-link{color:var(--t2);font-size:14px;font-weight:500;padding:6px 13px;border-radius:8px;transition:all .2s}
-.nav-link:hover{color:var(--t1);background:var(--b1)}
-.nav-link.active{color:var(--teal)}
-.nav-actions{display:flex;align-items:center;gap:10px}
-.nav-cta{background:linear-gradient(135deg,var(--teal),var(--blue));color:#fff;font-family:'Sora',sans-serif;font-size:13.5px;font-weight:700;padding:9px 20px;border-radius:100px;transition:all .3s;white-space:nowrap;display:inline-block}
-.nav-cta:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,123,255,.3)}
-.hamburger{display:none;background:transparent;border:1px solid var(--b2);border-radius:8px;padding:8px;color:var(--t2);cursor:pointer;align-items:center;justify-content:center}
-.nav-mobile{display:none;position:absolute;top:64px;left:0;right:0;background:var(--bg1);border-bottom:1px solid var(--b1);padding:12px 20px;flex-direction:column;gap:4px;z-index:99}
-.nav-mobile.open{display:flex}
-.nav-mobile a{color:var(--t2);font-size:14px;font-weight:500;padding:10px 14px;border-radius:8px;transition:all .2s}
-.nav-mobile a:hover{color:var(--t1);background:var(--b1)}
-.nav-mobile .nm-cta{background:linear-gradient(135deg,var(--teal),var(--blue));color:#fff;font-weight:700;text-align:center;margin-top:6px;border-radius:100px}
-
+nav{position:sticky;top:0;z-index:200;height:70px;display:flex;align-items:center;background:rgba(7,11,20,.88);backdrop-filter:blur(32px) saturate(180%);-webkit-backdrop-filter:blur(32px) saturate(180%);border-bottom:1px solid var(--b1)}
+.nav-inner{max-width:1300px;margin:0 auto;padding:0 32px;width:100%;display:flex;align-items:center;gap:40px}
+.logo{display:flex;align-items:center;gap:13px;flex-shrink:0}
+.logo-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:pulse-glow 4s ease-in-out infinite}
+.logo-mark svg{width:22px;height:22px}
+.logo-text-wrap{display:flex;flex-direction:column;gap:1px}
+.logo-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:900;letter-spacing:-.5px;color:var(--t1);line-height:1}
+.logo-name span{color:var(--blue)}
+.logo-tag{font-size:9px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.nav-links{display:flex;align-items:center;gap:8px;list-style:none;flex:1;justify-content:center}
+.nav-links a{font-size:13.5px;font-weight:400;color:var(--t3);padding:8px 14px;border-radius:var(--r1);transition:all .2s;white-space:nowrap}
+.nav-links a:hover,.nav-links a.active{color:var(--t1);background:var(--b1)}
+.nav-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.erse-badge{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:var(--green);background:rgba(0,229,155,.07);border:1px solid rgba(0,229,155,.18);padding:5px 11px;border-radius:99px;letter-spacing:1.2px}
+.erse-badge-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
+.btn-nav-cta{background:var(--blue);color:#fff;padding:11px 24px;border-radius:var(--r2);font-size:13.5px;font-weight:600;transition:all .25s;white-space:nowrap;display:inline-block;box-shadow:0 4px 20px rgba(79,124,255,.35)}
+.btn-nav-cta:hover{background:var(--blue2);transform:translateY(-1px);box-shadow:0 8px 28px rgba(79,124,255,.5)}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;padding:8px;cursor:pointer;border:none}
+.nav-hamburger span{display:block;width:22px;height:1.5px;background:var(--t2);border-radius:2px;transition:all .3s}
+.mobile-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(7,11,20,.97);backdrop-filter:blur(24px);flex-direction:column;align-items:center;justify-content:center;gap:28px}
+.mobile-overlay.open{display:flex;animation:fade-in .2s ease}
+.mobile-overlay a{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:var(--t1);transition:color .2s}
+.mobile-overlay a:hover{color:var(--blue)}
+.mob-close{position:absolute;top:24px;right:28px;font-size:24px;color:var(--t3);background:none;border:none;cursor:pointer}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 24px rgba(79,124,255,.2),0 0 60px rgba(79,124,255,.06)}50%{box-shadow:0 0 48px rgba(79,124,255,.5),0 0 100px rgba(79,124,255,.18)}}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+@media(max-width:768px){.nav-links{display:none}.nav-hamburger{display:flex}.erse-badge{display:none}}
 /* HERO */
 .hero{position:relative;overflow:hidden;padding:96px 24px 80px;min-height:80vh;display:flex;align-items:center}
 .hg1{position:absolute;top:-200px;right:-150px;width:700px;height:700px;background:radial-gradient(circle,rgba(0,201,167,.09) 0%,transparent 65%);pointer-events:none}
@@ -264,32 +263,45 @@ input[type=file]{display:none}
 </head>
 <body>
 
-<nav class="navbar">
+<nav>
   <div class="nav-inner">
-    <a href="/index.html" class="nav-logo" aria-label="ENERSIA — Página inicial">
-          <img src="/assets/brand/enersia-logo-header-transparent.png" alt="ENERSIA" class="nav-logo-img">
-        </a>
-    <div class="nav-links">
-      <a href="/empresas.html" class="nav-link active">Empresas</a>
-      <a href="/familias.html" class="nav-link">Famílias</a>
-      <a href="/solar.html" class="nav-link">Solar</a>
-      <a href="/analisar-fatura.html" class="nav-link">Analisar Fatura</a>
-    </div>
-    <div class="nav-actions">
-      <a href="#upload" class="nav-cta">Analisar agora</a>
-      <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
-        <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M0 1h18M0 7h18M0 13h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <a class="logo" href="/" aria-label="ENERSIA — Página inicial">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="14,2 5,14 12,14 10,22 19,10 12,10" fill="white"></polygon>
+        </svg>
+      </div>
+      <div class="logo-text-wrap">
+        <div class="logo-name">ENER<span>SIA</span></div>
+        <div class="logo-tag">Gestor Energético com IA</div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/">Início</a></li>
+      <li><a href="/empresas.html" class="active">Empresas</a></li>
+      <li><a href="/familias.html">Famílias</a></li>
+      <li><a href="/solar.html">Solar</a></li>
+      <li><a href="/analisar-fatura.html">Analisar Fatura</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="erse-badge"><div class="erse-badge-dot"></div>ERSE LIVE</div>
+      <a class="btn-nav-cta" href="#upload">Analisar fatura</a>
+      <button class="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+        <span></span><span></span><span></span>
       </button>
     </div>
   </div>
-  <div class="nav-mobile" id="navMobile">
-    <a href="/empresas.html">Empresas</a>
-    <a href="/familias.html">Famílias</a>
-    <a href="/solar.html">Solar</a>
-    <a href="/analisar-fatura.html">Analisar Fatura</a>
-    <a href="#upload" class="nm-cta" onclick="closeMenu()">Analisar agora →</a>
-  </div>
 </nav>
+<!-- MOBILE MENU -->
+<div class="mobile-overlay" id="mobileMenu">
+  <button class="mob-close" onclick="toggleMobileMenu()">×</button>
+  <a href="/">Início</a>
+  <a href="/empresas.html">Empresas</a>
+  <a href="/familias.html">Famílias</a>
+  <a href="/solar.html">Solar</a>
+  <a href="/analisar-fatura.html">Analisar Fatura</a>
+  <a class="btn-nav-cta" href="#upload" onclick="toggleMobileMenu()" style="margin-top:12px">Analisar fatura</a>
+</div>
 
 <!-- HERO -->
 <section class="hero">
@@ -947,8 +959,11 @@ function clearErr() { const b = document.getElementById('errorBox'); b.classList
 function normalizarMime(t) { const m = {'image/jpg':'image/jpeg','image/jpeg':'image/jpeg','image/png':'image/png','image/webp':'image/webp','image/gif':'image/gif','application/pdf':'application/pdf'}; return m[t] || 'image/jpeg'; }
 
 // ---- NAVEGAÇÃO ----
-function toggleMenu() { document.getElementById('navMobile').classList.toggle('open'); }
-function closeMenu() { document.getElementById('navMobile').classList.remove('open'); }
+function toggleMobileMenu() {
+  var m = document.getElementById('mobileMenu');
+  m.classList.toggle('open');
+  document.body.style.overflow = m.classList.contains('open') ? 'hidden' : '';
+}
 
 // ---- SCROLL ANIMATIONS ----
 const observer = new IntersectionObserver(entries => {
