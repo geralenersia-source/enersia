@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-PT">
 <head>
 <meta charset="UTF-8">
@@ -6,8 +6,7 @@
 <title>ENERSIA para Empresas — Reduza os Custos Energéticos com IA</title>
 <meta name="description" content="A ENERSIA analisa a fatura de energia da sua empresa e identifica poupanças reais em minutos. Sem compromisso. Análise gratuita com IA.">
 <meta name="theme-color" content="#0A0F1E">
-<link rel="icon" type="image/png" href="/assets/brand/enersia-favicon.png">
-<link rel="apple-touch-icon" href="/assets/brand/enersia-favicon.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230A0F1E'/><polygon points='18,3 7,18 16,18 14,29 25,14 16,14' fill='%2300C9A7'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -40,7 +39,6 @@ img{max-width:100%}
 .navbar{position:sticky;top:0;z-index:100;background:rgba(10,15,30,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);height:64px;display:flex;align-items:center;padding:0 24px}
 .nav-inner{max-width:1140px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .nav-logo{display:flex;align-items:center;gap:10px}
-.nav-logo-img{height:36px;width:auto;display:block}
 .nav-logo-text{font-family:'Sora',sans-serif;font-weight:800;font-size:17px;color:var(--t1);letter-spacing:-.02em;display:flex;align-items:center;gap:2px}
 .nav-bolt{color:var(--teal);display:inline-flex;align-items:center}
 .nav-links{display:flex;align-items:center;gap:4px}
@@ -267,7 +265,17 @@ input[type=file]{display:none}
 <nav class="navbar">
   <div class="nav-inner">
     <a href="/index.html" class="nav-logo" aria-label="ENERSIA — Página inicial">
-      <img src="/assets/brand/enersia-logo-principal-FINAL.png" alt="ENERSIA" class="nav-logo-img">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+        <defs><linearGradient id="ng" x1="2" y1="3" x2="28" y2="27" gradientUnits="userSpaceOnUse"><stop stop-color="#00C9A7"/><stop offset="1" stop-color="#007BFF"/></linearGradient></defs>
+        <path d="M6 4v22" stroke="url(#ng)" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M6 4h16" stroke="url(#ng)" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="24.5" cy="4" r="2.2" fill="url(#ng)"/>
+        <path d="M6 15h12" stroke="url(#ng)" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="20.5" cy="15" r="2.2" fill="url(#ng)"/>
+        <path d="M6 26h16" stroke="url(#ng)" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="24.5" cy="26" r="2.2" fill="url(#ng)"/>
+      </svg>
+      <span class="nav-logo-text">ENERS<span class="nav-bolt"><svg width="9" height="15" viewBox="0 0 9 15" fill="none" aria-hidden="true"><polygon points="5.5,0 0,8 4,8 3,15 9,7 5,7" fill="#00C9A7"/></svg></span>A</span>
     </a>
     <div class="nav-links">
       <a href="/empresas.html" class="nav-link active">Empresas</a>
