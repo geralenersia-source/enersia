@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-PT">
 <head>
 <meta charset="UTF-8">
@@ -6,7 +6,8 @@
 <title>ENERSIA — Analisar Fatura com IA</title>
 <meta name="description" content="Analise a sua fatura de energia com IA. Resultado em 60 segundos. Gratuito.">
 <meta name="theme-color" content="#070B14">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23070B14'/><polygon points='18,3 7,18 16,18 14,29 25,14 16,14' fill='%234F7CFF'/></svg>">
+<link rel="icon" type="image/png" href="/assets/brand/enersia-favicon.png">
+<link rel="apple-touch-icon" href="/assets/brand/enersia-favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -38,10 +39,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
 nav{position:sticky;top:0;z-index:200;height:66px;display:flex;align-items:center;background:rgba(7,11,20,.92);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-bottom:1px solid var(--b1)}
 .nav-inner{max-width:960px;margin:0 auto;padding:0 24px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .logo{display:flex;align-items:center;gap:11px}
-.logo-mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.logo-mark svg{width:19px;height:19px}
-.logo-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:900;letter-spacing:-.5px}
-.logo-name span{color:var(--blue)}
+.nav-logo-img{height:36px;width:auto;display:block}
 .nav-right{display:flex;align-items:center;gap:10px}
 .nav-home{font-size:13px;color:var(--t3);padding:8px 14px;border-radius:var(--r1);transition:all .2s}
 .nav-home:hover{color:var(--t1);background:var(--b1)}
@@ -283,11 +281,8 @@ footer a:hover{color:var(--t1)}
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <a href="/" class="logo">
-      <div class="logo-mark">
-        <svg viewBox="0 0 24 24" fill="none"><polygon points="14,2 5,13 12,13 10,22 19,11 12,11" fill="white"/></svg>
-      </div>
-      <div class="logo-name">ENER<span>SIA</span></div>
+    <a href="/" class="logo" aria-label="ENERSIA — Página inicial">
+      <img src="/assets/brand/enersia-logo-principal-FINAL.png" alt="ENERSIA" class="nav-logo-img">
     </a>
     <div class="nav-right">
       <a href="/" class="nav-home">← Início</a>
@@ -495,7 +490,7 @@ footer a:hover{color:var(--t1)}
   <div class="chat-window" id="chatWin">
     <div class="chat-header">
       <div class="chat-av">
-        <img src="data:image/jpeg;base64,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" alt="KAROL">
+        <img src="/assets/brand/enersia-karol-avatar.png" alt="KAROL">
       </div>
       <div>
         <div class="chat-name">KAROL</div>
@@ -506,7 +501,7 @@ footer a:hover{color:var(--t1)}
     <div class="chat-msgs" id="chatMsgs">
       <div class="cmsg">
         <div class="msg-av">
-          <img src="data:image/jpeg;base64,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" alt="KAROL">
+          <img src="/assets/brand/enersia-karol-avatar.png" alt="KAROL">
         </div>
         <div class="bubble bot">Olá! Sou a <strong>KAROL</strong>.<br><br>Está a analisar a sua fatura? Envie-a acima e a IA trata de tudo em 60 segundos — <strong>grátis</strong>.<br><br>Posso ajudar com alguma dúvida?</div>
       </div>
@@ -527,7 +522,7 @@ footer a:hover{color:var(--t1)}
   <div style="position:relative;display:inline-block">
     <div class="fab-badge" id="fabBadge">1</div>
     <div class="fab" onclick="toggleChat()" title="Falar com KAROL">
-      <img src="data:image/jpeg;base64,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" alt="KAROL">
+      <img src="/assets/brand/enersia-karol-avatar.png" alt="KAROL">
     </div>
   </div>
 </div>
@@ -1028,7 +1023,7 @@ function normalizarMime(t) {
 // ---- KAROL CHAT ----
 let chatOpen = false, hist = [];
 const KAROL_SYS = `És a KAROL, Consultora Energética Digital da ENERSIA. Respondes SEMPRE em português europeu (PT-PT). Tom profissional, directo e acolhedor. Sem gíria brasileira. ENERSIA: plataforma independente. NÃO somos a ERSE nem uma comercializadora. Dados ERSE 2026: Endesa 0.1362€/kWh | Iberdrola 0.1382€/kWh | Goldenergy 0.1399€/kWh | EDP 0.1420€/kWh | Plenitude 0.1433€/kWh | Repsol 0.1480€/kWh | Galp 0.1542€/kWh. LINKS: análise: https://www.enersia.pt/analisar-fatura.html | WhatsApp: https://wa.me/351910322702. REGRAS: máx 3 parágrafos. UMA pergunta de cada vez. Nota sempre: Valores baseados em dados públicos ERSE.`;
-const MINI_IMG = '<img src="data:image/jpeg;base64,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" alt="KAROL" style="width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:center top">';
+const MINI_IMG = '<img src="/assets/brand/enersia-karol-avatar.png" alt="KAROL" style="width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:center top">';
 
 function toggleChat() {
   chatOpen = !chatOpen;
@@ -1082,3 +1077,4 @@ async function sendQ(msg) {
 
 </body>
 </html>
+
