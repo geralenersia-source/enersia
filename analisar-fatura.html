@@ -1028,7 +1028,60 @@ function normalizarMime(t) {
 
 // ---- KAROL CHAT ----
 let chatOpen = false, hist = [];
-const KAROL_SYS = `És a KAROL, Consultora Energética Digital da ENERSIA. Respondes SEMPRE em português europeu (PT-PT). Tom profissional, directo e acolhedor. Sem gíria brasileira. ENERSIA: plataforma independente. NÃO somos a ERSE nem uma comercializadora. Dados ERSE 2026: Endesa 0.1362€/kWh | Iberdrola 0.1382€/kWh | Goldenergy 0.1399€/kWh | EDP 0.1420€/kWh | Plenitude 0.1433€/kWh | Repsol 0.1480€/kWh | Galp 0.1542€/kWh. LINKS: análise: https://www.enersia.pt/analisar-fatura.html | WhatsApp: https://wa.me/351910322702. REGRAS: máx 3 parágrafos. UMA pergunta de cada vez. Nota sempre: Valores baseados em dados públicos ERSE.`;
+const KAROL_SYS = `És a KAROL, Consultora Energética Digital da ENERSIA. Respondes SEMPRE em português europeu (PT-PT). Tom profissional, directo e acolhedor. Sem gíria brasileira. ENERSIA: plataforma independente. NÃO somos a ERSE nem uma comercializadora. {{PRECOS_DINAMICOS}} LINKS: análise: https://www.enersia.pt/analisar-fatura.html | WhatsApp: https://wa.me/351910322702. REGRAS: máx 3 parágrafos. UMA pergunta de cada vez. Nota sempre: Valores baseados em dados públicos ERSE.`;
+// ---- PRECOS DINAMICOS (precos.json -> KAROL) ----
+const PRECOS_FALLBACK = {
+  endesa:    "0.1362",
+  iber:      "0.1382",
+  golden:    "0.1399",
+  edp:       "0.1420",
+  plenitude: "0.1433",
+  repsol:    "0.1480",
+  galp:      "0.1542"
+};
+
+async function carregarPrecosEnergia() {
+  try {
+    const response = await fetch(
+      'https://raw.githubusercontent.com/geralenersia-source/enersia/main/precos.json?t=' + Date.now(),
+      { cache: 'no-store' }
+    );
+    if (!response.ok) throw new Error('Falha ao carregar precos.json');
+    const data = await response.json();
+    const c = data.comercializadoras || {};
+    return {
+      endesa:    String((c['Endesa']       || {}).preco_kwh || PRECOS_FALLBACK.endesa),
+      iber:      String((c['Iberdrola']    || {}).preco_kwh || PRECOS_FALLBACK.iber),
+      golden:    String((c['Goldenergy']   || {}).preco_kwh || PRECOS_FALLBACK.golden),
+      edp:       String((c['EDP']          || {}).preco_kwh || PRECOS_FALLBACK.edp),
+      plenitude: String((c['Plenitude']    || {}).preco_kwh || PRECOS_FALLBACK.plenitude),
+      repsol:    String((c['Repsol']       || {}).preco_kwh || PRECOS_FALLBACK.repsol),
+      galp:      String((c['Galp Energia'] || {}).preco_kwh || PRECOS_FALLBACK.galp)
+    };
+  } catch (error) {
+    console.warn('[ENERSIA] A usar precos fallback:', error);
+    return PRECOS_FALLBACK;
+  }
+}
+
+function gerarPrecosTexto(precos) {
+  return [
+    'Dados ERSE 2026 (actualizados):',
+    'Endesa '       + precos.endesa    + '€/kWh',
+    'Iberdrola '    + precos.iber      + '€/kWh',
+    'Goldenergy '   + precos.golden    + '€/kWh',
+    'EDP '          + precos.edp       + '€/kWh',
+    'Plenitude '    + precos.plenitude + '€/kWh',
+    'Repsol '       + precos.repsol    + '€/kWh',
+    'Galp '         + precos.galp      + '€/kWh'
+  ].join(' | ');
+}
+
+async function construirSystemPromptKarol() {
+  const precos = await carregarPrecosEnergia();
+  const precosTexto = gerarPrecosTexto(precos);
+  return KAROL_SYS.replace('{{PRECOS_DINAMICOS}}', precosTexto);
+}
 const MINI_IMG = '<img src="/assets/brand/enersia-karol-avatar.png" alt="KAROL" style="width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:center top">';
 
 function toggleChat() {
@@ -1061,7 +1114,7 @@ async function getReply(msg) {
     const r = await fetch(WORKER_URL + '/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: hist, system: KAROL_SYS })
+      body: JSON.stringify({ messages: hist, system: await construirSystemPromptKarol() })
     });
     const data = await r.json();
     const reply = data.reply || 'Erro técnico. WhatsApp: wa.me/351910322702';
