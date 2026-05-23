@@ -2199,16 +2199,19 @@ function toggleFaq(btn){
 })();
 
 /* ── KAROL CHAT ───────────────────────────────────────────── */
+var KAROL_WORKER='https://enersia-proxy.geralenersia.workers.dev';
+function sanitizeMdK(t){return t.replace(/\*\*([^*]*)\*\*/g,'$1').replace(/\*([^*]*)\*/g,'$1').replace(/__([^_]*)__/g,'$1').replace(/_([^_]*)_/g,'$1').replace(/```[\s\S]*?```/g,'').replace(/`([^`]*)`/g,'$1').replace(/^#{1,6}\s*/gm,'').trim();}
 var chatOpen=false, chatHistory=[];
 var KAROL_MINI_SVG='<img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEBAYFBQUGBgYHCQ4JCQgICRINDQoOFRIWFhUSFBQXGiEcFxgfGRQUHScdHyIjJSUlFhwpLCgkKyEkJST/2wBDAQYGBgkICREJCREkGBQYJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCT/wAARCAA8ADwDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD6orgviV8YdC+HMX2eXN/q0i7orGFgCB2Z2/gX9T2FTfFv4iR/Dvww13EEk1O6Jhsom5BfHLkf3VHJ9Tgd6+RJXu9Yvpr+/nkubq4cySzSHLOx7mvbynKvrP7yp8P5nl5hmCw65Y7nYeJPjN448WSPv1V9MtWzi2sCYlA93+8fxP4V5td+Ibee8ZHmuLtwcPM7kgH6nJNWPF94NK02K3Tia5J6dkGM/mSB+dUfBfw71bx+0q2KpBbRNh7mbITPcADkmunNcxjgX7HDpRtu7fgZZXgp45e0qXlfZfqbei/EK/0GSSTSfEGpacYXCMUlYRkk8cZwR9RXtfgX9pa9tJ47LxpAtxbsQP7Rto8Onu6Dhh7rg+xrwD4k/D298CabaJJdJdwOSjSIhXD5JGR9CfyqTw0/9peH7eQks8WYmJ9R0/QiscqxFPM7066TfRpWZrmlCplrUoXXdPVan39p+oWmq2UN9Y3EVzazoHiliYMrqe4NWK+T/gh8Tp/A2ux6LqU7HQr+QKd54tZWOBIPRScBh+PY5+sK87H4KWFqcj26M68Lio4iHMj5K+O/iKTxJ8R7y2Dk2ulAWcS9tw5kP13HH/ARXL2FoOOMVHqkj3niTVLiUkvLeTOxPqZGq1dTw6fpVzczyGKOOM5YdemBj3r7/B0o0KCXRI+HzCvKrWaW7Z59d3Fv4v8AFdnZSSugkcwLgDCDecD8uc+pr3nwPpeveCbT7JdNbS6YI5DBDAvzJtXdnJ5575J6ivmDStSGja9Z6iAXWCdZSuckgHkflmvqT+3WfTbXUdEsbi/tLqI7ZrSUhgD/AAkFWx+lfkuaVqlWpzS15vzP2Dh3C0+T2dPSS87aWOM+JNh4p1HQtRfX7m1Gn4EsbRjCpjBX5QMn6nn88Vwvw3Q/2bcwMD8zCZcjqD8px7cCuh+Kvj7Sr/Qf7J0+5AmdhHPGszSCFR1X0J7ccdea474Z3rf228TcRTQmJF/u7Tn/AB/OvV4XnKnioOStd2+9WPC4ujCdCag7tK979nc6fULQDPFfW/wX8Sy+Kvh5ptzcSF7q2Bs52PJZo+AT7ldp/GvlvUoeDXd/CnxFfaN4fu7a2ZghvGfj1Mcf+Ffa57hPa0lbdM+MyTF8stdrHKeNNLbQvH2u6eylRHeyMgP9xzvU/kwrzHxn4ruNRjm06DaLVZsDA5cLxkn6819LftR+FJdPsj44sIS+yJbW82jOw5xHKfbnaT/u18fyEzhmXIVR8zHv7CvEzDNnUwtOlTlZte9+Vvz/AAPWweWKGJnVqK9n7v53/rzK8y7doJ5C847V9I+F9D1Lw34cBsNTax08xh2kZhtYFA24Z4B5wfcV86LZzXDoiqWZlLEDsO5Ne4/F3X4vC+h2fh3T0ja/uYcvKy5NvCBjj0JwefTNfIYyLm4wR9hl1VUVOq+h4x4lnju9YurmFVWFpSI9oxkDv+PX8at+GtXXw/qdreJGk/ysGXdjr/I1hySNM4Pp0FTRxDehXK8E4PY16FGcqTjKDs1seTWjGspRqK6lv8z1q18U2GuO0MIkjnVN5jcdu+COtfQ/wI8FW194Ha+vUObq8leM46oAqfzRq+TvhdpF94j8c2OkWERknvd8KkDIjGMl29gBk1+hGg6La+HtFstJs1xBZwrEnqcDkn3JyT9a97F5xOvg4xm/fvrbsv8AO54mEyqGHxMnBe5bS/dlm/sLXVLKexvbeO4tbiNopYZF3LIhGCpHcEV8XfGz9mvWPA1xPrHhm3n1Tw4W3mOMF5rFeu1lHLIP745x971P2xRXz57h8GfDPw5DL4C13Wpoka4nZbOFiPuguqnH1LfpVv4waO11bXHjAzqkE8g020jxzNEpOZM+5ViP9kD1r638RfCXwn4ks761ksDp5vSrzS6e3kO7Aghjj5S2QOSM14f8ePA+niHQ9JjuLyK0ti4REZOwVR/D2H8643Tkqqbe7/A9FVoui4pbJffdnyxCqxzbmClVGSD39q1/CvhTX/HWsppWg6fPqF5KQMRj5Y1/vO3RBx1NfTPww/Zj8Ca7ZDUtWfV70gjMD3KpGfrsVW/WvoLw14U0Lwjpy6foGk2emWo5MdvGF3H1Y9WPuSTXYeccH8D/AIH6f8J9Me4uHjvdfu0C3N2o+WNevlRZ5C56nqxGT0AHqVFFAH//2Q==" alt="KAROL" style="width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:center top">';
 
-var KAROL_SYSTEM=`\u00c9s a KAROL, Consultora Energ\u00e9tica Digital da ENERSIA.
-Respondes SEMPRE em portugu\u00eas europeu (PT-PT). Tom profissional, directo e acolhedor. Sem g\u00edria brasileira.
-ENERSIA: plataforma independente de an\u00e1lise energ\u00e9tica. N\u00c3O somos a ERSE nem uma comercializadora.
-DADOS ERSE: EDP \u20ac0.1817/kWh (ref) | GALP \u20ac0.1284 (\u221229%) | GoldEnergy \u20ac0.1256 (\u221231%) | Coopernico \u20ac0.1267 (\u221230%) | Plenitude \u20ac0.1289 | Iberdrola \u20ac0.1298 | Repsol \u20ac0.1302 | Endesa \u20ac0.1310
-FLUXO: empresa ou particular \u2192 comercializadora actual \u2192 valor fatura \u2192 calcula poupan\u00e7a em \u20ac e % \u2192 encaminha para an\u00e1lise.
-LINKS: an\u00e1lise: https://www.enersia.pt/analisar-fatura.html | WhatsApp: https://wa.me/351910322702 | Reuni\u00e3o: https://calendly.com/geralenersia/30min
-REGRAS: m\u00e1x 3 par\u00e1grafos. UMA pergunta de cada vez. Sem inventar pre\u00e7os. Nota sempre: Valores baseados em dados p\u00fablicos ERSE.`;
+var KAROL_SYSTEM=`\u00c9s a KAROL, consultora energ\u00e9tica IA da ENERSIA \u2014 plataforma independente. N\u00e3o somos a EDP nem nenhuma comercializadora.
+Respondes SEMPRE em portugu\u00eas europeu (PT-PT). Jamais portugu\u00eas brasileiro. Tom inteligente, acolhedor e moderno.
+REGRA CR\u00cdTICA: ZERO Markdown. Nunca uses asteriscos, hashtags, negrito, backticks ou listas com tra\u00e7o. Texto simples e humano, sempre.
+M\u00e1ximo 3 linhas por resposta + 1 pergunta curta. Uma pergunta de cada vez.
+PRE\u00c7OS ERSE (fonte oficial): EDP 0.1817\u20ac/kWh | Galp 0.1284\u20ac/kWh | Goldenergy 0.1256\u20ac/kWh | Coop\u00e9rnico 0.1267\u20ac/kWh | Plenitude 0.1289\u20ac/kWh | Iberdrola 0.1298\u20ac/kWh | Repsol 0.1302\u20ac/kWh | Endesa 0.1310\u20ac/kWh
+FLUXO: empresa ou particular \u2192 comercializadora actual \u2192 valor fatura \u2192 calcula poupan\u00e7a \u2192 encaminha para an\u00e1lise.
+LINKS: an\u00e1lise: https://enersia.pt/analisar-fatura | WhatsApp: https://wa.me/351910322702
+REGRAS: m\u00e1x 3 linhas. UMA pergunta de cada vez. Nunca inventar pre\u00e7os. Sempre PT-PT.`;
 
 function toggleChat(){
   chatOpen=!chatOpen;
@@ -2260,20 +2263,15 @@ function removeTyping(){
 async function getKarolReply(userMsg){
   chatHistory.push({role:'user',content:userMsg});
   try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{
+    var res=await fetch(KAROL_WORKER+'/chat',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:320,
-        system:KAROL_SYSTEM,
-        messages:chatHistory
-      })
+      body:JSON.stringify({messages:chatHistory,system:KAROL_SYSTEM})
     });
     var data=await res.json();
-    var reply=(data.content&&data.content[0]&&data.content[0].text)||'Desculpe, erro t\u00e9cnico. Contacte-nos pelo WhatsApp: wa.me/351910322702';
+    var reply=data.reply||'Desculpe, erro t\u00e9cnico. Contacte-nos pelo WhatsApp: wa.me/351910322702';
     chatHistory.push({role:'assistant',content:reply});
-    return reply;
+    return sanitizeMdK(reply);
   } catch(err){
     return 'Erro t\u00e9cnico. Contacte-nos pelo WhatsApp: wa.me/351910322702';
   }

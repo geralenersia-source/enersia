@@ -1139,6 +1139,17 @@ function showTyping() {
   d.innerHTML = '<div class="msg-av">' + MINI_IMG + '</div><div class="bubble bot"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
   m.appendChild(d); m.scrollTop = m.scrollHeight;
 }
+function sanitizeMd(txt) {
+  return txt
+    .replace(/\*\*([^*]*)\*\*/g, '$1')
+    .replace(/\*([^*]*)\*/g, '$1')
+    .replace(/__([^_]*)__/g, '$1')
+    .replace(/_([^_]*)_/g, '$1')
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/`([^`]*)`/g, '$1')
+    .replace(/^#{1,6}\s*/gm, '')
+    .trim();
+}
 async function getReply(msg) {
   hist.push({ role: 'user', content: msg });
   try {
@@ -1148,7 +1159,8 @@ async function getReply(msg) {
       body: JSON.stringify({ messages: hist, system: buildKarolSys(karolPrecos) })
     });
     const data = await r.json();
-    const reply = data.reply || 'Erro técnico. WhatsApp: wa.me/351910322702';
+    const raw = data.reply || 'Erro técnico. WhatsApp: wa.me/351910322702';
+    const reply = sanitizeMd(raw);
     hist.push({ role: 'assistant', content: reply }); return reply;
   } catch(e) { return 'Erro técnico. WhatsApp: wa.me/351910322702'; }
 }
