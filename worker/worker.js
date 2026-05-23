@@ -95,14 +95,14 @@ async function carregarPrecosEnergia() {
     const data = await res.json();
     const c = data.comercializadoras || {};
     const precos = {
-      edp:       String(c['EDP']?.preco_kwh          ?? PRECOS_FALLBACK.edp),
-      galp:      String(c['Galp Energia']?.preco_kwh  ?? PRECOS_FALLBACK.galp),
-      golden:    String(c['Goldenergy']?.preco_kwh    ?? PRECOS_FALLBACK.golden),
-      coop:      String(c['Coopérnico']?.preco_kwh    ?? PRECOS_FALLBACK.coop),
-      plenitude: String(c['Plenitude']?.preco_kwh     ?? PRECOS_FALLBACK.plenitude),
-      iber:      String(c['Iberdrola']?.preco_kwh     ?? PRECOS_FALLBACK.iber),
-      repsol:    String(c['Repsol']?.preco_kwh        ?? PRECOS_FALLBACK.repsol),
-      endesa:    String(c['Endesa']?.preco_kwh        ?? PRECOS_FALLBACK.endesa),
+      edp:       String(data.edp       ?? c['EDP']?.preco_kwh          ?? PRECOS_FALLBACK.edp),
+      galp:      String(data.galp      ?? c['Galp Energia']?.preco_kwh  ?? PRECOS_FALLBACK.galp),
+      golden:    String(data.golden    ?? c['Goldenergy']?.preco_kwh    ?? PRECOS_FALLBACK.golden),
+      coop:      String(data.coop      ?? c['Coopérnico']?.preco_kwh    ?? PRECOS_FALLBACK.coop),
+      plenitude: String(data.plenitude ?? c['Plenitude']?.preco_kwh     ?? PRECOS_FALLBACK.plenitude),
+      iber:      String(data.iber      ?? c['Iberdrola']?.preco_kwh     ?? PRECOS_FALLBACK.iber),
+      repsol:    String(data.repsol    ?? c['Repsol']?.preco_kwh        ?? PRECOS_FALLBACK.repsol),
+      endesa:    String(data.endesa    ?? c['Endesa']?.preco_kwh        ?? PRECOS_FALLBACK.endesa),
     };
     console.log('[ENERSIA] Preços carregados do precos.json');
     return precos;
