@@ -7,7 +7,7 @@
   'use strict';
 
   const WORKER_URL = 'https://enersia-proxy.geralenersia.workers.dev';
-  const AVATAR     = '/assets/brand/enersia-karol-avatar.png';
+  const AVATAR     = '/assets/images/enersia-karol-avatar.png';
 
   /* ── Preços fallback ─────────────────────────────────────── */
   const _FB = {

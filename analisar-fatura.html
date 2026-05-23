@@ -39,7 +39,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
 nav{position:sticky;top:0;z-index:200;height:66px;display:flex;align-items:center;background:rgba(7,11,20,.92);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-bottom:1px solid var(--b1)}
 .nav-inner{max-width:960px;margin:0 auto;padding:0 24px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .logo{display:flex;align-items:center;gap:11px}
-.nav-logo-img{height:36px;width:auto;display:block}
+.nav-logo-img{height:40px;width:auto;display:block;object-fit:contain;vertical-align:middle}
 .nav-right{display:flex;align-items:center;gap:10px}
 .nav-home{font-size:13px;color:var(--t3);padding:8px 14px;border-radius:var(--r1);transition:all .2s}
 .nav-home:hover{color:var(--t1);background:var(--b1)}
@@ -282,7 +282,7 @@ footer a:hover{color:var(--t1)}
 <nav>
   <div class="nav-inner">
     <a href="/" class="logo" aria-label="ENERSIA — Página inicial">
-      <img src="/assets/brand/enersia-logo-principal-FINAL.png" alt="ENERSIA" class="nav-logo-img">
+      <img src="/assets/images/enersia-logo-header-transparent.png" alt="ENERSIA" class="nav-logo-img">
     </a>
     <div class="nav-right">
       <a href="/" class="nav-home">← Início</a>
@@ -490,7 +490,7 @@ footer a:hover{color:var(--t1)}
   <div class="chat-window" id="chatWin">
     <div class="chat-header">
       <div class="chat-av">
-        <img src="/assets/brand/enersia-karol-avatar.png" alt="KAROL">
+        <img src="/assets/images/enersia-karol-avatar.png" alt="KAROL">
       </div>
       <div>
         <div class="chat-name">KAROL</div>
@@ -501,7 +501,7 @@ footer a:hover{color:var(--t1)}
     <div class="chat-msgs" id="chatMsgs">
       <div class="cmsg">
         <div class="msg-av">
-          <img src="/assets/brand/enersia-karol-avatar.png" alt="KAROL">
+          <img src="/assets/images/enersia-karol-avatar.png" alt="KAROL">
         </div>
         <div class="bubble bot">Olá! Sou a <strong>KAROL</strong>.<br><br>Está a analisar a sua fatura? Envie-a acima e a IA trata de tudo em 60 segundos — <strong>grátis</strong>.<br><br>Posso ajudar com alguma dúvida?</div>
       </div>
@@ -522,7 +522,7 @@ footer a:hover{color:var(--t1)}
   <div style="position:relative;display:inline-block">
     <div class="fab-badge" id="fabBadge">1</div>
     <div class="fab" onclick="toggleChat()" title="Falar com KAROL">
-      <img src="/assets/brand/enersia-karol-avatar.png" alt="KAROL">
+      <img src="/assets/images/enersia-karol-avatar.png" alt="KAROL">
     </div>
   </div>
 </div>
@@ -1113,7 +1113,7 @@ function buildKarolSys(p) {
     };
   } catch (_) {}
 })();
-const MINI_IMG = '<img src="/assets/brand/enersia-karol-avatar.png" alt="KAROL" style="width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:center top">';
+const MINI_IMG = '<img src="/assets/images/enersia-karol-avatar.png" alt="KAROL" style="width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:center top">';
 
 function toggleChat() {
   chatOpen = !chatOpen;
