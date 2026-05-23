@@ -217,11 +217,34 @@ jobs:
                   zip_data = fetch(csv_url, timeout=60)
                   print(f"ZIP descarregado: {len(zip_data)} bytes")
 
-                  # 3. Extrair CSVs
+                  # 3. Extrair CSVs — detecção dinâmica de paths dentro do ZIP
                   zf = zipfile.ZipFile(io.BytesIO(zip_data))
-                  cond_raw = zf.read("csv/CondComerciais.csv").decode("utf-8-sig", errors="replace")
-                  prec_raw = zf.read("csv/Precos_ELEGN.csv").decode("utf-8-sig", errors="replace")
-                  print(f"CSVs extraídos: CondComerciais={len(cond_raw)} chars, Precos={len(prec_raw)} chars")
+                  nomes = zf.namelist()
+                  print(f"Ficheiros no ZIP: {nomes}")
+
+                  def encontrar_csv(padrao):
+                      """Encontra ficheiro no ZIP cujo nome (sem pasta) contém `padrao` (case-insensitive)."""
+                      candidatos = [n for n in nomes
+                                    if padrao.lower() in n.lower().split("/")[-1]
+                                    and n.lower().endswith(".csv")]
+                      print(f"  Padrão '{padrao}': candidatos={candidatos}")
+                      if not candidatos:
+                          raise RuntimeError(
+                              f"Ficheiro com '{padrao}' não encontrado no ZIP. "
+                              f"Ficheiros disponíveis: {nomes}"
+                          )
+                      escolhido = candidatos[0]
+                      if len(candidatos) > 1:
+                          print(f"  Múltiplos candidatos — a usar: {escolhido}")
+                      else:
+                          print(f"  A usar: {escolhido}")
+                      return escolhido
+
+                  cond_path = encontrar_csv("CondComerciais")
+                  prec_path = encontrar_csv("Precos_ELEGN")
+                  cond_raw = zf.read(cond_path).decode("utf-8-sig", errors="replace")
+                  prec_raw = zf.read(prec_path).decode("utf-8-sig", errors="replace")
+                  print(f"CSVs extraídos: {cond_path}={len(cond_raw)} chars, {prec_path}={len(prec_raw)} chars")
 
                   # 4. Extrair preços
                   print("\nA extrair preços...")
