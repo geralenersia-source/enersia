@@ -22,58 +22,53 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Instalar dependências
-        run: |
-          pip install --quiet playwright
-          playwright install chromium --with-deps
-
-      - name: Scrape preços ERSE
+      - name: Atualizar preços via CSV oficial ERSE
         id: scrape
         run: |
           python3 <<'PYEOF'
-          import asyncio, json, re, os, sys, unicodedata
+          """
+          Extrai preços de eletricidade do ZIP CSV oficial publicado pela ERSE em:
+            simuladorprecos.erse.pt/config/Settings.json -> csvPath -> ZIP
+          Dois ficheiros dentro do ZIP:
+            CondComerciais.csv  — metadados das ofertas (segmento, tipo, URL)
+            Precos_ELEGN.csv    — preços por oferta/potência/contagem
+          """
+          import csv, io, json, os, re, sys, unicodedata, urllib.request, zipfile
           from datetime import datetime, timezone
           from pathlib import Path
-          from playwright.async_api import async_playwright
 
           PRECOS_FILE = Path("precos.json")
-          URL = "https://www.erse.pt/consumidores/eletricidade/comparador-de-comercializadores/"
-          PRICE_MIN = 0.08
-          PRICE_MAX = 0.35
+          SETTINGS_URL = "https://simuladorprecos.erse.pt/config/Settings.json"
+          PRICE_MIN, PRICE_MAX = 0.08, 0.35
 
-          # Chaves internas → variantes de nome esperadas na página ERSE
-          MAPA = {
-              "edp":       ["edp comercial", "edp sv", "edp"],
-              "galp":      ["galp energia", "galp power", "galp"],
-              "golden":    ["goldenergy", "golden energy", "golden"],
-              "coop":      ["coopernico", "coopérnico", "cooperativa"],
-              "plenitude": ["plenitude", "eni gas", "eni"],
-              "iber":      ["iberdrola"],
-              "repsol":    ["repsol"],
-              "endesa":    ["endesa"],
+          # Código COM -> chave interna ENERSIA
+          # Verificado em 2026-05-23: EDPC=EDP(particulares), GALP=Galp, GOLD=Goldenergy,
+          # COOP=Coopernico, ENIPLENITUDE=Plenitude/ENI, IBD=Iberdrola, REPSOL=Repsol, END=Endesa
+          MAPA_COM = {
+              "edp":       ["EDPC"],
+              "galp":      ["GALP"],
+              "golden":    ["GOLD"],
+              "coop":      ["COOP"],
+              "plenitude": ["ENIPLENITUDE"],
+              "iber":      ["IBD"],
+              "repsol":    ["REPSOL"],
+              "endesa":    ["END"],
           }
+          CHAVES = list(MAPA_COM.keys())
 
-          def normalizar(texto):
-              nfkd = unicodedata.normalize("NFKD", str(texto))
-              return "".join(c for c in nfkd if not unicodedata.combining(c)).lower().strip()
+          # Potências domésticas por ordem de preferência (kVA)
+          POTS_PREF = [6.9, 3.45, 4.6, 5.75, 10.35, 13.8]
 
-          def corresponde(nome_pagina, variantes):
-              n = normalizar(nome_pagina)
-              return any(v in n or n in v for v in variantes)
+          def fetch(url, timeout=30):
+              url_enc = url.replace(" ", "%20")
+              req = urllib.request.Request(
+                  url_enc,
+                  headers={"User-Agent": "ENERSIA-price-updater/2.0 (github-actions)"}
+              )
+              with urllib.request.urlopen(req, timeout=timeout) as r:
+                  return r.read()
 
-          def extrair_preco(texto):
-              texto = str(texto).replace(",", ".").strip()
-              m = re.search(r"(\d+\.\d+)", texto)
-              if not m:
-                  return None
-              valor = float(m.group(1))
-              if valor > 1:          # cêntimos → euros (ex: 14.56 → 0.1456)
-                  valor = valor / 100
-              if PRICE_MIN <= valor <= PRICE_MAX:
-                  return f"{valor:.4f}"
-              return None
-
-          def ler_precos_atuais():
+          def ler_precos_anteriores():
               if PRECOS_FILE.exists():
                   try:
                       return json.loads(PRECOS_FILE.read_text(encoding="utf-8"))
@@ -81,161 +76,202 @@ jobs:
                       pass
               return {}
 
-          def percorrer_json(obj, candidatos):
-              if isinstance(obj, dict):
-                  nome = preco = None
-                  for k, v in obj.items():
-                      kl = k.lower()
-                      if any(x in kl for x in ["nome", "name", "comerci", "operador", "empresa"]):
-                          if isinstance(v, str):
-                              nome = v
-                      if any(x in kl for x in ["prec", "valor", "tarif", "kwh", "custo"]):
-                          if isinstance(v, (int, float, str)):
-                              preco = str(v)
-                  if nome and preco:
-                      candidatos.append((nome, preco))
-                  for v in obj.values():
-                      percorrer_json(v, candidatos)
-              elif isinstance(obj, list):
-                  for item in obj:
-                      percorrer_json(item, candidatos)
+          def validar_preco(val_str):
+              """Converte string de preco (virgula ou ponto) para float validado. None se invalido."""
+              try:
+                  v = float(str(val_str).replace(",", ".").strip())
+                  if v > 1:          # cêntimos → euros (14,56 -> 0.1456)
+                      v /= 100
+                  if PRICE_MIN <= v <= PRICE_MAX:
+                      return v
+              except Exception:
+                  pass
+              return None
 
-          def extrair_de_json(dados, fonte="API"):
-              precos = {}
-              candidatos = []
-              percorrer_json(dados, candidatos)
-              for nome, preco_str in candidatos:
-                  p = extrair_preco(preco_str)
-                  if p:
-                      for chave, variantes in MAPA.items():
-                          if corresponde(nome, variantes) and chave not in precos:
-                              precos[chave] = p
-                              print(f"  [{fonte}] {chave}: {p} ({nome})")
-              return precos
+          def extrair_precos(cond_raw, prec_raw):
+              """
+              Retorna dict {chave_enersia: preco_float} com o melhor preco por empresa.
 
-          def extrair_de_html(html):
-              precos = {}
-              texto = re.sub(r"<[^>]+>", " ", html)
-              texto = re.sub(r"\s+", " ", texto)
-              # Dividir em segmentos de ~200 chars para pesquisa localizada
-              segmentos = [texto[i:i+300] for i in range(0, len(texto), 150)]
-              for seg in segmentos:
-                  for chave, variantes in MAPA.items():
-                      if chave in precos:
+              Estratégia:
+                Fase 1: ofertas residenciais (Segmento != Ndom), eletricidade, preço FIXO (sem OMIE).
+                Fase 2 (fallback): ofertas residenciais, qualquer tipo de preço.
+                Fase 3 (último recurso): qualquer segmento, qualquer tipo de preço.
+              Em cada fase: Contagem=1 (simples) > Contagem=2 (bi-horária), pot=6.9 > outras.
+              Preço representativo:
+                Contagem=1 -> TV (tarifa variável simples)
+                Contagem=2 -> 0.30 * TV + 0.70 * TVV  (ponderação residencial típica)
+              """
+
+              def classificar_ofertas(segmento_ok, omie_ok):
+                  """Retorna set de COD_Proposta que passam no filtro."""
+                  validas = set()
+                  reader = csv.DictReader(io.StringIO(cond_raw), delimiter=";")
+                  for row in reader:
+                      if row.get("Fornecimento", "").strip() != "ELE":
                           continue
-                      if any(v in normalizar(seg) for v in variantes):
-                          m = re.search(
-                              r"(\d[\d,\.]+)\s*(?:€/kWh|eur/kwh|€\s*/\s*kwh|ct/kwh|cêntimos)",
-                              seg, re.IGNORECASE
-                          )
-                          if m:
-                              p = extrair_preco(m.group(1))
-                              if p:
-                                  precos[chave] = p
-                                  print(f"  [HTML] {chave}: {p}")
+                      seg = row.get("Segmento", "").strip()
+                      if not segmento_ok and seg == "Ndom":
+                          continue
+                      txerse = row.get("TxTERSE", "").lower()
+                      if not omie_ok and ("omie" in txerse or "mercado spot" in txerse):
+                          continue
+                      validas.add(row.get("COD_Proposta", "").strip())
+                  return validas
 
-              # JSON embutido em <script> tags
-              for bloco in re.findall(r"<script[^>]*>(.*?)</script>", html, re.DOTALL):
-                  for match in re.finditer(r"(\{[^<]{30,}\})", bloco):
-                      try:
-                          obj = json.loads(match.group(1))
-                          mais = extrair_de_json(obj, "SCRIPT")
-                          for k, v in mais.items():
-                              if k not in precos:
-                                  precos[k] = v
-                      except Exception:
-                          pass
-              return precos
+              def calcular_precos(ofertas_validas):
+                  """Dado um conjunto de COD_Proposta válidos, retorna melhor preço por chave."""
+                  # Acumular (preco_representativo, pot, contagem) por COM
+                  candidatos = {}  # com -> list of (preco, pot, contagem)
 
-          async def main():
+                  reader = csv.DictReader(io.StringIO(prec_raw), delimiter=";")
+                  for row in reader:
+                      com = row.get("COM", "").strip()
+                      cod_prop = row.get("COD_Proposta", "").strip()
+                      if cod_prop not in ofertas_validas:
+                          continue
+                      pot_v = validar_preco(row.get("Pot_Cont", "0"))
+                      if pot_v is None:
+                          continue
+                      contagem = row.get("Contagem", "").strip()
+                      tv = validar_preco(row.get("TV|TVFV|TVP", ""))
+                      tvv = validar_preco(row.get("TVV|TVC", ""))
+
+                      if contagem == "1" and tv is not None:
+                          preco = tv
+                      elif contagem == "2" and tv is not None and tvv is not None:
+                          preco = 0.30 * tv + 0.70 * tvv
+                      elif contagem == "2" and tv is not None:
+                          preco = tv
+                      elif tvv is not None:
+                          preco = tvv
+                      else:
+                          continue
+
+                      if not (PRICE_MIN <= preco <= PRICE_MAX):
+                          continue
+
+                      if com not in candidatos:
+                          candidatos[com] = []
+                      candidatos[com].append((preco, pot_v, contagem))
+
+                  # Para cada chave ENERSIA, escolher melhor preço
+                  resultado = {}
+                  for chave, codigos in MAPA_COM.items():
+                      melhor = None
+                      for cod in codigos:
+                          entradas = candidatos.get(cod, [])
+                          if not entradas:
+                              continue
+                          # Ordenar: Contagem=1 primeiro, depois pot preferida, depois menor preço
+                          def sort_key(e):
+                              preco, pot, cont = e
+                              cont_ord = 0 if cont == "1" else 1
+                              pot_ord = POTS_PREF.index(pot) if pot in POTS_PREF else 99
+                              return (cont_ord, pot_ord, preco)
+                          entradas_sorted = sorted(entradas, key=sort_key)
+                          preco_escolhido = entradas_sorted[0][0]
+                          if melhor is None or preco_escolhido < melhor:
+                              melhor = preco_escolhido
+                      if melhor is not None:
+                          resultado[chave] = melhor
+                  return resultado
+
+              # Percorrer 3 fases progressivamente mais permissivas.
+              # Por fase, preencher apenas as chaves ainda em falta — as já encontradas
+              # em fases anteriores (mais restritas) têm prioridade.
+              resultado = {}
+              for fase, (seg_ok, omie_ok) in enumerate([
+                  (False, False),   # Fase 1: residencial + preço fixo
+                  (False, True),    # Fase 2: residencial + qualquer preço (inclui OMIE)
+                  (True,  True),    # Fase 3: qualquer segmento + qualquer preço
+              ], start=1):
+                  em_falta = [c for c in CHAVES if c not in resultado]
+                  if not em_falta:
+                      break
+                  validas = classificar_ofertas(seg_ok, omie_ok)
+                  print(f"  Fase {fase}: {len(validas)} ofertas válidas | em falta: {em_falta}")
+                  mais = calcular_precos(validas)
+                  for k, v in mais.items():
+                      if k not in resultado:   # não sobrescrever resultado de fase mais restrita
+                          resultado[k] = v
+                  print(f"  Fase {fase}: encontrados agora: {list(mais.keys())} | total: {list(resultado.keys())}")
+
+              return resultado
+
+          def main():
               github_output = os.environ.get("GITHUB_OUTPUT", "/dev/null")
-              precos_atuais = ler_precos_atuais()
-              chaves_dados = list(MAPA.keys())
-              precos_prev = {k: str(precos_atuais[k]) for k in chaves_dados if k in precos_atuais}
-              print(f"Preços anteriores: {precos_prev}")
-
-              encontrados = {}
-              erro_msg = ""
+              precos_prev = ler_precos_anteriores()
+              print(f"Preços anteriores: { {k: precos_prev.get(k) for k in CHAVES} }")
 
               try:
-                  print(f"\nA aceder: {URL}")
-                  dados_api_capturados = {}
+                  # 1. Obter URL do CSV mais recente
+                  print(f"\nA obter Settings.json de {SETTINGS_URL}")
+                  settings = json.loads(fetch(SETTINGS_URL))
+                  csv_url = settings.get("csvPath", "")
+                  if not csv_url:
+                      raise RuntimeError("csvPath não encontrado no Settings.json")
+                  print(f"CSV URL: {csv_url}")
 
-                  async with async_playwright() as pw:
-                      browser = await pw.chromium.launch(args=["--no-sandbox", "--disable-dev-shm-usage"])
-                      context = await browser.new_context(
-                          locale="pt-PT",
-                          user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
-                      )
-                      page = await context.new_page()
+                  # 2. Descarregar ZIP
+                  print("A descarregar ZIP...")
+                  zip_data = fetch(csv_url, timeout=60)
+                  print(f"ZIP descarregado: {len(zip_data)} bytes")
 
-                      async def capturar(resp):
-                          ct = resp.headers.get("content-type", "")
-                          if "json" in ct and resp.status == 200:
-                              ul = resp.url.lower()
-                              if any(k in ul for k in ["prec", "tarif", "comerci", "ofert", "compar", "erse"]):
-                                  try:
-                                      dados_api_capturados[resp.url] = await resp.json()
-                                      print(f"  API: {resp.url}")
-                                  except Exception:
-                                      pass
+                  # 3. Extrair CSVs
+                  zf = zipfile.ZipFile(io.BytesIO(zip_data))
+                  cond_raw = zf.read("csv/CondComerciais.csv").decode("utf-8-sig", errors="replace")
+                  prec_raw = zf.read("csv/Precos_ELEGN.csv").decode("utf-8-sig", errors="replace")
+                  print(f"CSVs extraídos: CondComerciais={len(cond_raw)} chars, Precos={len(prec_raw)} chars")
 
-                      page.on("response", capturar)
-                      try:
-                          await page.goto(URL, wait_until="networkidle", timeout=90000)
-                      except Exception as e:
-                          print(f"  Aviso goto: {e}")
-                      await page.wait_for_timeout(8000)
-                      html = await page.content()
-                      await browser.close()
-
-                  # Tentar APIs capturadas primeiro
-                  for dados in dados_api_capturados.values():
-                      mais = extrair_de_json(dados, "API")
-                      for k, v in mais.items():
-                          if k not in encontrados:
-                              encontrados[k] = v
-
-                  # Fallback HTML
-                  if len(encontrados) < 3:
-                      mais_html = extrair_de_html(html)
-                      for k, v in mais_html.items():
-                          if k not in encontrados:
-                              encontrados[k] = v
-
-                  print(f"\nTotal encontrado: {len(encontrados)} comercializadoras: {list(encontrados.keys())}")
-
-                  if not encontrados:
-                      raise RuntimeError("Nenhum preço extraído — estrutura HTML pode ter mudado")
+                  # 4. Extrair preços
+                  print("\nA extrair preços...")
+                  encontrados = extrair_precos(cond_raw, prec_raw)
 
               except Exception as e:
-                  erro_msg = str(e)
+                  erro_msg = str(e)[:300]
                   print(f"\nERRO: {erro_msg}", file=sys.stderr)
                   with open(github_output, "a") as f:
                       f.write("sucesso=false\n")
-                      f.write(f"erro={erro_msg[:200]}\n")
+                      f.write(f"erro={erro_msg}\n")
                       f.write("alterado=false\n")
                       f.write("resumo=\n")
-                  sys.exit(0)  # Job não falha — Telegram notifica o erro
+                  sys.exit(0)
 
-              # Merge: novo se encontrado e válido, manter anterior caso contrário
+              # 5. Merge: usar novo se encontrado e válido, manter anterior se não
               precos_finais = {}
-              for chave in chaves_dados:
+              for chave in CHAVES:
                   if chave in encontrados:
-                      precos_finais[chave] = encontrados[chave]
-                  elif chave in precos_prev:
-                      precos_finais[chave] = precos_prev[chave]
-                      print(f"  MANTIDO (não encontrado): {chave} = {precos_prev[chave]}")
+                      precos_finais[chave] = f"{encontrados[chave]:.4f}"
+                  elif chave in precos_prev and str(precos_prev[chave]).replace(".", "").replace(",", "").isdigit():
+                      precos_finais[chave] = str(precos_prev[chave])
+                      print(f"  MANTIDO (sem dados novos): {chave} = {precos_finais[chave]}")
                   else:
-                      print(f"  AVISO: sem preço para {chave} e sem anterior")
+                      print(f"  AVISO: sem preço para {chave}")
 
+              if not precos_finais:
+                  erro_msg = "Nenhum preço extraído e nenhum anterior disponível"
+                  print(f"\nERRO: {erro_msg}", file=sys.stderr)
+                  with open(github_output, "a") as f:
+                      f.write("sucesso=false\n")
+                      f.write(f"erro={erro_msg}\n")
+                      f.write("alterado=false\n")
+                      f.write("resumo=\n")
+                  sys.exit(0)
+
+              # Log dos preços encontrados
+              print("\n--- Preços finais ---")
+              for k, v in precos_finais.items():
+                  origem = "NOVO" if k in encontrados else "MANTIDO"
+                  print(f"  {k:<12}: {v}  [{origem}]")
+
+              # 6. Construir JSON de saída
               agora = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
               resultado = {**precos_finais, "ultima_atualizacao": agora, "fonte": "ERSE"}
               json_novo = json.dumps(resultado, ensure_ascii=False, indent=2)
 
-              # Verificar se os preços mudaram (ignorar metadados)
+              # 7. Verificar se houve alteração real nos preços
               def so_precos(d):
-                  return {k: v for k, v in d.items() if k not in ("ultima_atualizacao", "fonte")}
+                  return {k: str(v) for k, v in d.items() if k not in ("ultima_atualizacao", "fonte")}
 
               alterado = True
               if PRECOS_FILE.exists():
@@ -257,7 +293,7 @@ jobs:
                   f.write("erro=\n")
                   f.write(f"resumo={resumo}\n")
 
-          asyncio.run(main())
+          main()
           PYEOF
 
       - name: Commit e push (apenas se alterado)
@@ -266,7 +302,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add precos.json
-          git commit -m "feat: GitHub Actions — preços ERSE actualizados automaticamente às 07:00"
+          git commit -m "fix: scraping ERSE via interceção API JSON"
           git push
 
       - name: Telegram — sucesso
@@ -283,11 +319,11 @@ jobs:
             EMOJI="ℹ️"; ESTADO="Preços sem alteração — sem commit"
           fi
           DATA=$(date -u '+%Y-%m-%d %H:%M UTC')
-          LINHAS=$(echo "$RESUMO" | tr '|' '\n' | sed 's/ //g' | sed 's/:/: /g')
-          MSG="$EMOJI ENERSIA — $ESTADO
-          📅 $DATA
+          LINHAS=$(echo "$RESUMO" | tr '|' '\n' | sed 's/^ //;s/ $//' | sed 's/:/: /')
+          MSG="${EMOJI} ENERSIA — ${ESTADO}
+          📅 ${DATA}
 
-          $LINHAS"
+          ${LINHAS}"
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -d "chat_id=${TELEGRAM_CHAT_ID}" \
             --data-urlencode "text=${MSG}" > /dev/null
@@ -301,9 +337,9 @@ jobs:
         run: |
           DATA=$(date -u '+%Y-%m-%d %H:%M UTC')
           MSG="❌ ENERSIA — Falha ao actualizar preços ERSE
-          📅 $DATA
+          📅 ${DATA}
 
-          Erro: $ERRO
+          Erro: ${ERRO}
 
           ⚠️ precos.json anterior mantido sem alterações."
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
