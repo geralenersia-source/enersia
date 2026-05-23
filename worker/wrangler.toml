@@ -1,0 +1,16 @@
+name = "enersia-proxy"
+main = "worker.js"
+compatibility_date = "2024-09-23"
+
+# NUNCA coloque a API key aqui.
+# Configure o secret com:
+#   wrangler secret put ANTHROPIC_API_KEY
+#
+# Para publicar:
+#   wrangler deploy
+#
+# Para testar localmente (sem secret real, use .dev.vars):
+#   wrangler dev
+#
+# Após publicar, a URL do Worker será exibida no terminal.
+# Copie-a e substitua WORKER_URL em analisar-fatura.html.

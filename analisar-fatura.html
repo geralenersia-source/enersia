@@ -39,10 +39,7 @@ button{font-family:inherit;cursor:pointer;border:none;outline:none}
 nav{position:sticky;top:0;z-index:200;height:66px;display:flex;align-items:center;background:rgba(7,11,20,.92);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-bottom:1px solid var(--b1)}
 .nav-inner{max-width:960px;margin:0 auto;padding:0 24px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .logo{display:flex;align-items:center;gap:11px}
-.logo-mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.logo-mark svg{width:19px;height:19px}
-.logo-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:900;letter-spacing:-.5px}
-.logo-name span{color:var(--blue)}
+.nav-logo-img{height:36px;width:auto;display:block}
 .nav-right{display:flex;align-items:center;gap:10px}
 .nav-home{font-size:13px;color:var(--t3);padding:8px 14px;border-radius:var(--r1);transition:all .2s}
 .nav-home:hover{color:var(--t1);background:var(--b1)}
@@ -284,11 +281,8 @@ footer a:hover{color:var(--t1)}
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <a href="/" class="logo">
-      <div class="logo-mark">
-        <svg viewBox="0 0 24 24" fill="none"><polygon points="14,2 5,13 12,13 10,22 19,11 12,11" fill="white"/></svg>
-      </div>
-      <div class="logo-name">ENER<span>SIA</span></div>
+    <a href="/" class="logo" aria-label="ENERSIA — Página inicial">
+      <img src="/assets/brand/enersia-logo-principal-FINAL.png" alt="ENERSIA" class="nav-logo-img">
     </a>
     <div class="nav-right">
       <a href="/" class="nav-home">← Início</a>
@@ -1028,60 +1022,7 @@ function normalizarMime(t) {
 
 // ---- KAROL CHAT ----
 let chatOpen = false, hist = [];
-const KAROL_SYS = `És a KAROL, Consultora Energética Digital da ENERSIA. Respondes SEMPRE em português europeu (PT-PT). Tom profissional, directo e acolhedor. Sem gíria brasileira. ENERSIA: plataforma independente. NÃO somos a ERSE nem uma comercializadora. {{PRECOS_DINAMICOS}} LINKS: análise: https://www.enersia.pt/analisar-fatura.html | WhatsApp: https://wa.me/351910322702. REGRAS: máx 3 parágrafos. UMA pergunta de cada vez. Nota sempre: Valores baseados em dados públicos ERSE.`;
-// ---- PRECOS DINAMICOS (precos.json -> KAROL) ----
-const PRECOS_FALLBACK = {
-  endesa:    "0.1362",
-  iber:      "0.1382",
-  golden:    "0.1399",
-  edp:       "0.1420",
-  plenitude: "0.1433",
-  repsol:    "0.1480",
-  galp:      "0.1542"
-};
-
-async function carregarPrecosEnergia() {
-  try {
-    const response = await fetch(
-      'https://raw.githubusercontent.com/geralenersia-source/enersia/main/precos.json?t=' + Date.now(),
-      { cache: 'no-store' }
-    );
-    if (!response.ok) throw new Error('Falha ao carregar precos.json');
-    const data = await response.json();
-    const c = data.comercializadoras || {};
-    return {
-      endesa:    String((c['Endesa']       || {}).preco_kwh || PRECOS_FALLBACK.endesa),
-      iber:      String((c['Iberdrola']    || {}).preco_kwh || PRECOS_FALLBACK.iber),
-      golden:    String((c['Goldenergy']   || {}).preco_kwh || PRECOS_FALLBACK.golden),
-      edp:       String((c['EDP']          || {}).preco_kwh || PRECOS_FALLBACK.edp),
-      plenitude: String((c['Plenitude']    || {}).preco_kwh || PRECOS_FALLBACK.plenitude),
-      repsol:    String((c['Repsol']       || {}).preco_kwh || PRECOS_FALLBACK.repsol),
-      galp:      String((c['Galp Energia'] || {}).preco_kwh || PRECOS_FALLBACK.galp)
-    };
-  } catch (error) {
-    console.warn('[ENERSIA] A usar precos fallback:', error);
-    return PRECOS_FALLBACK;
-  }
-}
-
-function gerarPrecosTexto(precos) {
-  return [
-    'Dados ERSE 2026 (actualizados):',
-    'Endesa '       + precos.endesa    + '€/kWh',
-    'Iberdrola '    + precos.iber      + '€/kWh',
-    'Goldenergy '   + precos.golden    + '€/kWh',
-    'EDP '          + precos.edp       + '€/kWh',
-    'Plenitude '    + precos.plenitude + '€/kWh',
-    'Repsol '       + precos.repsol    + '€/kWh',
-    'Galp '         + precos.galp      + '€/kWh'
-  ].join(' | ');
-}
-
-async function construirSystemPromptKarol() {
-  const precos = await carregarPrecosEnergia();
-  const precosTexto = gerarPrecosTexto(precos);
-  return KAROL_SYS.replace('{{PRECOS_DINAMICOS}}', precosTexto);
-}
+const KAROL_SYS = `És a KAROL, Consultora Energética Digital da ENERSIA. Respondes SEMPRE em português europeu (PT-PT). Tom profissional, directo e acolhedor. Sem gíria brasileira. ENERSIA: plataforma independente. NÃO somos a ERSE nem uma comercializadora. Dados ERSE 2026: Endesa 0.1362€/kWh | Iberdrola 0.1382€/kWh | Goldenergy 0.1399€/kWh | EDP 0.1420€/kWh | Plenitude 0.1433€/kWh | Repsol 0.1480€/kWh | Galp 0.1542€/kWh. LINKS: análise: https://www.enersia.pt/analisar-fatura.html | WhatsApp: https://wa.me/351910322702. REGRAS: máx 3 parágrafos. UMA pergunta de cada vez. Nota sempre: Valores baseados em dados públicos ERSE.`;
 const MINI_IMG = '<img src="/assets/brand/enersia-karol-avatar.png" alt="KAROL" style="width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:center top">';
 
 function toggleChat() {
@@ -1114,7 +1055,7 @@ async function getReply(msg) {
     const r = await fetch(WORKER_URL + '/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: hist, system: await construirSystemPromptKarol() })
+      body: JSON.stringify({ messages: hist, system: KAROL_SYS })
     });
     const data = await r.json();
     const reply = data.reply || 'Erro técnico. WhatsApp: wa.me/351910322702';
@@ -1136,3 +1077,4 @@ async function sendQ(msg) {
 
 </body>
 </html>
+

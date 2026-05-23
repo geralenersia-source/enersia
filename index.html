@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <!-- saved from url=(0045)file:///C:/Users/User/Downloads/index_24.html -->
 <html lang="pt-PT"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
@@ -126,20 +126,7 @@ nav{
   width:100%;display:flex;align-items:center;gap:40px;
 }
 .logo{display:flex;align-items:center;gap:13px;flex-shrink:0}
-.logo-mark{
-  width:42px;height:42px;border-radius:13px;
-  background:linear-gradient(135deg,var(--blue),var(--cyan));
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;animation:pulse-glow 4s ease-in-out infinite;
-}
-.logo-mark svg{width:22px;height:22px}
-.logo-text-wrap{display:flex;flex-direction:column;gap:1px}
-.logo-name{
-  font-family:'Syne',sans-serif;font-size:22px;
-  font-weight:900;letter-spacing:-.5px;color:var(--t1);line-height:1;
-}
-.logo-name span{color:var(--blue)}
-.logo-tag{font-size:9px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.nav-logo-img{height:36px;width:auto;display:block}
 .nav-links{display:flex;align-items:center;gap:8px;list-style:none;flex:1;justify-content:center}
 .nav-links a{
   font-size:13.5px;font-weight:400;color:var(--t3);
@@ -1297,16 +1284,8 @@ html, body {
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <a class="logo" href="https://www.enersia.pt/#">
-      <div class="logo-mark">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="14,2 5,14 12,14 10,22 19,10 12,10" fill="white"></polygon>
-        </svg>
-      </div>
-      <div class="logo-text-wrap">
-        <div class="logo-name">ENER<span>SIA</span></div>
-        <div class="logo-tag">Gestor Energético com IA</div>
-      </div>
+    <a class="logo" href="https://www.enersia.pt/#" aria-label="ENERSIA — Página inicial">
+      <img src="/assets/brand/enersia-logo-principal-FINAL.png" alt="ENERSIA" class="nav-logo-img">
     </a>
     <ul class="nav-links">
       <li><a href="https://www.enersia.pt/#analisar">Analisar fatura</a></li>
