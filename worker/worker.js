@@ -93,7 +93,7 @@ async function carregarPrecosEnergia() {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 5000);
   try {
-    const url = `https://raw.githubusercontent.com/geralenersia-source/enersia/principal/precos.json?t=${Date.now()}`;
+    const url = `https://raw.githubusercontent.com/geralenersia-source/enersia/main/precos.json?t=${Date.now()}`;
     const res = await fetch(url, { signal: controller.signal });
     clearTimeout(timeoutId);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -331,7 +331,7 @@ async function handlePrecosUpdate(request, env, cors) {
 
   const OWNER  = 'geralenersia-source';
   const REPO   = 'enersia';
-  const BRANCH = 'principal';
+  const BRANCH = 'main';
   const FILE   = 'precos.json';
   const GH_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
 
