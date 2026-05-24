@@ -50,7 +50,7 @@ function getCORSHeaders(request) {
   return {
     'Access-Control-Allow-Origin': allowOrigin,
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Secret',
     'Access-Control-Max-Age': '86400',
     'Vary': 'Origin',
   };
@@ -282,18 +282,31 @@ async function handleChat(request, env, cors) {
 // ---------------------------------------------------------------------------
 
 async function handlePrecosUpdate(request, env, cors) {
+  // ── 1. Validar secret do pedido ──────────────────────────────────────────
   const secret = request.headers.get('X-Secret') ?? '';
   if (!env.ENERSIA_UPDATE_SECRET || secret !== env.ENERSIA_UPDATE_SECRET) {
     return jsonResponse({ error: 'Não autorizado.' }, 401, cors);
   }
 
+  // ── 2. Validar GITHUB_TOKEN ───────────────────────────────────────────────
+  if (!env.GITHUB_TOKEN) {
+    console.error('[ENERSIA/precos-update] GITHUB_TOKEN ausente no Worker secret');
+    return jsonResponse({
+      error: 'GITHUB_TOKEN ausente no Worker secret.',
+      hint:  'Execute: wrangler secret put GITHUB_TOKEN',
+    }, 500, cors);
+  }
+
+  // ── 3. Ler payload ────────────────────────────────────────────────────────
   let payload;
   try {
     payload = await request.json();
   } catch (_) {
     return jsonResponse({ error: 'Payload inválido (JSON esperado).' }, 400, cors);
   }
+  console.log('[ENERSIA/precos-update] Payload recebido:', JSON.stringify(payload));
 
+  // ── 4. Validar campos obrigatórios ────────────────────────────────────────
   const campos = ['edp', 'galp', 'golden', 'coop', 'plenitude', 'iber', 'repsol', 'endesa'];
   for (const campo of campos) {
     const val = parseFloat(payload[campo]);
@@ -302,6 +315,7 @@ async function handlePrecosUpdate(request, env, cors) {
     }
   }
 
+  // ── 5. Construir novo conteúdo ────────────────────────────────────────────
   const novoConteudo = {
     edp:       String(payload.edp),
     galp:      String(payload.galp),
@@ -321,59 +335,102 @@ async function handlePrecosUpdate(request, env, cors) {
   const FILE   = 'precos.json';
   const GH_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
 
+  // Headers conformes à GitHub REST API v2022-11-28
+  const ghHeaders = {
+    'Authorization':        `Bearer ${env.GITHUB_TOKEN}`,
+    'Accept':               'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+    'User-Agent':           'ENERSIA-Worker',
+  };
+
+  // ── 6. Obter SHA actual do ficheiro ───────────────────────────────────────
+  console.log(`[ENERSIA/precos-update] GET SHA — repo: ${OWNER}/${REPO}, path: ${FILE}, branch: ${BRANCH}`);
+
   let sha;
   try {
-    const res = await fetch(`${GH_API}?ref=${BRANCH}`, {
-      headers: {
-        'Authorization': `Bearer ${env.GITHUB_TOKEN}`,
-        'Accept':        'application/vnd.github.v3+json',
-        'User-Agent':    'enersia-worker/1.0',
-      },
-    });
+    const res = await fetch(`${GH_API}?ref=${BRANCH}`, { headers: ghHeaders });
+    console.log(`[ENERSIA/precos-update] GitHub GET status: ${res.status}`);
+
     if (!res.ok) {
-      const err = await res.text().catch(() => '');
-      console.error('[ENERSIA] GitHub GET error:', res.status, err.substring(0, 200));
-      return jsonResponse({ error: 'Erro ao obter SHA do GitHub.' }, 502, cors);
+      let ghErr = {};
+      try { ghErr = await res.json(); } catch (_) {}
+      console.error(`[ENERSIA/precos-update] GitHub GET falhou ${res.status}:`, JSON.stringify(ghErr));
+      return jsonResponse({
+        error:             'Erro ao obter SHA do GitHub.',
+        github_status:     res.status,
+        github_message:    ghErr.message          || 'sem mensagem',
+        documentation_url: ghErr.documentation_url || null,
+        repo:              `${OWNER}/${REPO}`,
+        path_usado:        FILE,
+        branch_usada:      BRANCH,
+        hint: res.status === 401
+          ? 'Token inválido ou expirado — verifique GITHUB_TOKEN.'
+          : res.status === 403
+          ? 'Token sem permissão Contents:Write no repo geralenersia-source/enersia.'
+          : res.status === 404
+          ? 'Repositório ou ficheiro não encontrado — verifique owner/repo/path/branch.'
+          : 'Consulte os logs do Worker (wrangler tail) para mais detalhes.',
+      }, 502, cors);
     }
+
     const ghFile = await res.json();
     sha = ghFile.sha;
+    console.log(`[ENERSIA/precos-update] SHA obtido: ${sha}`);
   } catch (e) {
-    console.error('[ENERSIA] GitHub GET fetch error:', e.message);
-    return jsonResponse({ error: 'Erro de rede ao contactar GitHub.' }, 502, cors);
+    console.error('[ENERSIA/precos-update] Erro de rede no GET:', e.message);
+    return jsonResponse({ error: 'Erro de rede ao contactar GitHub.', detail: e.message }, 502, cors);
   }
 
+  // ── 7. Actualizar ficheiro via PUT ────────────────────────────────────────
   const conteudoBase64 = btoa(JSON.stringify(novoConteudo, null, 2));
+  console.log(`[ENERSIA/precos-update] PUT precos.json — branch: ${BRANCH}, updatedAt: ${novoConteudo.updatedAt}`);
+
   try {
     const res = await fetch(GH_API, {
       method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${env.GITHUB_TOKEN}`,
-        'Accept':        'application/vnd.github.v3+json',
-        'Content-Type':  'application/json',
-        'User-Agent':    'enersia-worker/1.0',
-      },
+      headers: { ...ghHeaders, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        message: `chore: actualizar precos.json — ${novoConteudo.updatedAt.slice(0, 10)}`,
+        message: `chore: atualizar precos.json automaticamente — ${novoConteudo.updatedAt.slice(0, 10)}`,
         content: conteudoBase64,
         sha,
         branch: BRANCH,
       }),
     });
+    console.log(`[ENERSIA/precos-update] GitHub PUT status: ${res.status}`);
+
     if (!res.ok) {
-      const err = await res.text().catch(() => '');
-      console.error('[ENERSIA] GitHub PUT error:', res.status, err.substring(0, 200));
-      return jsonResponse({ error: 'Erro ao actualizar precos.json no GitHub.' }, 502, cors);
+      let ghErr = {};
+      try { ghErr = await res.json(); } catch (_) {}
+      console.error(`[ENERSIA/precos-update] GitHub PUT falhou ${res.status}:`, JSON.stringify(ghErr));
+      return jsonResponse({
+        error:             'Erro ao actualizar precos.json no GitHub.',
+        github_status:     res.status,
+        github_message:    ghErr.message          || 'sem mensagem',
+        documentation_url: ghErr.documentation_url || null,
+        repo:              `${OWNER}/${REPO}`,
+        path_usado:        FILE,
+        branch_usada:      BRANCH,
+        hint: res.status === 422
+          ? 'SHA desactualizado — conflito de concorrência, tente novamente.'
+          : res.status === 403
+          ? 'Token sem permissão Contents:Write no repo geralenersia-source/enersia.'
+          : 'Consulte os logs do Worker (wrangler tail) para mais detalhes.',
+      }, 502, cors);
     }
   } catch (e) {
-    console.error('[ENERSIA] GitHub PUT fetch error:', e.message);
-    return jsonResponse({ error: 'Erro de rede ao actualizar GitHub.' }, 502, cors);
+    console.error('[ENERSIA/precos-update] Erro de rede no PUT:', e.message);
+    return jsonResponse({ error: 'Erro de rede ao actualizar GitHub.', detail: e.message }, 502, cors);
   }
 
-  console.log('[ENERSIA] precos.json actualizado com sucesso:', novoConteudo.updatedAt);
+  // ── 8. Sucesso ────────────────────────────────────────────────────────────
+  console.log('[ENERSIA/precos-update] precos.json actualizado com sucesso:', novoConteudo.updatedAt);
   return jsonResponse({
-    ok: true,
-    message: 'precos.json actualizado com sucesso.',
+    ok:        true,
+    message:   'precos.json actualizado com sucesso.',
     updatedAt: novoConteudo.updatedAt,
+    repo:      `${OWNER}/${REPO}`,
+    branch:    BRANCH,
+    path:      FILE,
   }, 200, cors);
 }
 
