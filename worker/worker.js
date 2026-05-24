@@ -13,7 +13,11 @@
  *   wrangler secret put ANTHROPIC_API_KEY
  */
 
-const ALLOWED_ORIGINS = ['https://www.enersia.pt', 'https://enersia.pt'];
+const ALLOWED_ORIGINS = [
+  'https://enersia.pt',
+  'https://www.enersia.pt',
+  'https://enersia.pages.dev',
+];
 
 const PRECOS_FALLBACK = {
   edp:      '0.1817',
@@ -40,12 +44,13 @@ const ANALISE_PROMPT_BASE =
 // CORS
 // ---------------------------------------------------------------------------
 
-function getCORSHeaders(origin) {
-  if (!ALLOWED_ORIGINS.includes(origin)) return {};
+function getCORSHeaders(request) {
+  const origin = request.headers.get('Origin') ?? '';
+  const allowOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
   return {
-    'Access-Control-Allow-Origin': origin,
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Origin': allowOrigin,
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Max-Age': '86400',
     'Vary': 'Origin',
   };
@@ -278,8 +283,7 @@ async function handleChat(request, env, cors) {
 
 export default {
   async fetch(request, env) {
-    const origin = request.headers.get('Origin') ?? '';
-    const cors = getCORSHeaders(origin);
+    const cors = getCORSHeaders(request);
 
     // Preflight CORS
     if (request.method === 'OPTIONS') {
