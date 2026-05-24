@@ -20,14 +20,14 @@ const ALLOWED_ORIGINS = [
 ];
 
 const PRECOS_FALLBACK = {
-  edp:      '0.1817',
-  galp:     '0.1284',
-  golden:   '0.1256',
-  coop:     '0.1267',
-  plenitude:'0.1289',
-  iber:     '0.1298',
-  repsol:   '0.1302',
-  endesa:   '0.1310',
+  edp:      '0.1337',
+  galp:     '0.1443',
+  golden:   '0.1290',
+  coop:     '0.1779',
+  plenitude:'0.1383',
+  iber:     '0.1382',
+  repsol:   '0.1424',
+  endesa:   '0.1438',
 };
 
 const ANALISE_PROMPT_BASE =
@@ -278,6 +278,106 @@ async function handleChat(request, env, cors) {
 }
 
 // ---------------------------------------------------------------------------
+// Route: POST /precos-update
+// ---------------------------------------------------------------------------
+
+async function handlePrecosUpdate(request, env, cors) {
+  const secret = request.headers.get('X-Secret') ?? '';
+  if (!env.ENERSIA_UPDATE_SECRET || secret !== env.ENERSIA_UPDATE_SECRET) {
+    return jsonResponse({ error: 'Não autorizado.' }, 401, cors);
+  }
+
+  let payload;
+  try {
+    payload = await request.json();
+  } catch (_) {
+    return jsonResponse({ error: 'Payload inválido (JSON esperado).' }, 400, cors);
+  }
+
+  const campos = ['edp', 'galp', 'golden', 'coop', 'plenitude', 'iber', 'repsol', 'endesa'];
+  for (const campo of campos) {
+    const val = parseFloat(payload[campo]);
+    if (!payload[campo] || isNaN(val) || val <= 0) {
+      return jsonResponse({ error: `Campo inválido ou em falta: ${campo}` }, 400, cors);
+    }
+  }
+
+  const novoConteudo = {
+    edp:       String(payload.edp),
+    galp:      String(payload.galp),
+    golden:    String(payload.golden),
+    coop:      String(payload.coop),
+    plenitude: String(payload.plenitude),
+    iber:      String(payload.iber),
+    repsol:    String(payload.repsol),
+    endesa:    String(payload.endesa),
+    updatedAt: new Date().toISOString(),
+    source:    payload.source || 'ERSE / atualização automática ENERSIA',
+  };
+
+  const OWNER  = 'geralenersia-source';
+  const REPO   = 'enersia';
+  const BRANCH = 'principal';
+  const FILE   = 'precos.json';
+  const GH_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
+
+  let sha;
+  try {
+    const res = await fetch(`${GH_API}?ref=${BRANCH}`, {
+      headers: {
+        'Authorization': `Bearer ${env.GITHUB_TOKEN}`,
+        'Accept':        'application/vnd.github.v3+json',
+        'User-Agent':    'enersia-worker/1.0',
+      },
+    });
+    if (!res.ok) {
+      const err = await res.text().catch(() => '');
+      console.error('[ENERSIA] GitHub GET error:', res.status, err.substring(0, 200));
+      return jsonResponse({ error: 'Erro ao obter SHA do GitHub.' }, 502, cors);
+    }
+    const ghFile = await res.json();
+    sha = ghFile.sha;
+  } catch (e) {
+    console.error('[ENERSIA] GitHub GET fetch error:', e.message);
+    return jsonResponse({ error: 'Erro de rede ao contactar GitHub.' }, 502, cors);
+  }
+
+  const conteudoBase64 = btoa(JSON.stringify(novoConteudo, null, 2));
+  try {
+    const res = await fetch(GH_API, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${env.GITHUB_TOKEN}`,
+        'Accept':        'application/vnd.github.v3+json',
+        'Content-Type':  'application/json',
+        'User-Agent':    'enersia-worker/1.0',
+      },
+      body: JSON.stringify({
+        message: `chore: actualizar precos.json — ${novoConteudo.updatedAt.slice(0, 10)}`,
+        content: conteudoBase64,
+        sha,
+        branch: BRANCH,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.text().catch(() => '');
+      console.error('[ENERSIA] GitHub PUT error:', res.status, err.substring(0, 200));
+      return jsonResponse({ error: 'Erro ao actualizar precos.json no GitHub.' }, 502, cors);
+    }
+  } catch (e) {
+    console.error('[ENERSIA] GitHub PUT fetch error:', e.message);
+    return jsonResponse({ error: 'Erro de rede ao actualizar GitHub.' }, 502, cors);
+  }
+
+  console.log('[ENERSIA] precos.json actualizado com sucesso:', novoConteudo.updatedAt);
+  return jsonResponse({
+    ok: true,
+    message: 'precos.json actualizado com sucesso.',
+    updatedAt: novoConteudo.updatedAt,
+  }, 200, cors);
+}
+
+// ---------------------------------------------------------------------------
 // Entry point
 // ---------------------------------------------------------------------------
 
@@ -297,8 +397,9 @@ export default {
 
     const { pathname } = new URL(request.url);
 
-    if (pathname === '/analisar') return handleAnalisar(request, env, cors);
-    if (pathname === '/chat')     return handleChat(request, env, cors);
+    if (pathname === '/analisar')       return handleAnalisar(request, env, cors);
+    if (pathname === '/chat')           return handleChat(request, env, cors);
+    if (pathname === '/precos-update')  return handlePrecosUpdate(request, env, cors);
 
     return jsonResponse({ error: 'Rota não encontrada.' }, 404, cors);
   },

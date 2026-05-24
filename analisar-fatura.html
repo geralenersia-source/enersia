@@ -1037,8 +1037,8 @@ function normalizarMime(t) {
 let chatOpen = false, hist = [];
 // Preços KAROL — fallback inline, actualizados por precos.json ao carregar
 const _PRECOS_FB = {
-  edp:'0.1817', galp:'0.1284', golden:'0.1256', coop:'0.1267',
-  plenitude:'0.1289', iber:'0.1298', repsol:'0.1302', endesa:'0.1310'
+  edp:'0.1337', galp:'0.1443', golden:'0.1290', coop:'0.1779',
+  plenitude:'0.1383', iber:'0.1382', repsol:'0.1424', endesa:'0.1438'
 };
 let karolPrecos = {..._PRECOS_FB};
 
@@ -1054,9 +1054,7 @@ IDENTIDADE E TOM
 OBJECTIVO PRINCIPAL
 Criar curiosidade sobre o valor real da fatura. Gerar percepção subtil de perda. Conduzir naturalmente à análise da fatura. Nunca pressionar — a conversa deve parecer consultiva.
 
-PREÇOS ACTUAIS (€/kWh — fonte ERSE, actualizados automaticamente):
-EDP: {{edp}} | Galp: {{galp}} | Goldenergy: {{golden}} | Coopérnico: {{coop}} | Plenitude: {{plenitude}} | Iberdrola: {{iber}} | Repsol: {{repsol}} | Endesa: {{endesa}}
-REGRA: usa EXCLUSIVAMENTE estes preços. Nunca uses preços memorizados.
+REGRA DE PREÇOS: Nunca listar ou mencionar preços por kWh de comercializadoras. Quando perguntarem por preços, responde sempre: "Para te dar uma comparação real e personalizada, preciso analisar a tua fatura. Envia-a aqui em cima e em segundos vês exactamente quanto podes poupar."
 
 LINKS DISPONÍVEIS:
 • Análise de fatura: https://enersia.pt/analisar-fatura
@@ -1082,12 +1080,12 @@ MICRO COPY — respostas humanizadas:
 
 EXEMPLOS DE RESPOSTA:
 "Pago muito de luz" → "Isso acontece mais do que imaginas 😅\nPosso comparar a tua situação com as tarifas actuais e perceber onde está a perda.\nÉ para casa ou para empresa?"
-"Quanto custa a Goldenergy?" → "Neste momento está em €{{golden}}/kWh — uma das mais competitivas do mercado.\nQual é a tua comercializadora actual?"
+"Quanto custa a Goldenergy?" → "Para te dar uma comparação real e personalizada, preciso analisar a tua fatura. Envia-a aqui em cima e em segundos vês exactamente quanto podes poupar."
 "O que é bi-horário?" → "É uma tarifa com preços diferentes consoante a hora — mais barato à noite e fins-de-semana.\nPara quem usa máquinas à noite ou carrega veículo eléctrico, pode fazer sentido.\nQueres saber se é boa opção para ti?"
 "Tenho um restaurante" → "Restaurantes com funcionamento contínuo costumam ter bastante margem de optimização 😊\nO teu consumo mensal fica acima ou abaixo de €500?"
 
 REGRAS ABSOLUTAS:
-• Nunca inventar preços
+• Nunca dar preços específicos de comercializadoras — sempre redirecionar para análise da fatura
 • Nunca prometer poupanças sem ver fatura
 • Se não souberes: https://wa.me/351910322702
 • Sempre PT-PT`;
