@@ -4,13 +4,17 @@
  * A ANTHROPIC_API_KEY nunca fica exposta no frontend.
  *
  * Rotas:
- *   POST /analisar  — análise de fatura (PDF ou imagem) com Claude
- *   POST /chat      — chat KAROL com Claude Haiku
- *   OPTIONS *       — preflight CORS
+ *   POST /analisar       — análise de fatura (PDF ou imagem) com Claude
+ *   POST /chat           — chat KAROL com Claude Haiku
+ *   POST /precos-update  — atualizar precos.json no GitHub
+ *   OPTIONS *            — preflight CORS
  *
  * Deploy:
  *   wrangler deploy
  *   wrangler secret put ANTHROPIC_API_KEY
+ *   wrangler secret put BREVO_API_KEY
+ *   wrangler secret put ENERSIA_UPDATE_SECRET
+ *   wrangler secret put GITHUB_TOKEN
  */
 
 const ALLOWED_ORIGINS = [
@@ -134,6 +138,65 @@ function gerarPrecosTexto(precos) {
 }
 
 // ---------------------------------------------------------------------------
+// Brevo — email de confirmação (fire-and-forget)
+// ---------------------------------------------------------------------------
+
+async function enviarEmailConfirmacao(env, nome, email, resultado) {
+  if (!env.BREVO_API_KEY) return; // secret não configurado — ignorar silenciosamente
+  try {
+    const comercializadora = resultado?.comercializadora ?? 'desconhecida';
+    const poupancaRaw = resultado?.poupanca_mensal_estimada;
+    const poupanca = poupancaRaw != null ? Number(poupancaRaw).toFixed(2) : '–';
+    const recomendacao = resultado?.recomendacao_comercializador ?? '–';
+
+    const htmlContent =
+      '<div style="font-family:Arial,sans-serif;background:#070B14;color:#F5F7FA;padding:32px;border-radius:12px;max-width:560px;margin:0 auto">' +
+      '<div style="text-align:center;margin-bottom:24px">' +
+      '<span style="font-size:22px;font-weight:700;color:#4F7CFF">ENERSIA</span>' +
+      '</div>' +
+      '<h2 style="color:#F5F7FA;font-size:18px;margin:0 0 16px">Olá ' + nome + ', a tua análise está pronta ⚡</h2>' +
+      '<p style="color:#94A3B8;font-size:14px;line-height:1.6;margin:0 0 20px">' +
+      'Analisámos a tua fatura da <strong style="color:#F5F7FA">' + comercializadora + '</strong> e encontrámos oportunidades de poupança.' +
+      '</p>' +
+      '<div style="background:rgba(79,124,255,.10);border:1px solid rgba(79,124,255,.25);border-radius:10px;padding:16px 20px;margin-bottom:20px">' +
+      '<table style="width:100%;border-collapse:collapse">' +
+      '<tr><td style="color:#94A3B8;font-size:13px">Poupança mensal estimada</td>' +
+      '<td style="text-align:right;color:#00E59B;font-weight:700;font-size:16px">' + poupanca + ' €/mês</td></tr>' +
+      '<tr><td style="color:#94A3B8;font-size:13px;padding-top:8px">Comercializadora recomendada</td>' +
+      '<td style="text-align:right;color:#4F7CFF;font-weight:600;font-size:14px;padding-top:8px">' + recomendacao + '</td></tr>' +
+      '</table>' +
+      '</div>' +
+      '<p style="color:#64748B;font-size:12px;line-height:1.5;margin:0 0 16px">' +
+      'Acede a <a href="https://enersia.pt/analisar-fatura" style="color:#4F7CFF;text-decoration:none">enersia.pt</a> para consultar os detalhes completos.' +
+      '</p>' +
+      '<hr style="border:none;border-top:1px solid rgba(255,255,255,.08);margin:20px 0">' +
+      '<p style="color:#475569;font-size:11px;text-align:center;margin:0">' +
+      'ENERSIA · Plataforma independente de análise energética · ' +
+      '<a href="https://enersia.pt/privacidade" style="color:#475569">Privacidade</a>' +
+      '</p>' +
+      '</div>';
+
+    const payload = {
+      sender: { name: 'ENERSIA', email: 'geral@enersia.pt' },
+      to: [{ email: email, name: nome }],
+      subject: '⚡ A tua análise ENERSIA está pronta — poupança estimada: ' + poupanca + ' €/mês',
+      htmlContent: htmlContent,
+    };
+
+    await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': env.BREVO_API_KEY,
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch (e) {
+    console.error('Brevo email error (non-blocking):', e.message);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Route: POST /analisar
 // ---------------------------------------------------------------------------
 
@@ -225,6 +288,9 @@ async function handleAnalisar(request, env, cors) {
       cors
     );
   }
+
+  // Email de confirmação — fire-and-forget (não bloqueia a resposta)
+  enviarEmailConfirmacao(env, nome, email, resultado).catch(() => {});
 
   return jsonResponse(resultado, 200, cors);
 }

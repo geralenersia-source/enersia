@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Política de Privacidade — ENERSIA</title>
+<meta name="description" content="Política de Privacidade da ENERSIA — como recolhemos, usamos e protegemos os seus dados pessoais em conformidade com o RGPD.">
+<meta name="theme-color" content="#070B14">
+<link rel="icon" type="image/png" href="/assets/brand/enersia-favicon.png">
+<link rel="apple-touch-icon" href="/assets/brand/enersia-favicon.png">
+<link rel="canonical" href="https://www.enersia.pt/privacidade">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#070B14;--bg1:#0D111B;--bg2:#111827;
+  --s1:#161D2E;--s2:#1B2435;
+  --blue:#4F7CFF;--blue2:#3B65E8;
+  --cyan:#00C2FF;--green:#00E59B;--amber:#fb923c;--red:#ff6060;
+  --t1:#F5F7FA;--t2:#94A3B8;--t3:#64748B;--t4:#475569;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg0);color:var(--t1);font-family:'DM Sans',system-ui,sans-serif;line-height:1.7;min-height:100vh}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(7,11,20,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.06);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:Syne,sans-serif;font-weight:900;font-size:18px;color:var(--t1);text-decoration:none;letter-spacing:-.02em}
+.nav-logo span{color:var(--cyan)}
+.nav-back{font-size:13px;color:var(--t3);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s}
+.nav-back:hover{color:var(--blue)}
+.nav-back svg{flex-shrink:0}
+
+/* HERO */
+.hero{padding:64px 24px 40px;max-width:760px;margin:0 auto}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);background:rgba(0,194,255,.08);border:1px solid rgba(0,194,255,.18);padding:5px 12px;border-radius:99px;margin-bottom:20px}
+.hero h1{font-family:Syne,sans-serif;font-weight:900;font-size:clamp(28px,5vw,42px);line-height:1.15;letter-spacing:-.03em;margin-bottom:16px}
+.hero-sub{font-size:15px;color:var(--t3);max-width:560px}
+.hero-updated{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t4);margin-top:16px}
+
+/* CONTENT */
+.content{max-width:760px;margin:0 auto;padding:0 24px 80px}
+.section{margin-bottom:40px;padding:28px 32px;background:var(--bg1);border:1px solid rgba(255,255,255,.06);border-radius:16px}
+.section h2{font-family:Syne,sans-serif;font-weight:800;font-size:18px;color:var(--t1);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.section h2 .sec-num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;background:rgba(79,124,255,.15);color:var(--blue);font-size:12px;font-weight:800;flex-shrink:0}
+.section p{font-size:14px;color:var(--t2);margin-bottom:12px}
+.section p:last-child{margin-bottom:0}
+.section ul,.section ol{padding-left:20px;margin-bottom:12px}
+.section li{font-size:14px;color:var(--t2);margin-bottom:6px;line-height:1.6}
+.section a{color:var(--blue);text-decoration:none}
+.section a:hover{text-decoration:underline}
+.highlight-box{background:rgba(79,124,255,.07);border:1px solid rgba(79,124,255,.2);border-radius:10px;padding:14px 18px;margin-top:12px}
+.highlight-box p{margin:0;font-size:13px;color:var(--t2)}
+.table-wrap{overflow-x:auto;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:rgba(255,255,255,.05);color:var(--t2);font-weight:600;padding:10px 14px;text-align:left;border-bottom:1px solid rgba(255,255,255,.08)}
+td{padding:10px 14px;color:var(--t2);border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(0,229,155,.1);color:var(--green);margin-right:4px}
+.tag.blue{background:rgba(79,124,255,.12);color:var(--blue)}
+.tag.amber{background:rgba(251,146,60,.1);color:var(--amber)}
+
+/* CONTACT CARD */
+.contact-card{background:rgba(79,124,255,.06);border:1px solid rgba(79,124,255,.2);border-radius:12px;padding:20px 24px;margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.contact-row{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--t2)}
+.contact-row svg{flex-shrink:0;color:var(--blue)}
+.contact-row a{color:var(--blue);text-decoration:none}
+.contact-row a:hover{text-decoration:underline}
+
+/* FOOTER */
+footer{background:var(--bg1);border-top:1px solid rgba(255,255,255,.06);padding:28px 24px;margin-top:0}
+.footer-inner{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-links-row{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links-row a{font-size:12px;color:var(--t4);text-decoration:none;transition:color .2s}
+.footer-links-row a:hover{color:var(--blue)}
+.footer-copy-text{font-size:12px;color:var(--t4)}
+
+@media(max-width:600px){
+  .section{padding:20px 18px}
+  .hero{padding:40px 16px 28px}
+  .content{padding:0 16px 60px}
+  nav{padding:0 16px}
+  .footer-inner{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="/">ENER<span>SIA</span></a>
+  <a class="nav-back" href="/">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Voltar ao início
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    RGPD Conforme
+  </div>
+  <h1>Política de Privacidade</h1>
+  <p class="hero-sub">Explicamos como recolhemos, utilizamos e protegemos os seus dados pessoais em total conformidade com o Regulamento Geral sobre a Proteção de Dados (RGPD).</p>
+  <div class="hero-updated">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Última atualização: Maio 2026
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <div class="section">
+    <h2><span class="sec-num">1</span>Responsável pelo Tratamento</h2>
+    <p>O responsável pelo tratamento dos seus dados pessoais é:</p>
+    <div class="contact-card">
+      <div class="contact-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span><strong style="color:var(--t1)">Johnnyson Diego Gonçalves da Silva</strong> — ENERSIA</span>
+      </div>
+      <div class="contact-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <a href="mailto:geral@enersia.pt">geral@enersia.pt</a>
+      </div>
+      <div class="contact-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.59 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.36a16 16 0 0 0 5.63 5.63l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16.92z"/></svg>
+        <a href="tel:+351910322702">+351 910 322 702</a>
+      </div>
+      <div class="contact-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <a href="https://www.enersia.pt" target="_blank">www.enersia.pt</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">2</span>Dados Pessoais Recolhidos</h2>
+    <p>A ENERSIA recolhe os seguintes dados quando utiliza a nossa plataforma:</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Dados</th><th>Quando</th></tr>
+        <tr><td>Nome completo</td><td>Formulário de análise de fatura</td></tr>
+        <tr><td>Endereço de email</td><td>Formulário de análise de fatura</td></tr>
+        <tr><td>Número de telefone</td><td>Formulário de análise de fatura</td></tr>
+        <tr><td>Distrito de residência</td><td>Formulário de análise de fatura</td></tr>
+        <tr><td>Tipo de cliente (família/empresa)</td><td>Formulário de análise de fatura</td></tr>
+        <tr><td>Ficheiro da fatura energética (PDF ou imagem)</td><td>Upload para análise</td></tr>
+        <tr><td>Dados de consumo energético</td><td>Extraídos da fatura pela IA</td></tr>
+        <tr><td>Comercializadora atual e tipo de tarifa</td><td>Extraídos da fatura pela IA</td></tr>
+        <tr><td>Mensagens enviadas pelo chat KAROL</td><td>Interação com o assistente IA</td></tr>
+      </table>
+    </div>
+    <div class="highlight-box">
+      <p>A fatura energética é transmitida de forma segura e encriptada. Não é armazenada permanentemente nos nossos servidores — é processada em memória para análise e eliminada em até 30 dias, salvo obrigação legal ou pedido expresso do utilizador.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">3</span>Finalidade do Tratamento</h2>
+    <p>Os seus dados são utilizados exclusivamente para:</p>
+    <ul>
+      <li><strong style="color:var(--t1)">Análise energética personalizada</strong> — extração de informação da fatura e cálculo de poupança potencial</li>
+      <li><strong style="color:var(--t1)">Comparação de tarifas</strong> — comparação com as tarifas das comercializadoras certificadas ERSE disponíveis no mercado português</li>
+      <li><strong style="color:var(--t1)">Contacto comercial solicitado</strong> — resposta a pedidos de contacto que o utilizador inicie expressamente</li>
+      <li><strong style="color:var(--t1)">Melhoria da plataforma</strong> — análise agregada e anonimizada de padrões de utilização</li>
+      <li><strong style="color:var(--t1)">Segurança e prevenção de fraude</strong> — deteção de utilizações abusivas ou atividade maliciosa</li>
+    </ul>
+    <p>Os seus dados <strong style="color:var(--t1)">não são vendidos, partilhados comercialmente ou utilizados para fins publicitários de terceiros</strong>.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">4</span>Base Legal</h2>
+    <p>O tratamento dos seus dados pessoais assenta nas seguintes bases legais (artigo 6.º do RGPD):</p>
+    <ul>
+      <li><span class="tag">Consentimento</span> — consentimento explícito do titular, prestado no momento do upload da fatura e da submissão do formulário</li>
+      <li><span class="tag blue">Interesse legítimo</span> — segurança da plataforma e prevenção de utilizações abusivas ou fraudulentas</li>
+    </ul>
+    <p>Pode retirar o seu consentimento a qualquer momento, sem que isso prejudique a licitude do tratamento efetuado anteriormente.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">5</span>Utilização de Inteligência Artificial</h2>
+    <p>A ENERSIA utiliza sistemas de Inteligência Artificial para processar e analisar as faturas energéticas submetidas pelos utilizadores.</p>
+    <div class="highlight-box">
+      <p>Os dados da fatura — incluindo o ficheiro em si e os dados extraídos — podem ser transmitidos a sistemas de IA (nomeadamente a API Claude da Anthropic) para extração de informação energética, cálculo de consumo e geração de análise personalizada. Este processamento ocorre em tempo real e de forma encriptada.</p>
+    </div>
+    <p style="margin-top:12px">Não é tomada nenhuma decisão totalmente automatizada com efeitos jurídicos ou significativos sobre o utilizador. A análise gerada é uma estimativa informativa, não um aconselhamento financeiro vinculativo.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">6</span>Subcontratantes e Transferências</h2>
+    <p>Para operar tecnicamente a plataforma, a ENERSIA utiliza os seguintes subcontratantes, <strong style="color:var(--t1)">exclusivamente para fins técnicos de operação da plataforma</strong>:</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Subcontratante</th><th>Finalidade técnica</th><th>Localização</th></tr>
+        <tr><td>Cloudflare</td><td>Alojamento do site (Cloudflare Pages) e proxy seguro (Workers)</td><td>EUA / UE</td></tr>
+        <tr><td>Anthropic / Claude AI</td><td>Processamento de IA para análise de faturas e assistente KAROL</td><td>EUA</td></tr>
+        <tr><td>Make.com</td><td>Automação de processos internos (notificações, armazenamento)</td><td>UE</td></tr>
+        <tr><td>Google Drive / Sheets / Gmail</td><td>Armazenamento temporário de análises e notificações internas</td><td>EUA / UE</td></tr>
+        <tr><td>Telegram Bot API</td><td>Notificações internas à equipa ENERSIA</td><td>EUA / UE</td></tr>
+        <tr><td>Brevo (ex-Sendinblue)</td><td>Envio de email de confirmação ao utilizador</td><td>UE (França)</td></tr>
+        <tr><td>GitHub</td><td>Alojamento de código-fonte e atualização de preços</td><td>EUA</td></tr>
+      </table>
+    </div>
+    <p style="margin-top:12px">As transferências para países terceiros (EUA) são efetuadas com base em cláusulas contratuais-tipo aprovadas pela Comissão Europeia ou outras salvaguardas adequadas.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">7</span>Prazos de Conservação</h2>
+    <ul>
+      <li><strong style="color:var(--t1)">Faturas energéticas (ficheiros)</strong> — eliminadas em até <span class="tag">30 dias</span> após receção, salvo obrigação legal ou pedido expresso do utilizador</li>
+      <li><strong style="color:var(--t1)">Dados de análise (resultados agregados)</strong> — conservados pelo prazo estritamente necessário para operação da plataforma</li>
+      <li><strong style="color:var(--t1)">Dados de contacto</strong> — conservados enquanto houver relação ativa com o utilizador ou até pedido de apagamento</li>
+      <li><strong style="color:var(--t1)">Registos de segurança (logs)</strong> — conservados pelo prazo mínimo necessário para fins de segurança, não superior a 12 meses</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">8</span>Os Seus Direitos</h2>
+    <p>Nos termos do RGPD, tem os seguintes direitos relativamente aos seus dados pessoais:</p>
+    <ul>
+      <li><span class="tag blue">Acesso</span> — saber quais os dados que temos sobre si</li>
+      <li><span class="tag blue">Retificação</span> — corrigir dados incorretos ou incompletos</li>
+      <li><span class="tag blue">Apagamento</span> — solicitar a eliminação dos seus dados ("direito a ser esquecido")</li>
+      <li><span class="tag blue">Limitação</span> — limitar o tratamento dos seus dados em determinadas circunstâncias</li>
+      <li><span class="tag blue">Oposição</span> — opor-se ao tratamento baseado em interesse legítimo</li>
+      <li><span class="tag blue">Portabilidade</span> — receber os seus dados num formato estruturado e legível por máquina</li>
+      <li><span class="tag blue">Retirada de consentimento</span> — retirar o consentimento a qualquer momento, sem efeito retroativo</li>
+    </ul>
+    <p>Para exercer qualquer destes direitos, contacte-nos:</p>
+    <div class="contact-card">
+      <div class="contact-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <span>Email RGPD: <a href="mailto:geral@enersia.pt">geral@enersia.pt</a></span>
+      </div>
+      <div class="contact-row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.59 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.36a16 16 0 0 0 5.63 5.63l.9-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16.92z"/></svg>
+        <span>Telefone: <a href="tel:+351910322702">+351 910 322 702</a></span>
+      </div>
+    </div>
+    <p style="margin-top:14px">Responderemos ao seu pedido no prazo máximo de <strong style="color:var(--t1)">30 dias</strong> a contar da receção.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">9</span>Reclamação à CNPD</h2>
+    <p>Se considerar que o tratamento dos seus dados pessoais viola o RGPD, tem o direito de apresentar reclamação junto da autoridade de controlo competente em Portugal:</p>
+    <div class="highlight-box">
+      <p><strong style="color:var(--t1)">CNPD — Comissão Nacional de Proteção de Dados</strong><br>
+      Rua de São Bento, n.º 148-3.º — 1200-821 Lisboa<br>
+      <a href="https://www.cnpd.pt" target="_blank" rel="noopener">www.cnpd.pt</a> · geral@cnpd.pt</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">10</span>Segurança dos Dados</h2>
+    <p>A ENERSIA implementa medidas técnicas e organizacionais adequadas para proteger os seus dados pessoais contra acesso não autorizado, perda acidental, destruição ou divulgação, incluindo:</p>
+    <ul>
+      <li>Transmissão encriptada (HTTPS/TLS) em todas as comunicações</li>
+      <li>Proxy seguro via Cloudflare Workers — a chave da API de IA nunca é exposta ao browser</li>
+      <li>Acesso restrito aos dados apenas ao pessoal técnico autorizado</li>
+      <li>Monitorização de acessos e registos de segurança</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">11</span>Cookies</h2>
+    <p>O nosso site utiliza cookies para funcionamento essencial e melhoria da experiência. Consulte a nossa <a href="/cookies">Política de Cookies</a> para informação detalhada.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">12</span>Lei Aplicável</h2>
+    <p>A presente Política de Privacidade é regida pelo Regulamento (UE) 2016/679 (RGPD) e pela legislação portuguesa de proteção de dados, nomeadamente a Lei n.º 58/2019, de 8 de agosto.</p>
+    <p>Em caso de litígio, o foro competente é o tribunal da comarca de Braga, sem prejuízo de recurso à CNPD ou de mecanismos alternativos de resolução de litígios.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">13</span>Alterações a esta Política</h2>
+    <p>A ENERSIA reserva-se o direito de atualizar esta Política de Privacidade. Em caso de alterações materiais, notificaremos os utilizadores com conta ativa por email ou através de aviso no site. A versão em vigor é sempre a disponível nesta página.</p>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-links-row">
+      <a href="/">Início</a>
+      <a href="/termos">Termos de Uso</a>
+      <a href="/cookies">Cookies</a>
+      <a href="mailto:geral@enersia.pt">Contacto</a>
+    </div>
+    <span class="footer-copy-text">© 2026 ENERSIA · Todos os direitos reservados</span>
+  </div>
+</footer>
+
+<script src="/assets/js/rgpd-banner.js"></script>
+</body>
+</html>

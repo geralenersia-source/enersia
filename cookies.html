@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Política de Cookies — ENERSIA</title>
+<meta name="description" content="Política de Cookies da ENERSIA — informação sobre os cookies utilizados na plataforma e como gerir as suas preferências.">
+<meta name="theme-color" content="#070B14">
+<link rel="icon" type="image/png" href="/assets/brand/enersia-favicon.png">
+<link rel="apple-touch-icon" href="/assets/brand/enersia-favicon.png">
+<link rel="canonical" href="https://www.enersia.pt/cookies">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#070B14;--bg1:#0D111B;--bg2:#111827;
+  --s1:#161D2E;--s2:#1B2435;
+  --blue:#4F7CFF;--blue2:#3B65E8;
+  --cyan:#00C2FF;--green:#00E59B;--amber:#fb923c;--red:#ff6060;
+  --t1:#F5F7FA;--t2:#94A3B8;--t3:#64748B;--t4:#475569;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg0);color:var(--t1);font-family:'DM Sans',system-ui,sans-serif;line-height:1.7;min-height:100vh}
+nav{position:sticky;top:0;z-index:100;background:rgba(7,11,20,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.06);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:Syne,sans-serif;font-weight:900;font-size:18px;color:var(--t1);text-decoration:none;letter-spacing:-.02em}
+.nav-logo span{color:var(--cyan)}
+.nav-back{font-size:13px;color:var(--t3);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s}
+.nav-back:hover{color:var(--blue)}
+.hero{padding:64px 24px 40px;max-width:760px;margin:0 auto}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green);background:rgba(0,229,155,.08);border:1px solid rgba(0,229,155,.2);padding:5px 12px;border-radius:99px;margin-bottom:20px}
+.hero h1{font-family:Syne,sans-serif;font-weight:900;font-size:clamp(28px,5vw,42px);line-height:1.15;letter-spacing:-.03em;margin-bottom:16px}
+.hero-sub{font-size:15px;color:var(--t3);max-width:560px}
+.hero-updated{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t4);margin-top:16px}
+.content{max-width:760px;margin:0 auto;padding:0 24px 80px}
+.section{margin-bottom:40px;padding:28px 32px;background:var(--bg1);border:1px solid rgba(255,255,255,.06);border-radius:16px}
+.section h2{font-family:Syne,sans-serif;font-weight:800;font-size:18px;color:var(--t1);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.section h2 .sec-num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;background:rgba(0,229,155,.1);color:var(--green);font-size:12px;font-weight:800;flex-shrink:0}
+.section p{font-size:14px;color:var(--t2);margin-bottom:12px}
+.section p:last-child{margin-bottom:0}
+.section ul{padding-left:20px;margin-bottom:12px}
+.section li{font-size:14px;color:var(--t2);margin-bottom:6px;line-height:1.6}
+.section a{color:var(--blue);text-decoration:none}
+.section a:hover{text-decoration:underline}
+.highlight-box{background:rgba(0,229,155,.06);border:1px solid rgba(0,229,155,.18);border-radius:10px;padding:14px 18px;margin-top:12px}
+.highlight-box p{margin:0;font-size:13px;color:var(--t2)}
+.table-wrap{overflow-x:auto;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:rgba(255,255,255,.05);color:var(--t2);font-weight:600;padding:10px 14px;text-align:left;border-bottom:1px solid rgba(255,255,255,.08)}
+td{padding:10px 14px;color:var(--t2);border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(0,229,155,.1);color:var(--green);margin-right:4px}
+.tag.amber{background:rgba(251,146,60,.1);color:var(--amber)}
+.tag.blue{background:rgba(79,124,255,.12);color:var(--blue)}
+
+/* PREFERENCE PANEL */
+.pref-panel{background:var(--bg2);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:20px;margin-top:16px}
+.pref-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.pref-row:last-child{border-bottom:none}
+.pref-info{flex:1;padding-right:16px}
+.pref-info strong{font-size:14px;color:var(--t1);display:block;margin-bottom:3px}
+.pref-info span{font-size:12px;color:var(--t3)}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.1);border-radius:12px;transition:.3s}
+.toggle-slider::before{position:absolute;content:"";width:18px;height:18px;left:3px;bottom:3px;background:#94A3B8;border-radius:50%;transition:.3s}
+.toggle input:checked + .toggle-slider{background:var(--blue)}
+.toggle input:checked + .toggle-slider::before{transform:translateX(20px);background:#fff}
+.toggle input:disabled + .toggle-slider{opacity:.5;cursor:not-allowed}
+.pref-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.btn-pref{padding:10px 22px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',system-ui,sans-serif;transition:all .2s}
+.btn-save{background:var(--blue);color:#fff}
+.btn-save:hover{background:var(--blue2)}
+.btn-reject{background:transparent;color:var(--t3);border:1px solid rgba(255,255,255,.1)}
+.btn-reject:hover{color:var(--t1);background:rgba(255,255,255,.05)}
+
+footer{background:var(--bg1);border-top:1px solid rgba(255,255,255,.06);padding:28px 24px}
+.footer-inner{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-links-row{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links-row a{font-size:12px;color:var(--t4);text-decoration:none;transition:color .2s}
+.footer-links-row a:hover{color:var(--blue)}
+.footer-copy-text{font-size:12px;color:var(--t4)}
+.saved-notice{display:none;background:rgba(0,229,155,.1);border:1px solid rgba(0,229,155,.25);color:var(--green);border-radius:8px;padding:10px 16px;font-size:13px;margin-top:12px}
+
+@media(max-width:600px){.section{padding:20px 18px}.hero{padding:40px 16px 28px}.content{padding:0 16px 60px}nav{padding:0 16px}.footer-inner{flex-direction:column;align-items:flex-start}.pref-row{flex-direction:column;align-items:flex-start;gap:10px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">ENER<span>SIA</span></a>
+  <a class="nav-back" href="/">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Voltar ao início
+  </a>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Transparência Total
+  </div>
+  <h1>Política de Cookies</h1>
+  <p class="hero-sub">Informação clara sobre os cookies que utilizamos, para que servem e como pode gerir as suas preferências.</p>
+  <div class="hero-updated">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Última atualização: Maio 2026
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="section">
+    <h2><span class="sec-num">1</span>O Que São Cookies?</h2>
+    <p>Cookies são pequenos ficheiros de texto que um website guarda no seu browser quando o visita. Servem para recordar as suas preferências, manter sessões ativas e melhorar a experiência de navegação.</p>
+    <p>Pode controlar e/ou eliminar cookies como desejar — consulte a secção "Gerir Preferências" mais abaixo.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">2</span>Cookies que Utilizamos</h2>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Nome</th><th>Tipo</th><th>Duração</th><th>Finalidade</th></tr>
+        <tr>
+          <td><code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan)">enersia_cookie_consent</code></td>
+          <td><span class="tag">Essencial</span></td>
+          <td>1 ano</td>
+          <td>Guarda a sua preferência de cookies (aceitar/rejeitar) para não mostrar o banner em cada visita</td>
+        </tr>
+        <tr>
+          <td><code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan)">karol_opened</code></td>
+          <td><span class="tag">Funcional</span></td>
+          <td>Sessão</td>
+          <td>Controla se o assistente KAROL já foi aberto na sessão atual, para evitar abertura repetida</td>
+        </tr>
+        <tr>
+          <td><code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan)">k_af</code></td>
+          <td><span class="tag">Funcional</span></td>
+          <td>Sessão</td>
+          <td>Controla abertura do chat KAROL na página de análise de fatura</td>
+        </tr>
+        <tr>
+          <td><code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan)">karol_v2</code></td>
+          <td><span class="tag">Funcional</span></td>
+          <td>Sessão</td>
+          <td>Controla abertura do chat KAROL nas páginas de audiência (empresas, famílias, solar)</td>
+        </tr>
+      </table>
+    </div>
+    <div class="highlight-box">
+      <p>A ENERSIA <strong>não utiliza cookies analíticos ou de publicidade de terceiros</strong>. Não existe rastreio do utilizador para fins publicitários.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">3</span>Cookies de Terceiros</h2>
+    <p>Alguns serviços técnicos utilizados pela ENERSIA podem colocar os seus próprios cookies:</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Serviço</th><th>Tipo</th><th>Política</th></tr>
+        <tr>
+          <td>Cloudflare</td>
+          <td><span class="tag">Essencial</span></td>
+          <td><a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">cloudflare.com/privacypolicy</a></td>
+        </tr>
+        <tr>
+          <td>Google Fonts</td>
+          <td><span class="tag blue">Funcional</span></td>
+          <td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">4</span>Gerir as Suas Preferências</h2>
+    <p>Pode alterar as suas preferências de cookies a qualquer momento através do painel abaixo:</p>
+
+    <div class="pref-panel" id="prefPanel">
+      <div class="pref-row">
+        <div class="pref-info">
+          <strong>Cookies Essenciais</strong>
+          <span>Necessários para o funcionamento básico do site. Não podem ser desativados.</span>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" checked disabled>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="pref-row">
+        <div class="pref-info">
+          <strong>Cookies Funcionais</strong>
+          <span>Melhoram a experiência ao recordar preferências de sessão (ex: estado do chat KAROL).</span>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggleFunctional" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="pref-row">
+        <div class="pref-info">
+          <strong>Cookies Analíticos</strong>
+          <span>A ENERSIA não utiliza cookies analíticos de terceiros atualmente.</span>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggleAnalytics" disabled>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="pref-actions">
+        <button class="btn-pref btn-save" onclick="saveCookiePrefs()">Guardar preferências</button>
+        <button class="btn-pref btn-reject" onclick="rejectAllOptional()">Rejeitar opcionais</button>
+      </div>
+      <div class="saved-notice" id="savedNotice">✓ Preferências guardadas com sucesso.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">5</span>Como Eliminar Cookies no Browser</h2>
+    <p>Pode eliminar ou bloquear cookies diretamente nas definições do seu browser:</p>
+    <ul>
+      <li><strong style="color:var(--t1)">Chrome:</strong> Definições → Privacidade e segurança → Cookies e outros dados de sites</li>
+      <li><strong style="color:var(--t1)">Firefox:</strong> Definições → Privacidade &amp; Segurança → Cookies e dados de sites</li>
+      <li><strong style="color:var(--t1)">Safari:</strong> Preferências → Privacidade → Gerir dados do site</li>
+      <li><strong style="color:var(--t1)">Edge:</strong> Definições → Privacidade, pesquisa e serviços → Cookies</li>
+    </ul>
+    <div class="highlight-box">
+      <p>Nota: a desativação de cookies essenciais pode afetar o funcionamento correto da plataforma ENERSIA.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="sec-num">6</span>Contacto</h2>
+    <p>Para qualquer questão sobre a nossa utilização de cookies:</p>
+    <ul>
+      <li>Email: <a href="mailto:geral@enersia.pt">geral@enersia.pt</a></li>
+      <li>Consulte também a nossa <a href="/privacidade">Política de Privacidade</a></li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-links-row">
+      <a href="/">Início</a>
+      <a href="/privacidade">Privacidade</a>
+      <a href="/termos">Termos de Uso</a>
+      <a href="mailto:geral@enersia.pt">Contacto</a>
+    </div>
+    <span class="footer-copy-text">© 2026 ENERSIA · Todos os direitos reservados</span>
+  </div>
+</footer>
+
+<script>
+var LS_KEY = 'enersia_cookie_consent';
+
+function loadPrefs() {
+  var val = localStorage.getItem(LS_KEY);
+  if (val === 'essential') {
+    document.getElementById('toggleFunctional').checked = false;
+  }
+}
+
+function saveCookiePrefs() {
+  var functional = document.getElementById('toggleFunctional').checked;
+  localStorage.setItem(LS_KEY, functional ? 'all' : 'essential');
+  var notice = document.getElementById('savedNotice');
+  notice.style.display = 'block';
+  setTimeout(function() { notice.style.display = 'none'; }, 3000);
+}
+
+function rejectAllOptional() {
+  document.getElementById('toggleFunctional').checked = false;
+  localStorage.setItem(LS_KEY, 'essential');
+  var notice = document.getElementById('savedNotice');
+  notice.style.display = 'block';
+  setTimeout(function() { notice.style.display = 'none'; }, 3000);
+}
+
+loadPrefs();
+</script>
+<script src="/assets/js/rgpd-banner.js"></script>
+</body>
+</html>

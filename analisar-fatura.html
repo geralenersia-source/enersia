@@ -132,10 +132,26 @@ input[type=file]{display:none}
 .multi-converting{display:none;text-align:center;padding:8px 0;font-size:12px;color:var(--cyan);font-family:'JetBrains Mono',monospace;margin-top:8px;align-items:center;justify-content:center;gap:6px}
 
 /* BOTÃO ANALISAR */
-.btn-analisar{width:100%;padding:16px;border-radius:var(--r2);background:linear-gradient(135deg,var(--blue),#6b93ff);color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .25s;margin-top:20px;letter-spacing:-.01em}
+.btn-analisar{width:100%;padding:16px;border-radius:var(--r2);background:linear-gradient(135deg,var(--blue),#6b93ff);color:#fff;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .25s;margin-top:12px;letter-spacing:-.01em}
 .btn-analisar:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(79,124,255,.35)}
 .btn-analisar:disabled{background:var(--s2);color:var(--t4);cursor:not-allowed;transform:none}
 .btn-legal{text-align:center;font-size:11px;color:var(--t4);margin-top:12px;line-height:1.6}
+
+/* CONSENTIMENTO RGPD */
+.consent-box{margin-top:20px;padding:14px 16px;background:rgba(79,124,255,.06);border:1px solid rgba(79,124,255,.2);border-radius:10px}
+.consent-label{display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--t2);line-height:1.55}
+.consent-label input[type=checkbox]{margin-top:2px;flex-shrink:0;width:16px;height:16px;accent-color:var(--blue);cursor:pointer}
+.consent-label a{color:var(--blue);text-decoration:none}
+.consent-label a:hover{text-decoration:underline}
+.consent-warn{margin-top:8px;font-size:12px;color:var(--amber);display:flex;align-items:center;gap:6px}
+
+/* FOOTER */
+.af-footer{background:#0D111B;border-top:1px solid rgba(255,255,255,.06);padding:22px 24px;margin-top:40px}
+.af-footer-inner{max-width:540px;margin:0 auto;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center}
+.af-footer-links{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.af-footer-links a{font-size:12px;color:var(--t4);text-decoration:none;transition:color .2s}
+.af-footer-links a:hover{color:var(--blue)}
+.af-footer-copy{font-size:11px;color:var(--t4)}
 
 /* LOADING */
 .loading-card{display:none;text-align:center;padding:52px 28px}
@@ -433,11 +449,26 @@ footer a:hover{color:var(--t1)}
         <button class="file-remove" onclick="clearFile()" title="Remover">✕</button>
       </div>
 
+      <!-- CONSENTIMENTO RGPD -->
+      <div class="consent-box">
+        <label class="consent-label">
+          <input type="checkbox" id="consentCheck" onchange="updateAnalyzeBtn()">
+          <span>Li e aceito a <a href="/privacidade" target="_blank">Política de Privacidade</a> e os <a href="/termos" target="_blank">Termos de Uso</a>, e autorizo o tratamento da minha fatura para análise energética personalizada.</span>
+        </label>
+        <div class="consent-warn" id="consentWarn" style="display:none">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Por favor, aceite os termos para continuar.
+        </div>
+      </div>
+
       <button class="btn-analisar" id="btnAnalisar" disabled onclick="analisar()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         Analisar com IA — Gratuito
       </button>
-      <div class="btn-legal">Ao analisar, aceita os nossos <a href="/privacidade.html" style="color:var(--blue)">Termos de Privacidade</a>. Os seus dados são tratados com confidencialidade.</div>
+      <div class="btn-legal">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        As faturas enviadas são utilizadas apenas para análise energética e eliminadas em até 30 dias, salvo obrigação legal.
+      </div>
     </div>
   </div>
 
@@ -589,7 +620,7 @@ function handleFile(f) {
   document.getElementById('fileSelected').classList.add('show');
   dz.style.display = 'none';
   const reader = new FileReader();
-  reader.onload = e => { fileB64 = e.target.result.split(',')[1]; document.getElementById('btnAnalisar').disabled = false; };
+  reader.onload = e => { fileB64 = e.target.result.split(',')[1]; updateAnalyzeBtn(); };
   reader.readAsDataURL(f);
   clearErr();
 }
@@ -635,11 +666,13 @@ function handleMultipleFiles(files) {
     }
   }
   multiFiles = [...files];
+  // Para multi-imagem, criar um fileB64 temporário para a validação de consent
+  fileB64 = 'pending-multi';
   clearErr();
   dz.style.display = 'none';
   document.getElementById('fileSelected').classList.remove('show');
   showMultiPreview();
-  document.getElementById('btnAnalisar').disabled = false;
+  updateAnalyzeBtn();
 }
 
 function showMultiPreview() {
@@ -749,6 +782,18 @@ async function generatePDFFromImages() {
   }
 }
 
+// ---- CONSENTIMENTO RGPD ----
+function updateAnalyzeBtn() {
+  var hasFile = (typeof fileB64 !== 'undefined' && fileB64 !== null);
+  var chk = document.getElementById('consentCheck');
+  var hasConsent = chk && chk.checked;
+  document.getElementById('btnAnalisar').disabled = !(hasFile && hasConsent);
+  if (hasConsent) {
+    var warn = document.getElementById('consentWarn');
+    if (warn) warn.style.display = 'none';
+  }
+}
+
 // ---- VALIDAÇÃO ----
 function validarContacto() {
   const nome = document.getElementById('f-nome').value.trim();
@@ -764,6 +809,13 @@ function validarContacto() {
 
 // ---- ANALISAR — LÓGICA PRINCIPAL ----
 async function analisar() {
+  // Verificar consentimento RGPD
+  var chk = document.getElementById('consentCheck');
+  if (!chk || !chk.checked) {
+    var warn = document.getElementById('consentWarn');
+    if (warn) warn.style.display = 'flex';
+    return;
+  }
   // Multi-imagens: converter para PDF antes de enviar ao Worker
   if (multiFiles.length > 1) {
     if (!validarContacto()) return;
@@ -1192,6 +1244,22 @@ async function sendQ(msg) {
 
 <!-- WhatsApp Float -->
 <a class="wa-float" href="https://wa.me/351910322702?text=Ol%C3%A1%20%F0%9F%91%8B%20Vim%20atrav%C3%A9s%20do%20site%20da%20ENERSIA." target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+
+<!-- FOOTER -->
+<footer class="af-footer">
+  <div class="af-footer-inner">
+    <div class="af-footer-links">
+      <a href="/">Início</a>
+      <a href="/privacidade">Política de Privacidade</a>
+      <a href="/termos">Termos de Uso</a>
+      <a href="/cookies">Cookies</a>
+      <a href="mailto:geral@enersia.pt">Contacto</a>
+    </div>
+    <span class="af-footer-copy">© 2026 ENERSIA · Plataforma independente de análise energética · Todos os direitos reservados</span>
+  </div>
+</footer>
+
+<script src="/assets/js/rgpd-banner.js"></script>
 </body>
 </html>
 
