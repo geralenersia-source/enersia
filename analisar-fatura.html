@@ -452,12 +452,12 @@ footer a:hover{color:var(--t1)}
       <!-- CONSENTIMENTO RGPD -->
       <div class="consent-box">
         <label class="consent-label">
-          <input type="checkbox" id="consentCheck" onchange="updateAnalyzeBtn()">
+          <input type="checkbox" id="consentCheck" required onchange="updateAnalyzeBtn()">
           <span>Li e aceito a <a href="/privacidade" target="_blank">Política de Privacidade</a> e os <a href="/termos" target="_blank">Termos de Uso</a>, e autorizo o tratamento da minha fatura para análise energética personalizada.</span>
         </label>
         <div class="consent-warn" id="consentWarn" style="display:none">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          Por favor, aceite os termos para continuar.
+          Tem de aceitar a política de privacidade para continuar.
         </div>
       </div>
 
@@ -784,10 +784,10 @@ async function generatePDFFromImages() {
 
 // ---- CONSENTIMENTO RGPD ----
 function updateAnalyzeBtn() {
-  var hasFile = (typeof fileB64 !== 'undefined' && fileB64 !== null);
+  var hasFile = !!fileB64 || (Array.isArray(multiFiles) && multiFiles.length > 1);
   var chk = document.getElementById('consentCheck');
   var hasConsent = chk && chk.checked;
-  document.getElementById('btnAnalisar').disabled = !(hasFile && hasConsent);
+  document.getElementById('btnAnalisar').disabled = !hasFile;
   if (hasConsent) {
     var warn = document.getElementById('consentWarn');
     if (warn) warn.style.display = 'none';
@@ -814,6 +814,7 @@ async function analisar() {
   if (!chk || !chk.checked) {
     var warn = document.getElementById('consentWarn');
     if (warn) warn.style.display = 'flex';
+    showErr('Tem de aceitar a política de privacidade para continuar.');
     return;
   }
   // Multi-imagens: converter para PDF antes de enviar ao Worker

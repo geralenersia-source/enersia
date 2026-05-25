@@ -157,6 +157,12 @@ input[type=file]{display:none}
 .file-size{font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-top:2px}
 .file-remove{width:28px;height:28px;border-radius:50%;background:var(--b1);color:var(--t3);display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:all .2s;flex-shrink:0;font-size:14px}
 .file-remove:hover{background:rgba(255,96,96,.15);color:var(--red)}
+.consent-box{margin-top:16px;padding:13px 15px;background:rgba(0,123,255,.06);border:1px solid rgba(0,123,255,.18);border-radius:var(--r2)}
+.consent-label{display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:12.5px;color:var(--t2);line-height:1.5}
+.consent-label input[type=checkbox]{margin-top:2px;flex-shrink:0;width:16px;height:16px;accent-color:var(--blue);cursor:pointer}
+.consent-label a{color:var(--blue);text-decoration:none}
+.consent-label a:hover{text-decoration:underline}
+.consent-warn{display:none;margin-top:8px;font-size:12px;color:var(--red)}
 /* TIPO DE SERVIÇO */
 .srv-row{margin:16px 0 20px}
 .srv-label{font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);display:block;margin-bottom:8px}
@@ -498,6 +504,13 @@ input[type=file]{display:none}
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             Analisar com IA — Gratuito
           </button>
+          <div class="consent-box">
+            <label class="consent-label">
+              <input type="checkbox" id="consentCheckEmpresas" required onchange="updateAnalyzeBtn()">
+              <span>Li e aceito a <a href="/privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a> e autorizo o tratamento da minha fatura para análise energética personalizada.</span>
+            </label>
+            <div class="consent-warn" id="consentWarn">Tem de aceitar a política de privacidade para continuar.</div>
+          </div>
           <div class="btn-legal">Ao analisar, aceita os nossos <a href="/privacidade.html" style="color:var(--blue)">Termos de Privacidade</a>. Dados tratados com confidencialidade.</div>
         </div>
       </div>
@@ -671,7 +684,7 @@ function handleFile(f) {
   document.getElementById('fileSelected').classList.add('show');
   dz.style.display = 'none';
   const reader = new FileReader();
-  reader.onload = ev => { fileB64 = ev.target.result.split(',')[1]; document.getElementById('btnAnalisar').disabled = false; };
+  reader.onload = ev => { fileB64 = ev.target.result.split(',')[1]; updateAnalyzeBtn(); };
   reader.readAsDataURL(f);
   clearErr();
 }
@@ -704,7 +717,7 @@ function handleMultipleFiles(files) {
   dz.style.display = 'none';
   document.getElementById('fileSelected').classList.remove('show');
   showMultiPreview();
-  document.getElementById('btnAnalisar').disabled = false;
+  updateAnalyzeBtn();
 }
 
 function showMultiPreview() {
@@ -789,6 +802,28 @@ async function generatePDFFromImages() {
 }
 
 // ---- VALIDAÇÃO ----
+function updateAnalyzeBtn() {
+  const chk = document.getElementById('consentCheckEmpresas');
+  const warn = document.getElementById('consentWarn');
+  const btn = document.getElementById('btnAnalisar');
+  const hasConsent = !!(chk && chk.checked);
+  const hasFile = !!fileB64 || (Array.isArray(multiFiles) && multiFiles.length > 1);
+  if (btn) btn.disabled = !hasFile;
+  if (hasConsent && warn) warn.style.display = 'none';
+}
+
+function validarConsentimento() {
+  const chk = document.getElementById('consentCheckEmpresas');
+  const warn = document.getElementById('consentWarn');
+  if (!chk || !chk.checked) {
+    if (warn) warn.style.display = 'block';
+    showErr('Tem de aceitar a política de privacidade para continuar.');
+    return false;
+  }
+  if (warn) warn.style.display = 'none';
+  return true;
+}
+
 function validarContacto() {
   const nome = document.getElementById('f-nome').value.trim();
   const tel = document.getElementById('f-tel').value.trim();
@@ -803,6 +838,7 @@ function validarContacto() {
 
 // ---- ANALISAR ----
 async function analisar() {
+  if (!validarConsentimento()) return;
   if (multiFiles.length > 1) {
     if (!validarContacto()) return;
     const ok = await generatePDFFromImages();
