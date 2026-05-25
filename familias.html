@@ -851,32 +851,54 @@ function getServico() {
 // ---- NOTIFICAR MAKE ----
 async function notificarMake({ nome, tel, email, distrito, isPDF, mediaType, fileB64, dados, servico }) {
   const mType = mediaType || (isPDF ? 'application/pdf' : 'image/jpeg');
-  await fetch(MAKE_WH, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      timestamp: new Date().toISOString(),
-      tipo: LEAD_TIPO,
-      segmento: LEAD_TIPO,
-      servico: servico || 'eletricidade',
-      formato: isPDF ? 'pdf' : 'imagem',
-      mediaType: mType,
-      fileName: (file && file.name) ? file.name : ('fatura.' + (isPDF ? 'pdf' : 'jpg')),
-      nome, telefone: tel, email, distrito, base64: fileB64,
-      comercializadora: dados.comercializadora || '',
-      periodo: dados.periodo || '',
-      total_fatura: dados.total_fatura || 0,
-      consumo_kwh: dados.consumo_kwh || 0,
-      poupanca_mensal_estimada: dados.poupanca_mensal_estimada || 0,
-      percentagem_poupanca: dados.percentagem_poupanca || 0,
-      recomendacao_comercializador: dados.recomendacao_comercializador || '',
-      motivo_recomendacao: dados.motivo_recomendacao || '',
-      analise_detalhada: dados.analise_detalhada || '',
-      urgencia: dados.urgencia || ''
-    })
-  });
+  const nomeFicheiro = (file && file.name) ? file.name : ('fatura.' + (isPDF ? 'pdf' : 'jpg'));
+  const payload = {
+    timestamp: new Date().toISOString(),
+    nome,
+    email,
+    telefone: tel,
+    distrito,
+    segmento: LEAD_TIPO,
+    servico: servico || 'eletricidade',
+    tipo: LEAD_TIPO,
+    formato: isPDF ? 'pdf' : 'imagem',
+    mediaType: mType,
+    contentType: mType,
+    nome_ficheiro: nomeFicheiro,
+    fileName: nomeFicheiro,
+    base64: fileB64 || '',
+    data: fileB64 || '',
+    comercializadora: dados.comercializadora || '',
+    total_fatura: dados.total_fatura || 0,
+    consumo: dados.consumo_kwh || 0,
+    consumo_kwh: dados.consumo_kwh || 0,
+    urgencia: dados.urgencia || '',
+    periodo: dados.periodo || '',
+    poupanca_mensal_estimada: dados.poupanca_mensal_estimada || 0,
+    percentagem_poupanca: dados.percentagem_poupanca || 0,
+    recomendacao_comercializador: dados.recomendacao_comercializador || '',
+    motivo_recomendacao: dados.motivo_recomendacao || '',
+    analise_detalhada: dados.analise_detalhada || ''
+  };
+  await enviarPayloadMake(payload, fileB64, mType, nomeFicheiro);
 }
 
+function enviarPayloadMake(payload, fileB64, mediaType, nomeFicheiro) {
+  const form = new FormData();
+  Object.keys(payload).forEach(key => form.append(key, payload[key] == null ? '' : String(payload[key])));
+  if (fileB64) {
+    form.append('ficheiro', base64ToBlob(fileB64, mediaType), nomeFicheiro);
+  }
+  return fetch(MAKE_WH, { method: 'POST', body: form });
+}
+
+function base64ToBlob(base64, mediaType) {
+  const clean = String(base64 || '').replace(/^data:[^,]+,/, '');
+  const binary = atob(clean);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: mediaType || 'application/octet-stream' });
+}
 // ---- MOSTRAR RESULTADO ----
 function showResult(r) {
   document.getElementById('loadingCard').classList.remove('show');
