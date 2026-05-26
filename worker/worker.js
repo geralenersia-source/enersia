@@ -34,6 +34,13 @@ const PRECOS_FALLBACK = {
   endesa:   '0.1438',
 };
 
+const PRECOS_REPO = {
+  owner:  'geralenersia-source',
+  repo:   'enersia',
+  branch: 'main',
+  file:   'precos.json',
+};
+
 const ANALISE_PROMPT_BASE =
   'Analisa esta fatura de energia portuguesa e devolve APENAS um objeto JSON válido, ' +
   'sem texto antes nem depois, sem markdown e sem crases. ' +
@@ -87,6 +94,53 @@ function extractJSON(text) {
   }
 
   return null;
+}
+
+function validarUpdateSecret(request, env, cors) {
+  const secret = request.headers.get('X-Secret') ?? '';
+  if (!env.ENERSIA_UPDATE_SECRET || secret !== env.ENERSIA_UPDATE_SECRET) {
+    return jsonResponse({ error: 'Nao autorizado.' }, 401, cors);
+  }
+  return null;
+}
+
+function dataLisboa(value = new Date()) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Lisbon',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+
+  const byType = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${byType.year}-${byType.month}-${byType.day}`;
+}
+
+function dataHoraLisboa(value = new Date()) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Lisbon',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).formatToParts(date);
+
+  const byType = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${byType.year}-${byType.month}-${byType.day} ${byType.hour}:${byType.minute}:${byType.second}`;
+}
+
+function atualizacaoFoiHoje(precosData, hojeLisboa = dataLisboa()) {
+  const updatedDateLisboa = dataLisboa(precosData?.updatedAt);
+  return Boolean(updatedDateLisboa && updatedDateLisboa === hojeLisboa);
 }
 
 // ---------------------------------------------------------------------------
@@ -347,6 +401,48 @@ async function handleChat(request, env, cors) {
 // Route: POST /precos-update
 // ---------------------------------------------------------------------------
 
+async function carregarPrecosPublicos() {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
+  try {
+    const url = `https://raw.githubusercontent.com/${PRECOS_REPO.owner}/${PRECOS_REPO.repo}/${PRECOS_REPO.branch}/${PRECOS_REPO.file}?t=${Date.now()}`;
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (e) {
+    clearTimeout(timeoutId);
+    throw e;
+  }
+}
+
+async function handlePrecosStatus(request, env, cors) {
+  const unauthorized = validarUpdateSecret(request, env, cors);
+  if (unauthorized) return unauthorized;
+
+  let precosData;
+  try {
+    precosData = await carregarPrecosPublicos();
+  } catch (e) {
+    console.error('[ENERSIA/precos-status] Falha ao carregar precos.json:', e.message);
+    return jsonResponse({ error: 'Erro ao consultar estado dos precos.', detail: e.message }, 502, cors);
+  }
+
+  const todayLisbon = dataLisboa();
+  const updatedDateLisbon = dataLisboa(precosData?.updatedAt);
+  const updatedToday = atualizacaoFoiHoje(precosData, todayLisbon);
+
+  return jsonResponse({
+    ok: true,
+    updatedToday,
+    todayLisbon,
+    updatedAt: precosData?.updatedAt || null,
+    updatedAtLisbon: dataHoraLisboa(precosData?.updatedAt),
+    updatedDateLisbon,
+    timezone: 'Europe/Lisbon',
+  }, 200, cors);
+}
+
 async function handlePrecosUpdate(request, env, cors) {
   // ── 1. Validar secret do pedido ──────────────────────────────────────────
   const secret = request.headers.get('X-Secret') ?? '';
@@ -392,13 +488,14 @@ async function handlePrecosUpdate(request, env, cors) {
     repsol:    String(payload.repsol),
     endesa:    String(payload.endesa),
     updatedAt: new Date().toISOString(),
+    updatedAtLisbon: dataHoraLisboa(),
     source:    payload.source || 'ERSE / atualização automática ENERSIA',
   };
 
-  const OWNER  = 'geralenersia-source';
-  const REPO   = 'enersia';
-  const BRANCH = 'main';
-  const FILE   = 'precos.json';
+  const OWNER  = PRECOS_REPO.owner;
+  const REPO   = PRECOS_REPO.repo;
+  const BRANCH = PRECOS_REPO.branch;
+  const FILE   = PRECOS_REPO.file;
   const GH_API = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
 
   // Headers conformes à GitHub REST API v2022-11-28
@@ -442,6 +539,32 @@ async function handlePrecosUpdate(request, env, cors) {
     const ghFile = await res.json();
     sha = ghFile.sha;
     console.log(`[ENERSIA/precos-update] SHA obtido: ${sha}`);
+
+    let precosAtuais = null;
+    try {
+      const conteudoAtual = atob((ghFile.content || '').replace(/\s/g, ''));
+      precosAtuais = JSON.parse(conteudoAtual);
+    } catch (e) {
+      console.warn('[ENERSIA/precos-update] Nao foi possivel ler updatedAt atual:', e.message);
+    }
+
+    const todayLisbon = dataLisboa();
+    if (atualizacaoFoiHoje(precosAtuais, todayLisbon)) {
+      console.log(`[ENERSIA/precos-update] Ignorado: precos ja atualizados em ${todayLisbon} Europe/Lisbon`);
+      return jsonResponse({
+        ok: false,
+        skipped: true,
+        reason: 'already_updated_today',
+        message: 'Precos ja atualizados hoje. Nenhuma alteracao efetuada.',
+        todayLisbon,
+        updatedAt: precosAtuais.updatedAt,
+        updatedAtLisbon: dataHoraLisboa(precosAtuais.updatedAt),
+        timezone: 'Europe/Lisbon',
+        repo: `${OWNER}/${REPO}`,
+        branch: BRANCH,
+        path: FILE,
+      }, 200, cors);
+    }
   } catch (e) {
     console.error('[ENERSIA/precos-update] Erro de rede no GET:', e.message);
     return jsonResponse({ error: 'Erro de rede ao contactar GitHub.', detail: e.message }, 502, cors);
@@ -492,8 +615,11 @@ async function handlePrecosUpdate(request, env, cors) {
   console.log('[ENERSIA/precos-update] precos.json actualizado com sucesso:', novoConteudo.updatedAt);
   return jsonResponse({
     ok:        true,
+    skipped:   false,
     message:   'precos.json actualizado com sucesso.',
     updatedAt: novoConteudo.updatedAt,
+    updatedAtLisbon: novoConteudo.updatedAtLisbon,
+    timezone:  'Europe/Lisbon',
     repo:      `${OWNER}/${REPO}`,
     branch:    BRANCH,
     path:      FILE,
@@ -522,6 +648,7 @@ export default {
 
     if (pathname === '/analisar')       return handleAnalisar(request, env, cors);
     if (pathname === '/chat')           return handleChat(request, env, cors);
+    if (pathname === '/precos-status')  return handlePrecosStatus(request, env, cors);
     if (pathname === '/precos-update')  return handlePrecosUpdate(request, env, cors);
 
     return jsonResponse({ error: 'Rota não encontrada.' }, 404, cors);
