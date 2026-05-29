@@ -924,6 +924,7 @@ async function analisar() {
     if (!r.comercializadora && !r.total_fatura && !r.analise_detalhada) throw new Error('Análise incompleta. Verifique a nitidez da imagem ou use o PDF original.');
     showResult(r);
     notificarMake({ nome, tel, email, distrito, tipoImovel, areaTelhado, isPDF, mediaType, fileB64, dados: r, servico: getServico() }).catch(e => console.warn('Make:', e));
+    notificarIRIS({ nome, tel, email, distrito, tipo_imovel: tipoImovel, area_telhado: areaTelhado, score_aria: r.score_lead, poupanca_aria: r.poupanca_mensal_estimada }).catch(e => console.warn('IRIS:', e));
   } catch(e) {
     document.getElementById('loadingCard').classList.remove('show');
     document.getElementById('uploadCard').style.display = 'block';
@@ -996,6 +997,21 @@ function base64ToBlob(base64, mediaType) {
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
   return new Blob([bytes], { type: mediaType || 'application/octet-stream' });
 }
+
+// ---- NOTIFICAR IRIS (CRM directo) ----
+async function notificarIRIS({ nome, tel, email, distrito, tipo_imovel, area_telhado, score_aria, poupanca_aria }) {
+  const payload = { nome, telefone: tel, email, distrito, tipo: LEAD_TIPO };
+  if (tipo_imovel)   payload.tipo_imovel   = tipo_imovel;
+  if (area_telhado)  payload.area_telhado  = area_telhado;
+  if (score_aria)    payload.score_aria    = score_aria;
+  if (poupanca_aria) payload.poupanca_aria = Number(poupanca_aria).toFixed(2);
+  await fetch(WORKER_URL + '/lead', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+}
+
 // ---- MOSTRAR CONFIRMAÇÃO (dados da IA vão para Make.com / Telegram / Sheets) ----
 function showResult(r) {
   // Os dados da IA (r) são enviados via notificarMake para o back-end.

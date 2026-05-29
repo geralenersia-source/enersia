@@ -6,6 +6,7 @@
  * Rotas:
  *   POST /analisar       — análise de fatura (PDF ou imagem) com Claude
  *   POST /chat           — chat KAROL com Claude Haiku
+ *   POST /lead           — captura de lead do site → alerta Telegram (IRIS)
  *   POST /precos-update  — atualizar precos.json no GitHub
  *   OPTIONS *            — preflight CORS
  *
@@ -15,6 +16,8 @@
  *   wrangler secret put BREVO_API_KEY
  *   wrangler secret put ENERSIA_UPDATE_SECRET
  *   wrangler secret put GITHUB_TOKEN
+ *   wrangler secret put TELEGRAM_TOKEN
+ *   wrangler secret put TELEGRAM_CHAT_ID
  */
 
 const ALLOWED_ORIGINS = [
@@ -41,15 +44,71 @@ const PRECOS_REPO = {
   file:   'precos.json',
 };
 
+const ARIA_SYSTEM_PROMPT =
+  'És a ARIA — Assistente de Reconhecimento de Inteligência Aplicada da ENERSIA, ' +
+  'a plataforma portuguesa de inteligência energética. ' +
+  'Analisas faturas com precisão cirúrgica e identificas poupanças reais. ' +
+  'Respondes sempre em JSON válido, nunca em markdown.';
+
 const ANALISE_PROMPT_BASE =
   'Analisa esta fatura de energia portuguesa e devolve APENAS um objeto JSON válido, ' +
-  'sem texto antes nem depois, sem markdown e sem crases. ' +
-  'Campos obrigatórios: comercializadora, periodo, total_fatura número, consumo_kwh número, ' +
-  'poupanca_mensal_estimada número, percentagem_poupanca número, recomendacao_comercializador, ' +
-  'motivo_recomendacao sem quebras de linha, analise_detalhada sem quebras de linha, ' +
-  'urgencia Alta Media ou Baixa. ' +
-  'Para estimativa de poupança, usa os preços indicados abaixo. ' +
-  'Se algum dado não existir na fatura, estima com prudência e explica no campo analise_detalhada.';
+  'sem texto antes nem depois, sem markdown, sem crases e sem comentários. ' +
+  'Para campos sem informação na fatura usa null em strings e 0 em números. ' +
+  'Estima com prudência quando necessário e explica em analise_detalhada.\n\n' +
+  'ESTRUTURA OBRIGATÓRIA — devolve exactamente estes 30 campos:\n' +
+  '{\n' +
+  '  "comercializadora": "nome da comercializadora vendedora",\n' +
+  '  "nif_cliente": "NIF fiscal do cliente ou null",\n' +
+  '  "numero_cliente": "número de cliente ou contrato",\n' +
+  '  "periodo": "período faturado ex Jan-Fev 2025",\n' +
+  '  "data_emissao": "data de emissão DD/MM/AAAA",\n' +
+  '  "total_fatura": 0,\n' +
+  '  "valor_energia": 0,\n' +
+  '  "valor_potencia": 0,\n' +
+  '  "valor_impostos": 0,\n' +
+  '  "consumo_kwh": 0,\n' +
+  '  "potencia_contratada_kva": 0,\n' +
+  '  "tarifa_tipo": "BTN BTE MAT AT MT ou outra",\n' +
+  '  "ciclo_horario": "Simples Bi-horário Tri-horário ou Sem ciclo",\n' +
+  '  "tensao_servico": "BT MT AT ou outra",\n' +
+  '  "distribuidora": "E-Redes EDP Distribuição ou outra",\n' +
+  '  "consumo_gas_m3": 0,\n' +
+  '  "valor_gas": 0,\n' +
+  '  "poupanca_mensal_estimada": 0,\n' +
+  '  "poupanca_anual_estimada": 0,\n' +
+  '  "percentagem_poupanca": 0,\n' +
+  '  "recomendacao_comercializador": "comercializadora mais barata dos preços indicados abaixo",\n' +
+  '  "preco_kwh_actual": 0,\n' +
+  '  "preco_kwh_recomendado": 0,\n' +
+  '  "motivo_recomendacao": "razão concisa sem quebras de linha",\n' +
+  '  "alertas": "alertas detectados: potência sobredimensionada ciclo inadequado etc. ou string vazia",\n' +
+  '  "potencial_solar": "Alto Médio ou Baixo",\n' +
+  '  "analise_detalhada": "análise completa sem quebras de linha",\n' +
+  '  "urgencia": "Alta Media ou Baixa",\n' +
+  '  "score_lead": 0,\n' +
+  '  "segmento": "Empresa ou Residencial",\n' +
+  '  "localizacao": "distrito ou localidade do cliente se disponível"\n' +
+  '}\n\n' +
+  'CÁLCULOS OBRIGATÓRIOS:\n' +
+  'preco_kwh_actual = (valor_energia + valor_potencia) / consumo_kwh\n' +
+  'poupanca_mensal_estimada = consumo_kwh × (preco_kwh_actual - preco_kwh_recomendado)\n' +
+  'poupanca_anual_estimada = poupanca_mensal_estimada × 12\n' +
+  'percentagem_poupanca = (poupanca_mensal_estimada / total_fatura) × 100\n\n' +
+  'REGRAS SCORE_LEAD — soma os pontos aplicáveis (resultado final de 0 a 10):\n' +
+  '+3 se consumo_kwh > 5000 (grande consumidor ou empresa industrial)\n' +
+  '+2 se urgencia = Alta\n' +
+  '+2 se total_fatura > 500\n' +
+  '+1 se potência mal contratada detectada (sub ou sobredimensionada para o consumo)\n' +
+  '+1 se ciclo horário inadequado para o perfil de consumo detectado\n' +
+  '+1 se potencial_solar = Alto\n\n' +
+  'REGRAS POTENCIAL_SOLAR:\n' +
+  'Alto — consumo_kwh > 3000 E (segmento = Empresa ou moradia unifamiliar)\n' +
+  'Médio — consumo_kwh entre 1000 e 3000 kWh\n' +
+  'Baixo — consumo_kwh < 1000 kWh ou apartamento em edifício\n\n' +
+  'REGRAS URGÊNCIA:\n' +
+  'Alta — preco_kwh_actual mais de 15% acima do mais barato disponível\n' +
+  'Media — diferença entre 5% e 15%\n' +
+  'Baixa — diferença inferior a 5% ou cliente já na melhor opção\n\n';
 
 // ---------------------------------------------------------------------------
 // CORS
@@ -298,7 +357,8 @@ async function handleAnalisar(request, env, cors) {
 
   const anthropicPayload = {
     model: 'claude-sonnet-4-6',
-    max_tokens: 1024,
+    max_tokens: 2048,
+    system: ARIA_SYSTEM_PROMPT,
     messages: [
       {
         role: 'user',
@@ -395,6 +455,75 @@ async function handleChat(request, env, cors) {
   const data = await anthropicRes.json().catch(() => null);
   const reply = data?.content?.[0]?.text ?? 'Erro técnico. WhatsApp: wa.me/351910322702';
   return jsonResponse({ reply }, 200, cors);
+}
+
+// ---------------------------------------------------------------------------
+// Route: POST /lead  (IRIS)
+// ---------------------------------------------------------------------------
+
+async function handleLead(request, env, cors) {
+  let body;
+  try {
+    body = await request.json();
+  } catch (_) {
+    return jsonResponse({ error: 'Corpo do pedido inválido (JSON esperado).' }, 400, cors);
+  }
+
+  const { nome, telefone, email, distrito, tipo } = body;
+
+  if (!nome)      return jsonResponse({ error: 'Campo nome obrigatório.' }, 400, cors);
+  if (!telefone)  return jsonResponse({ error: 'Campo telefone obrigatório.' }, 400, cors);
+  if (!email)     return jsonResponse({ error: 'Campo email obrigatório.' }, 400, cors);
+  if (!distrito)  return jsonResponse({ error: 'Campo distrito obrigatório.' }, 400, cors);
+  if (!tipo)      return jsonResponse({ error: 'Campo tipo obrigatório (empresa|solar).' }, 400, cors);
+
+  const ts = dataHoraLisboa();
+  const leadId = Math.random().toString(36).slice(2, 10).toUpperCase();
+
+  // Extra fields (solar)
+  const extra = {};
+  if (body.tipo_imovel)   extra.tipo_imovel   = String(body.tipo_imovel);
+  if (body.area_telhado)  extra.area_telhado  = String(body.area_telhado);
+  if (body.score_aria)    extra.score_aria     = body.score_aria;
+  if (body.poupanca_aria) extra.poupanca_aria  = body.poupanca_aria;
+
+  // Telegram alert — fire-and-forget (não bloqueia resposta)
+  if (env.TELEGRAM_TOKEN && env.TELEGRAM_CHAT_ID) {
+    const tipoEmoji = tipo === 'solar' ? '☀️' : '🏭';
+    const scoreAria = extra.score_aria ? ` | Score ARIA: ${extra.score_aria}` : '';
+    const poupanca  = extra.poupanca_aria ? ` | Poupança est.: €${extra.poupanca_aria}/mês` : '';
+    const msgText   =
+      `🌸 *IRIS — Novo Lead do Site*\n\n` +
+      `${tipoEmoji} *${nome}*\n` +
+      `📍 ${distrito} | ${tipo.toUpperCase()}\n` +
+      `📞 ${telefone}\n` +
+      `📧 ${email}\n` +
+      `🆔 ${leadId}${scoreAria}${poupanca}\n` +
+      `🕐 ${ts}\n\n` +
+      `_Acede ao CRM ENERSIA → Tab IRIS para processar._`;
+
+    fetch(
+      `https://api.telegram.org/bot${env.TELEGRAM_TOKEN}/sendMessage`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id:    String(env.TELEGRAM_CHAT_ID),
+          text:       msgText,
+          parse_mode: 'Markdown',
+        }),
+      }
+    ).catch((e) => console.error('IRIS Telegram error:', e.message));
+  }
+
+  console.log(`[IRIS] Novo lead: ${leadId} — ${nome} — ${tipo} — ${distrito}`);
+
+  return jsonResponse({
+    ok:        true,
+    lead_id:   leadId,
+    timestamp: ts,
+    message:   'Lead recebido. Notificação enviada.',
+  }, 200, cors);
 }
 
 // ---------------------------------------------------------------------------
@@ -648,6 +777,7 @@ export default {
 
     if (pathname === '/analisar')       return handleAnalisar(request, env, cors);
     if (pathname === '/chat')           return handleChat(request, env, cors);
+    if (pathname === '/lead')           return handleLead(request, env, cors);
     if (pathname === '/precos-status')  return handlePrecosStatus(request, env, cors);
     if (pathname === '/precos-update')  return handlePrecosUpdate(request, env, cors);
 
