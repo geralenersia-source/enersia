@@ -203,12 +203,12 @@ input[type=file]{display:none}
 /* OPERADORA RECOMENDADA — DESTAQUE */
 .rec-hero{background:linear-gradient(135deg,rgba(0,229,155,.10),rgba(79,124,255,.06));border:2px solid rgba(0,229,155,.35);border-radius:var(--r3);padding:22px 26px;margin:20px 0;position:relative;overflow:hidden}
 .rec-hero::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,229,155,.06),transparent);pointer-events:none}
-.rec-hero-label{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.rec-hero-name{font-family:'Syne',sans-serif;font-size:clamp(1.35rem,4vw,1.9rem);font-weight:900;color:var(--t1);letter-spacing:-.03em;line-height:1.1;margin-bottom:14px}
-.rec-hero-pills{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-.rec-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;font-size:13px;font-weight:700}
-.rec-pill.green{background:rgba(0,229,155,.13);border:1px solid rgba(0,229,155,.28);color:var(--green)}
-.rec-pill.blue{background:rgba(79,124,255,.12);border:1px solid rgba(79,124,255,.28);color:var(--blue)}
+.rec-hero-label{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.rec-hero-name{font-family:'Syne',sans-serif;font-size:clamp(1.6rem,5vw,2.1rem);font-weight:900;color:var(--green);letter-spacing:-.03em;line-height:1.1;background:rgba(0,229,155,.09);border:1.5px solid rgba(0,229,155,.28);border-radius:10px;padding:7px 20px;display:inline-block;margin-bottom:14px}
+.rec-hero-saving{font-size:13.5px;font-weight:600;color:var(--t2);margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rec-hero-saving .sv{color:var(--green);font-weight:800}
+.rec-hero-saving .sep{color:var(--t4)}
+.rec-hero-saving .pct{color:var(--blue);font-weight:700}
 .rec-hero-motivo{font-size:13px;color:var(--t2);line-height:1.7}
 
 /* RELATÓRIO COMPLETO */
@@ -1090,21 +1090,23 @@ function showResult(r) {
   if (recom) {
     if (temPoupanca) {
       // ✅ Operadora recomendada com poupança — destaque máximo
+      const savingLine = '<div class="rec-hero-saving">'
+        + '<span class="sv">Poupa ' + pMes.toFixed(0) + '€/mês</span>'
+        + '<span class="sep">·</span>'
+        + '<span class="sv">' + pAno.toFixed(0) + '€/ano</span>'
+        + (perc > 0 ? '<span class="sep">·</span><span class="pct">' + perc.toFixed(0) + '% mais barato</span>' : '')
+        + '</div>';
       html += '<div class="rec-hero">'
             +   '<div class="rec-hero-label">✅ Operadora Recomendada</div>'
             +   '<div class="rec-hero-name">' + recom + '</div>'
-            +   '<div class="rec-hero-pills">'
-            +     '<span class="rec-pill green">−' + pMes.toFixed(0) + '€ / mês</span>'
-            +     '<span class="rec-pill green">−' + pAno.toFixed(0) + '€ / ano</span>'
-            +     (perc > 0 ? '<span class="rec-pill blue">' + perc.toFixed(0) + '% mais barato</span>' : '')
-            +   '</div>'
+            +   savingLine
             +   (r.motivo_recomendacao ? '<div class="rec-hero-motivo">' + r.motivo_recomendacao + '</div>' : '')
             + '</div>';
     } else {
       // Tarifa actual competitiva
       html += '<div class="rec-hero">'
             +   '<div class="rec-hero-label">📊 Análise de Mercado</div>'
-            +   '<div class="rec-hero-name">' + recom + '</div>'
+            +   '<div class="rec-hero-name" style="color:var(--blue);border-color:rgba(79,124,255,.3);background:rgba(79,124,255,.09)">' + recom + '</div>'
             +   '<div class="rec-hero-motivo">' + (r.motivo_recomendacao || 'A sua tarifa actual é competitiva no mercado.') + '</div>'
             + '</div>';
     }
