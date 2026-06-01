@@ -200,6 +200,42 @@ input[type=file]{display:none}
 .btn-nova{width:100%;padding:13px;border-radius:var(--r2);background:transparent;border:1.5px solid var(--b2);color:var(--t3);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;display:none;margin-top:12px}
 .btn-nova:hover{color:var(--t1);background:var(--b1)}
 
+/* OPERADORA RECOMENDADA — DESTAQUE */
+.rec-hero{background:linear-gradient(135deg,rgba(0,229,155,.10),rgba(79,124,255,.06));border:2px solid rgba(0,229,155,.35);border-radius:var(--r3);padding:22px 26px;margin:20px 0;position:relative;overflow:hidden}
+.rec-hero::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,229,155,.06),transparent);pointer-events:none}
+.rec-hero-label{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.rec-hero-name{font-family:'Syne',sans-serif;font-size:clamp(1.35rem,4vw,1.9rem);font-weight:900;color:var(--t1);letter-spacing:-.03em;line-height:1.1;margin-bottom:14px}
+.rec-hero-pills{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.rec-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:99px;font-size:13px;font-weight:700}
+.rec-pill.green{background:rgba(0,229,155,.13);border:1px solid rgba(0,229,155,.28);color:var(--green)}
+.rec-pill.blue{background:rgba(79,124,255,.12);border:1px solid rgba(79,124,255,.28);color:var(--blue)}
+.rec-hero-motivo{font-size:13px;color:var(--t2);line-height:1.7}
+
+/* RELATÓRIO COMPLETO */
+.full-report{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r4);overflow:hidden;margin-top:20px;animation:fade-up .4s var(--ease) both}
+.report-hdr{padding:20px 26px 16px;border-bottom:1px solid var(--b1);background:linear-gradient(135deg,rgba(79,124,255,.05),transparent);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.report-hdr-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--t1);display:flex;align-items:center;gap:8px}
+.report-urg{font-family:'JetBrains Mono',monospace;font-size:8.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border-radius:99px}
+.report-urg.alta{background:rgba(255,96,96,.12);border:1px solid rgba(255,96,96,.25);color:var(--red)}
+.report-urg.media{background:rgba(251,146,60,.12);border:1px solid rgba(251,146,60,.25);color:var(--amber)}
+.report-urg.baixa{background:rgba(0,229,155,.1);border:1px solid rgba(0,229,155,.22);color:var(--green)}
+.report-body{padding:22px 26px}
+.report-sec{margin-bottom:22px}
+.report-sec-title{font-family:'JetBrains Mono',monospace;font-size:8.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--t4);margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--b1)}
+.report-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.report-row:last-child{border-bottom:none}
+.rk{font-size:12.5px;color:var(--t3);flex-shrink:0}
+.rv{font-size:12.5px;font-weight:600;color:var(--t1);text-align:right;max-width:60%}
+.rv.green{color:var(--green)}.rv.amber{color:var(--amber)}.rv.blue{color:var(--blue)}
+.report-rec-row{background:linear-gradient(135deg,rgba(0,229,155,.08),rgba(79,124,255,.05));border:1.5px solid rgba(0,229,155,.3);border-radius:var(--r2);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.report-rec-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--green)}
+.report-rec-saving{font-size:12px;font-weight:700;color:var(--t2)}
+.report-next{background:linear-gradient(135deg,rgba(79,124,255,.08),rgba(0,194,255,.04));border:1px solid rgba(79,124,255,.2);border-radius:var(--r2);padding:18px 20px;margin-top:4px}
+.report-next-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px}
+.report-next-desc{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:14px}
+.report-next-btns{display:flex;gap:10px;flex-wrap:wrap}
+@media(max-width:520px){.rec-hero{padding:16px 18px}.report-hdr,.report-body{padding:16px 18px}.report-row{flex-direction:column;gap:2px}.rv{text-align:left;max-width:100%}.report-rec-row{flex-direction:column;align-items:flex-start}}
+
 /* ERRO */
 .error-box{display:none;margin-bottom:20px}
 .error-box.show{display:block;animation:fade-up .4s var(--ease)}
@@ -585,6 +621,7 @@ const LEAD_SEGMENTO = 'geral';
 
 // ---- ESTADO ----
 let file = null, fileB64 = null, multiFiles = [];
+let currentUserData = { nome: '', tel: '', email: '', distrito: '' };
 
 // ---- FILE HANDLING ----
 const fi = document.getElementById('fileInput');
@@ -859,6 +896,8 @@ async function analisar() {
       throw new Error('Análise incompleta. Verifique a nitidez da imagem ou use o PDF original.');
     }
 
+    // -- GUARDAR DADOS UTILIZADOR PARA O RELATÓRIO --
+    currentUserData = { nome, tel, email, distrito };
     // -- MOSTRAR RESULTADO --
     showResult(r);
 
@@ -1020,39 +1059,146 @@ function showResult(r) {
   document.getElementById('resCard').classList.add('show');
   document.getElementById('btnNova').style.display = 'block';
 
-  const pMes = parseFloat(r.poupanca_mensal_estimada) || 0;
-  const pAno = pMes * 12;
-  const perc = parseFloat(r.percentagem_poupanca) || 0;
+  const pMes  = parseFloat(r.poupanca_mensal_estimada) || 0;
+  const pAno  = pMes * 12;
+  const perc  = parseFloat(r.percentagem_poupanca) || 0;
   const total = parseFloat(r.total_fatura) || 0;
-  const recom = r.recomendacao_comercializador || '';
+  const kwh   = parseFloat(r.consumo_kwh) || 0;
+  const recom = (r.recomendacao_comercializador || '').trim();
   const comerc = r.comercializadora || 'Actual';
+  const temPoupanca = pMes > 0 && recom && recom.toLowerCase() !== comerc.toLowerCase() && recom.toLowerCase() !== 'manter actual';
 
+  // ── Topo do cartão (comercializadora actual + poupança total) ──────────────
   document.getElementById('rComercializadora').textContent = comerc;
   document.getElementById('rPeriodo').textContent = r.periodo || '';
-
   if (pMes > 0) {
     document.getElementById('resSavingBox').style.display = 'block';
     document.getElementById('rPoupanca').textContent = '−' + pMes.toFixed(0) + '€';
   }
 
+  // ── Grid de métricas rápidas ──────────────────────────────────────────────
   let grid = '';
   if (total > 0) grid += '<div class="res-item"><div class="res-item-label">Fatura actual</div><div class="res-item-val amber">' + total.toFixed(2) + '€/mês</div></div>';
-  if (pMes > 0) grid += '<div class="res-item"><div class="res-item-label">Poupança mensal</div><div class="res-item-val green">−' + pMes.toFixed(0) + '€/mês</div></div>';
-  if (pAno > 0) grid += '<div class="res-item"><div class="res-item-label">Poupança anual</div><div class="res-item-val green">−' + pAno.toFixed(0) + '€/ano</div></div>';
-  if (perc > 0) grid += '<div class="res-item"><div class="res-item-label">Desconto</div><div class="res-item-val green">' + perc.toFixed(0) + '% mais barato</div></div>';
+  if (pMes > 0)  grid += '<div class="res-item"><div class="res-item-label">Poupança mensal</div><div class="res-item-val green">−' + pMes.toFixed(0) + '€/mês</div></div>';
+  if (pAno > 0)  grid += '<div class="res-item"><div class="res-item-label">Poupança anual</div><div class="res-item-val green">−' + pAno.toFixed(0) + '€/ano</div></div>';
+  if (perc > 0)  grid += '<div class="res-item"><div class="res-item-label">Desconto</div><div class="res-item-val green">' + perc.toFixed(0) + '% mais barato</div></div>';
   document.getElementById('resGrid').innerHTML = grid || '<div class="res-item"><div class="res-item-label">Análise</div><div class="res-item-val">Ver recomendação abaixo</div></div>';
 
+  // ── Secção de detalhe: OPERADORA EM DESTAQUE + análise ───────────────────
   let html = '';
-  if (recom && recom.toLowerCase() !== 'manter actual' && pMes > 0) {
-    html += '<div class="rec-box"><h4>Recomendação ENERSIA</h4><p>Mude para <strong>' + recom + '</strong> e poupe <strong>' + pMes.toFixed(0) + '€ por mês</strong> (' + pAno.toFixed(0) + '€ por ano).' + (r.motivo_recomendacao ? ' ' + r.motivo_recomendacao : '') + '</p></div>';
-  } else if (recom) {
-    html += '<div class="rec-box"><h4>Recomendação ENERSIA</h4><p>' + (r.motivo_recomendacao || 'A sua tarifa actual é competitiva no mercado.') + '</p></div>';
+
+  if (recom) {
+    if (temPoupanca) {
+      // ✅ Operadora recomendada com poupança — destaque máximo
+      html += '<div class="rec-hero">'
+            +   '<div class="rec-hero-label">✅ Operadora Recomendada</div>'
+            +   '<div class="rec-hero-name">' + recom + '</div>'
+            +   '<div class="rec-hero-pills">'
+            +     '<span class="rec-pill green">−' + pMes.toFixed(0) + '€ / mês</span>'
+            +     '<span class="rec-pill green">−' + pAno.toFixed(0) + '€ / ano</span>'
+            +     (perc > 0 ? '<span class="rec-pill blue">' + perc.toFixed(0) + '% mais barato</span>' : '')
+            +   '</div>'
+            +   (r.motivo_recomendacao ? '<div class="rec-hero-motivo">' + r.motivo_recomendacao + '</div>' : '')
+            + '</div>';
+    } else {
+      // Tarifa actual competitiva
+      html += '<div class="rec-hero">'
+            +   '<div class="rec-hero-label">📊 Análise de Mercado</div>'
+            +   '<div class="rec-hero-name">' + recom + '</div>'
+            +   '<div class="rec-hero-motivo">' + (r.motivo_recomendacao || 'A sua tarifa actual é competitiva no mercado.') + '</div>'
+            + '</div>';
+    }
   }
+
   if (r.analise_detalhada) {
     html += '<div class="analise-box">' + r.analise_detalhada + '</div>';
   }
-  if (!html) html = '<p>Análise concluída. Fale com um especialista para conhecer as melhores opções para o seu perfil.</p>';
+  if (!html) html = '<p style="color:var(--t2);font-size:14px">Análise concluída. Fale com um especialista para conhecer as melhores opções para o seu perfil.</p>';
   document.getElementById('resDetail').innerHTML = html;
+
+  // ── RELATÓRIO COMPLETO ────────────────────────────────────────────────────
+  // Remover relatório anterior se existir
+  const oldRep = document.getElementById('fullReport');
+  if (oldRep) oldRep.remove();
+
+  const urg = (r.urgencia || '').toLowerCase();
+  const urgClass = urg === 'alta' ? 'alta' : urg === 'media' || urg === 'média' ? 'media' : 'baixa';
+  const urgLabel = urg === 'alta' ? '🔴 Urgente' : urg === 'media' || urg === 'média' ? '🟡 Médio' : '🟢 Baixo';
+
+  // Linhas do relatório — só mostrar campos com valor
+  function row(label, value, cls) {
+    if (!value && value !== 0) return '';
+    return '<div class="report-row"><span class="rk">' + label + '</span><span class="rv' + (cls ? ' ' + cls : '') + '">' + value + '</span></div>';
+  }
+
+  // Secção 1 — Identificação
+  let sec1 = '';
+  if (currentUserData.nome)    sec1 += row('Nome', currentUserData.nome);
+  if (comerc)                  sec1 += row('Comercializadora actual', comerc);
+  if (r.periodo)               sec1 += row('Período', r.periodo);
+  if (currentUserData.distrito)sec1 += row('Distrito', currentUserData.distrito);
+
+  // Secção 2 — Dados da fatura
+  let sec2 = '';
+  if (total > 0) sec2 += row('Fatura actual', total.toFixed(2) + ' €/mês', 'amber');
+  if (kwh > 0)   sec2 += row('Consumo eléctrico', kwh.toLocaleString('pt-PT') + ' kWh', '');
+
+  // Secção 3 — Recomendação
+  let sec3 = '';
+  if (recom) {
+    sec3 += '<div class="report-rec-row">'
+          +   '<div>'
+          +     '<div style="font-size:10px;color:var(--t3);margin-bottom:4px;font-family:\'JetBrains Mono\',monospace;letter-spacing:1.5px;text-transform:uppercase">✅ Operadora Recomendada</div>'
+          +     '<div class="report-rec-name">' + recom + '</div>'
+          +   '</div>'
+          +   (temPoupanca ? '<div class="report-rec-saving">−' + pMes.toFixed(0) + '€/mês · −' + pAno.toFixed(0) + '€/ano' + (perc > 0 ? ' · ' + perc.toFixed(0) + '%' : '') + '</div>' : '')
+          + '</div>';
+    if (pMes > 0) sec3 += row('Poupança mensal estimada', '− ' + pMes.toFixed(0) + ' €', 'green');
+    if (pAno > 0) sec3 += row('Poupança anual estimada',  '− ' + pAno.toFixed(0) + ' €', 'green');
+    if (perc > 0) sec3 += row('Percentagem de desconto',  perc.toFixed(0) + '%', 'green');
+  }
+
+  // Secção 4 — Próximo passo
+  const ctaText = temPoupanca
+    ? 'Está a pagar <strong>' + (pMes > 0 ? pMes.toFixed(0) + '€ por mês</strong> acima do necessário. ' : 'mais do que devia.</strong> ')
+      + 'A nossa equipa trata de todo o processo de mudança — sem burocracia, sem custos.'
+    : 'A nossa equipa pode confirmar se existem optimizações adicionais para o seu perfil de consumo.';
+
+  const reportHTML =
+    '<div class="full-report" id="fullReport">'
+    + '<div class="report-hdr">'
+    +   '<div class="report-hdr-title">📄 Relatório Completo da Análise</div>'
+    +   (r.urgencia ? '<span class="report-urg ' + urgClass + '">' + urgLabel + '</span>' : '')
+    + '</div>'
+    + '<div class="report-body">'
+
+    + (sec1 ? '<div class="report-sec"><div class="report-sec-title">Identificação</div>' + sec1 + '</div>' : '')
+    + (sec2 ? '<div class="report-sec"><div class="report-sec-title">Dados da Fatura</div>' + sec2 + '</div>' : '')
+
+    + (sec3
+      ? '<div class="report-sec"><div class="report-sec-title">Recomendação ENERSIA</div>' + sec3 + '</div>'
+      : '')
+
+    + '<div class="report-sec">'
+    +   '<div class="report-sec-title">Próximo Passo</div>'
+    +   '<div class="report-next">'
+    +     '<div class="report-next-title">' + (temPoupanca ? '💡 Como começar a poupar' : '📞 Fale com um especialista') + '</div>'
+    +     '<div class="report-next-desc">' + ctaText + '</div>'
+    +     '<div class="report-next-btns">'
+    +       '<a class="btn-cta-wa" href="https://wa.me/351910322702?text=' + encodeURIComponent('Olá! Acabei de analisar a minha fatura na ENERSIA' + (recom ? ' e vi que posso mudar para ' + recom : '') + '. Podem ajudar-me?') + '" target="_blank" style="font-size:13px;padding:10px 18px"><svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp</a>'
+    +       '<a class="btn-cta-main" href="https://calendly.com/geralenersia/30min" target="_blank" style="font-size:13px;padding:10px 18px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Reunião Gratuita</a>'
+    +     '</div>'
+    +   '</div>'
+    + '</div>'
+
+    + '</div>'
+    + '</div>';
+
+  // Inserir relatório após o resCard
+  document.getElementById('resCard').insertAdjacentHTML('afterend', reportHTML);
+
+  // Scroll suave para o início do resultado
+  setTimeout(() => document.getElementById('resCard').scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
 }
 
 // ---- RESET ----
