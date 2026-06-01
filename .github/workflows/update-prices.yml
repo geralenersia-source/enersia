@@ -287,24 +287,55 @@ jobs:
                   origem = "NOVO" if k in encontrados else "MANTIDO"
                   print(f"  {k:<12}: {v}  [{origem}]")
 
-              # 6. Construir JSON de saída
+              # 6. Ler estado anterior para comparação e cálculo de dias
               agora = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-              resultado = {**precos_finais, "ultima_atualizacao": agora, "fonte": "ERSE"}
-              json_novo = json.dumps(resultado, ensure_ascii=False, indent=2)
+              ultima_atualizacao_anterior = agora  # default: hoje
+              dias_sem_alt = 0
+
+              precos_anteriores_obj = {}
+              if PRECOS_FILE.exists():
+                  try:
+                      precos_anteriores_obj = json.loads(PRECOS_FILE.read_text(encoding="utf-8"))
+                      ua = precos_anteriores_obj.get("ultima_atualizacao") or precos_anteriores_obj.get("updatedAt")
+                      if ua:
+                          ultima_atualizacao_anterior = ua
+                          try:
+                              dt_ant = datetime.fromisoformat(ua.replace("Z", "+00:00"))
+                              dt_now = datetime.now(timezone.utc)
+                              dias_sem_alt = (dt_now - dt_ant).days
+                          except Exception:
+                              pass
+                  except Exception:
+                      pass
 
               # 7. Verificar se houve alteração real nos preços
               def so_precos(d):
-                  return {k: str(v) for k, v in d.items() if k not in ("ultima_atualizacao", "fonte")}
+                  campos_meta = {"ultima_atualizacao", "ultima_verificacao", "updatedAt",
+                                 "updatedAtLisbon", "fonte", "source", "alterado",
+                                 "dias_sem_alteracao"}
+                  return {k: str(v) for k, v in d.items() if k not in campos_meta}
 
               alterado = True
-              if PRECOS_FILE.exists():
-                  try:
-                      atual = json.loads(PRECOS_FILE.read_text(encoding="utf-8"))
-                      if so_precos(atual) == so_precos(resultado):
-                          alterado = False
-                          print("\nPreços sem alteração — não haverá commit.")
-                  except Exception:
-                      pass
+              if precos_anteriores_obj:
+                  if so_precos(precos_anteriores_obj) == so_precos({**precos_finais}):
+                      alterado = False
+                      print(f"\nPreços sem alteração — mantidos desde {ultima_atualizacao_anterior[:10]}.")
+
+              # 8. Construir JSON de saída
+              # ultima_atualizacao só muda quando os preços mudam
+              # ultima_verificacao é sempre actualizado (registo diário do check)
+              ultima_atualizacao_final = agora if alterado else ultima_atualizacao_anterior
+              dias_final = 0 if alterado else dias_sem_alt
+
+              resultado = {
+                  **precos_finais,
+                  "ultima_atualizacao": ultima_atualizacao_final,
+                  "ultima_verificacao": agora,
+                  "alterado": alterado,
+                  "dias_sem_alteracao": dias_final,
+                  "fonte": "ERSE",
+              }
+              json_novo = json.dumps(resultado, ensure_ascii=False, indent=2)
 
               PRECOS_FILE.write_text(json_novo + "\n", encoding="utf-8")
               print(f"\nprecos.json escrito:\n{json_novo}")
@@ -315,17 +346,23 @@ jobs:
                   f.write(f"alterado={'true' if alterado else 'false'}\n")
                   f.write("erro=\n")
                   f.write(f"resumo={resumo}\n")
+                  f.write(f"dias_sem_alt={dias_final}\n")
+                  f.write(f"ultima_atualizacao={ultima_atualizacao_final[:10]}\n")
 
           main()
           PYEOF
 
-      - name: Commit e push (apenas se alterado)
-        if: steps.scrape.outputs.sucesso == 'true' && steps.scrape.outputs.alterado == 'true'
+      - name: Commit e push
+        if: steps.scrape.outputs.sucesso == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add precos.json
-          git commit -m "fix: scraping ERSE via interceção API JSON"
+          if [ "${{ steps.scrape.outputs.alterado }}" = "true" ]; then
+            git commit -m "chore: actualizar precos.json — dados ERSE $(date -u '+%Y-%m-%d')"
+          else
+            git commit -m "chore: verificacao diaria ERSE — sem alteracao de precos $(date -u '+%Y-%m-%d')"
+          fi
           git push
 
       - name: Telegram — sucesso
@@ -335,18 +372,58 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           RESUMO: ${{ steps.scrape.outputs.resumo }}
           ALTERADO: ${{ steps.scrape.outputs.alterado }}
+          DIAS: ${{ steps.scrape.outputs.dias_sem_alt }}
+          ULT_AT: ${{ steps.scrape.outputs.ultima_atualizacao }}
         run: |
-          if [ "$ALTERADO" = "true" ]; then
-            EMOJI="✅"; ESTADO="Preços actualizados e guardados"
-          else
-            EMOJI="ℹ️"; ESTADO="Preços sem alteração — sem commit"
-          fi
           DATA=$(date -u '+%Y-%m-%d %H:%M UTC')
-          LINHAS=$(echo "$RESUMO" | tr '|' '\n' | sed 's/^ //;s/ $//' | sed 's/:/: /')
-          MSG="${EMOJI} ENERSIA — ${ESTADO}
-          📅 ${DATA}
+          LINHAS=$(echo "$RESUMO" | tr '|' '\n' | sed 's/^ //;s/ $//' | sed 's/:/: €\/kWh — /')
 
-          ${LINHAS}"
+          if [ "$ALTERADO" = "true" ]; then
+            # Preços mudaram — notificação positiva
+            MSG="✅ ENERSIA — Preços actualizados
+📅 ${DATA}
+
+Comercializadoras actualizadas:
+${LINHAS}
+
+Dados guardados em precos.json e disponíveis no site."
+
+          elif [ "${DIAS}" -ge 6 ] 2>/dev/null; then
+            # 6+ dias sem alteração — alerta possível problema
+            MSG="🚨 ENERSIA — Verificar sistema de preços
+📅 ${DATA}
+
+⚠️ Preços sem alteração há ${DIAS} dias (desde ${ULT_AT}).
+Isto pode ser normal (ERSE não actualizou) ou indicar um problema no scraper.
+
+Acção recomendada: verificar logs do GitHub Actions e simuladorprecos.erse.pt
+
+Preços actuais:
+${LINHAS}"
+
+          elif [ "${DIAS}" -ge 3 ] 2>/dev/null; then
+            # 3–5 dias sem alteração — aviso subtil
+            MSG="⚠️ ENERSIA — Preços estáveis (${DIAS} dias)
+📅 ${DATA}
+
+Os preços da ERSE não foram alterados desde ${ULT_AT}.
+Sistema a funcionar normalmente — próxima revisão ERSE prevista trimestralmente.
+
+Preços confirmados:
+${LINHAS}"
+
+          else
+            # 0–2 dias sem alteração — normal
+            MSG="ℹ️ ENERSIA — Verificação diária concluída
+📅 ${DATA}
+
+Sem alterações de preços (último update: ${ULT_AT}).
+Sistema a funcionar correctamente.
+
+Preços actuais:
+${LINHAS}"
+          fi
+
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -d "chat_id=${TELEGRAM_CHAT_ID}" \
             --data-urlencode "text=${MSG}" > /dev/null
