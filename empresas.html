@@ -956,17 +956,17 @@ function showResult(r) {
   document.getElementById('resCard').classList.add('show');
   document.getElementById('btnNova').style.display = 'block';
   const pMes = parseFloat(r.poupanca_mensal_estimada) || 0;
-  const pAno = pMes * 12;
+  const pAno = parseFloat(r.poupanca_anual_estimada) || (pMes * 12);
   const perc = parseFloat(r.percentagem_poupanca) || 0;
   const total = parseFloat(r.total_fatura) || 0;
   document.getElementById('rComercializadora').textContent = r.comercializadora || 'Actual';
   document.getElementById('rPeriodo').textContent = r.periodo || '';
-  if (pMes > 0) { document.getElementById('resSavingBox').style.display = 'block'; document.getElementById('rPoupanca').textContent = '−' + pMes.toFixed(0) + '€'; }
+  if (pMes > 0) { document.getElementById('resSavingBox').style.display = 'block'; document.getElementById('rPoupanca').textContent = '−' + pMes.toFixed(2) + '€'; }
   let grid = '';
   if (total > 0) grid += '<div class="res-item"><div class="res-item-label">Fatura actual</div><div class="res-item-val amber">' + total.toFixed(2) + '€/mês</div></div>';
-  if (pMes > 0) grid += '<div class="res-item"><div class="res-item-label">Poupança mensal</div><div class="res-item-val green">−' + pMes.toFixed(0) + '€/mês</div></div>';
-  if (pAno > 0) grid += '<div class="res-item"><div class="res-item-label">Poupança anual</div><div class="res-item-val green">−' + pAno.toFixed(0) + '€/ano</div></div>';
-  if (perc > 0) grid += '<div class="res-item"><div class="res-item-label">Desconto</div><div class="res-item-val green">' + perc.toFixed(0) + '% mais barato</div></div>';
+  grid += '<div class="res-item"><div class="res-item-label">Poupança mensal</div><div class="res-item-val green">−' + pMes.toFixed(2) + '€/mês</div></div>';
+  grid += '<div class="res-item"><div class="res-item-label">Poupança anual</div><div class="res-item-val green">−' + pAno.toFixed(2) + '€/ano</div></div>';
+  grid += '<div class="res-item"><div class="res-item-label">Desconto</div><div class="res-item-val green">' + perc.toFixed(1) + '% mais barato</div></div>';
   document.getElementById('resGrid').innerHTML = grid || '<div class="res-item"><div class="res-item-label">Análise</div><div class="res-item-val">Ver recomendação abaixo</div></div>';
   let html = '';
   const recom = r.recomendacao_comercializador || '';
