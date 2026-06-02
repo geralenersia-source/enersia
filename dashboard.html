@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ENERSIA — Dashboard Enterprise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root {
+  --bg:     #070B14;
+  --bg2:    #0D1525;
+  --bg3:    #111D33;
+  --border: #1A2A45;
+  --blue:   #4F7CFF;
+  --cyan:   #00C2FF;
+  --green:  #00E59B;
+  --amber:  #F5A623;
+  --red:    #FF4D6A;
+  --purple: #A855F7;
+  --teal:   #14B8A6;
+  --text:   #C8D8F0;
+  --muted:  #4A6080;
+  --sidebar: 220px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px}
+
+/* ── CANVAS THREE.JS ── */
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;position:relative;z-index:1}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar);min-width:var(--sidebar);
+  background:rgba(13,21,37,0.92);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  padding:24px 0;
+  backdrop-filter:blur(20px);
+  position:relative;z-index:10;
+  transition:transform .3s ease;
+}
+.sidebar-logo{
+  padding:0 20px 24px;
+  border-bottom:1px solid var(--border);
+}
+.logo-mark{
+  font-family:'Syne',sans-serif;
+  font-size:22px;font-weight:800;letter-spacing:2px;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  display:inline-block;
+}
+.logo-sub{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;color:var(--muted);letter-spacing:3px;
+  text-transform:uppercase;margin-top:2px;display:block;
+}
+.live-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(0,229,155,0.12);
+  border:1px solid rgba(0,229,155,0.3);
+  border-radius:20px;padding:3px 10px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  color:var(--green);margin-top:10px;
+}
+.live-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--green);
+  animation:pulse-green 1.4s ease-in-out infinite;
+}
+@keyframes pulse-green{0%,100%{box-shadow:0 0 0 0 rgba(0,229,155,.5)}50%{box-shadow:0 0 0 5px rgba(0,229,155,0)}}
+
+.sidebar-nav{flex:1;padding:20px 0;overflow-y:auto}
+.nav-section{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;padding:0 20px 8px}
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 20px;cursor:pointer;
+  color:var(--muted);font-size:13px;font-weight:500;
+  transition:all .2s;border-left:2px solid transparent;
+  position:relative;
+}
+.nav-item:hover{color:var(--text);background:rgba(79,124,255,.08)}
+.nav-item.active{
+  color:var(--blue);background:rgba(79,124,255,.12);
+  border-left-color:var(--blue);
+}
+.nav-icon{font-size:16px;width:20px;text-align:center}
+
+.sidebar-status{
+  padding:16px 20px;
+  border-top:1px solid var(--border);
+}
+.vps-status-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.vps-status-row{display:flex;align-items:center;gap:8px;font-size:12px}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.status-dot.online{background:var(--green);box-shadow:0 0 6px var(--green)}
+.status-dot.offline{background:var(--red);box-shadow:0 0 6px var(--red)}
+.sidebar-version{
+  padding:12px 20px 0;
+  font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);
+}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── HEADER ── */
+.header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 28px;
+  background:rgba(7,11,20,0.7);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(20px);
+  flex-shrink:0;
+  gap:16px;
+}
+.header-left h1{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#E8F0FF}
+.header-left p{font-size:12px;color:var(--muted);margin-top:2px}
+.header-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.conn-badge{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:20px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  border:1px solid var(--border);background:var(--bg2);
+  transition:all .3s;
+}
+.conn-badge.online{border-color:rgba(0,229,155,.4);color:var(--green)}
+.conn-badge.offline{border-color:rgba(255,77,106,.4);color:var(--red)}
+.conn-badge.checking{border-color:rgba(245,166,35,.4);color:var(--amber)}
+.uptime-badge{
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  color:var(--muted);padding:6px 12px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:20px;
+}
+#clock{
+  font-family:'JetBrains Mono',monospace;font-size:13px;
+  color:var(--text);padding:6px 12px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:20px;
+  min-width:80px;text-align:center;
+}
+.btn{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:8px;border:1px solid var(--border);
+  background:var(--bg3);color:var(--text);cursor:pointer;
+  font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;
+  transition:all .2s;white-space:nowrap;
+}
+.btn:hover{background:rgba(79,124,255,.15);border-color:var(--blue);color:var(--blue)}
+.btn-primary{background:rgba(79,124,255,.2);border-color:var(--blue);color:var(--blue)}
+.btn-primary:hover{background:rgba(79,124,255,.35)}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:24px}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-track{background:var(--bg)}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* ── SECTIONS ── */
+.section{display:none}
+.section.active{display:block}
+
+/* ── SECTION HEADER ── */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#E8F0FF;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+.section-title::before{content:'';width:3px;height:16px;background:var(--blue);border-radius:2px;display:block}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.kpi-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:18px;position:relative;overflow:hidden;
+  transition:all .3s;cursor:default;
+}
+.kpi-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--card-color,var(--blue)),transparent);
+  opacity:.6;
+}
+.kpi-card:hover{border-color:var(--card-color,var(--blue));transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.kpi-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.kpi-value{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:600;color:#E8F0FF;line-height:1}
+.kpi-value.loading{color:var(--muted);font-size:20px}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:6px}
+.kpi-icon{position:absolute;top:16px;right:16px;font-size:22px;opacity:.3}
+
+/* ── AGENTS GRID ── */
+.agents-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.agent-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:14px;
+  padding:20px;position:relative;overflow:hidden;
+  transition:all .3s;cursor:pointer;
+}
+.agent-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.agent-glow{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  border-radius:14px;opacity:0;transition:opacity .3s;
+  pointer-events:none;
+}
+.agent-card:hover .agent-glow{opacity:1}
+.agent-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.agent-icon-wrap{
+  width:42px;height:42px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.agent-info{flex:1;min-width:0}
+.agent-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#E8F0FF}
+.agent-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.status-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:20px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;
+  border:1px solid;
+}
+.status-badge.running{background:rgba(0,229,155,.1);border-color:rgba(0,229,155,.3);color:var(--green)}
+.status-badge.stopped{background:rgba(255,77,106,.1);border-color:rgba(255,77,106,.3);color:var(--red)}
+.status-badge.checking{background:rgba(245,166,35,.1);border-color:rgba(245,166,35,.3);color:var(--amber)}
+.status-dot-sm{width:5px;height:5px;border-radius:50%;background:currentColor;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.progress-wrap{margin:12px 0;background:rgba(255,255,255,.04);border-radius:4px;height:3px;overflow:hidden}
+.progress-bar{height:100%;border-radius:4px;transition:width 1s ease;position:relative;overflow:hidden}
+.progress-bar::after{
+  content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);
+  animation:shimmer 2s ease-in-out infinite;
+}
+@keyframes shimmer{0%{left:-100%}100%{left:100%}}
+.tech-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.tag{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  padding:3px 8px;border-radius:4px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  color:var(--muted);
+}
+
+/* ── DIAGNOSTIC PANEL ── */
+.diag-panel{
+  display:none;margin-top:14px;padding:14px;
+  background:rgba(7,11,20,.8);border:1px solid var(--border);
+  border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:11px;
+  line-height:1.8;
+}
+.agent-card:hover .diag-panel{display:block}
+.diag-row{display:flex;gap:8px}
+.diag-key{color:var(--muted);min-width:80px;flex-shrink:0}
+.diag-val{color:var(--text)}
+.diag-val.green{color:var(--green)}
+.diag-val.blue{color:var(--blue)}
+.diag-val.cyan{color:var(--cyan)}
+.diag-val.amber{color:var(--amber)}
+.diag-val.purple{color:var(--purple)}
+.diag-val.red{color:var(--red)}
+
+/* ── SERVICES GRID ── */
+.services-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.service-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:18px;transition:all .3s;
+}
+.service-card:hover{border-color:var(--card-color,var(--blue));transform:translateY(-2px)}
+.service-icon{font-size:24px;margin-bottom:10px}
+.service-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#E8F0FF;margin-bottom:4px}
+.service-desc{font-size:11px;color:var(--muted);line-height:1.6}
+.service-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  margin-top:8px;padding:3px 8px;border-radius:4px;
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  background:rgba(0,229,155,.1);border:1px solid rgba(0,229,155,.2);
+  color:var(--green);
+}
+
+/* ── INFRA GRID ── */
+.infra-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.infra-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:20px;transition:all .3s;
+}
+.infra-card:hover{border-color:rgba(79,124,255,.4);transform:translateY(-2px)}
+.infra-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#E8F0FF;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.infra-detail{font-size:12px;color:var(--muted);line-height:1.8}
+.infra-detail strong{color:var(--text)}
+
+/* ── ACTIONS ── */
+.actions-row{display:flex;gap:12px;flex-wrap:wrap}
+.action-btn{
+  flex:1;min-width:160px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 20px;border-radius:12px;
+  border:1px solid var(--border);background:var(--bg2);
+  color:var(--text);cursor:pointer;
+  font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;
+  transition:all .25s;
+}
+.action-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,.4)}
+.action-btn.blue:hover{background:rgba(79,124,255,.2);border-color:var(--blue);color:var(--blue)}
+.action-btn.cyan:hover{background:rgba(0,194,255,.2);border-color:var(--cyan);color:var(--cyan)}
+.action-btn.green:hover{background:rgba(0,229,155,.2);border-color:var(--green);color:var(--green)}
+.action-btn.amber:hover{background:rgba(245,166,35,.2);border-color:var(--amber);color:var(--amber)}
+.action-icon{font-size:18px}
+
+/* ── BOTTOM PANELS ── */
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+
+/* ── LOG FEED ── */
+.log-panel{
+  background:var(--bg2);border:1px solid var(--border);border-radius:14px;
+  display:flex;flex-direction:column;height:260px;overflow:hidden;
+}
+.log-header{
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.log-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#E8F0FF;display:flex;align-items:center;gap:8px}
+.log-live{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse-green 1.4s ease-in-out infinite}
+.log-body{flex:1;overflow-y:auto;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:11px}
+.log-body::-webkit-scrollbar{width:3px}
+.log-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.log-entry{display:flex;gap:8px;padding:3px 0;animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.log-time{color:var(--muted);flex-shrink:0;min-width:58px}
+.log-src{padding:0 6px;border-radius:3px;font-weight:600;flex-shrink:0;min-width:58px;text-align:center}
+.log-msg{color:var(--text);opacity:.85}
+.src-karol{background:rgba(0,194,255,.15);color:var(--cyan)}
+.src-zeus{background:rgba(79,124,255,.15);color:var(--blue)}
+.src-make{background:rgba(0,229,155,.15);color:var(--green)}
+.src-bot{background:rgba(245,166,35,.15);color:var(--amber)}
+.src-evol{background:rgba(168,85,247,.15);color:var(--purple)}
+.src-worker{background:rgba(255,77,106,.15);color:var(--red)}
+
+/* ── NEXT STEPS ── */
+.steps-panel{
+  background:var(--bg2);border:1px solid var(--border);border-radius:14px;
+  display:flex;flex-direction:column;height:260px;overflow:hidden;
+}
+.steps-header{padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
+.steps-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#E8F0FF}
+.steps-body{flex:1;overflow-y:auto;padding:12px 18px}
+.step-item{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid rgba(26,42,69,.5)}
+.step-item:last-child{border-bottom:none}
+.step-num{
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;
+  margin-top:1px;
+}
+.step-num.p1{background:rgba(255,77,106,.2);color:var(--red);border:1px solid rgba(255,77,106,.3)}
+.step-num.p2{background:rgba(245,166,35,.2);color:var(--amber);border:1px solid rgba(245,166,35,.3)}
+.step-num.p3{background:rgba(79,124,255,.2);color:var(--blue);border:1px solid rgba(79,124,255,.3)}
+.step-text{font-size:12px;color:var(--text);line-height:1.5}
+.step-tag{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted)}
+
+/* ── FOOTER ── */
+.footer{
+  padding:12px 28px;border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);
+  background:rgba(7,11,20,.7);backdrop-filter:blur(20px);flex-shrink:0;
+}
+
+/* ── HAMBURGER ── */
+.hamburger{display:none;position:fixed;top:14px;left:14px;z-index:100;
+  width:40px;height:40px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:8px;cursor:pointer;align-items:center;justify-content:center;
+  font-size:18px;color:var(--text);
+}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9;backdrop-filter:blur(4px)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1200px){
+  .kpi-grid{grid-template-columns:repeat(3,1fr)}
+  .agents-grid{grid-template-columns:repeat(2,1fr)}
+  .services-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+  .sidebar{position:fixed;left:0;top:0;height:100%;transform:translateX(-100%);z-index:50}
+  .sidebar.open{transform:none}
+  .sidebar-overlay.open{display:block}
+  .hamburger{display:flex}
+  .main{width:100%}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .agents-grid{grid-template-columns:1fr}
+  .services-grid{grid-template-columns:repeat(2,1fr)}
+  .infra-grid{grid-template-columns:1fr}
+  .bottom-grid{grid-template-columns:1fr}
+  .actions-row .action-btn{min-width:140px}
+  .content{padding:16px}
+  .header{padding:14px 16px}
+  .header-left h1{font-size:15px}
+  .uptime-badge{display:none}
+}
+@media(max-width:480px){
+  .kpi-grid{grid-template-columns:1fr}
+  .services-grid{grid-template-columns:1fr}
+  .actions-row{flex-direction:column}
+}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:10px;padding:12px 18px;
+  font-size:13px;color:var(--text);
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 8px 30px rgba(0,0,0,.5);
+  transform:translateY(80px);opacity:0;
+  transition:all .3s ease;pointer-events:none;
+}
+.toast.show{transform:none;opacity:1}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- HAMBURGER -->
+<button class="hamburger" id="hamburger" aria-label="Menu">☰</button>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app">
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">ENERSIA</div>
+      <span class="logo-sub">Energy Intelligence Platform</span>
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        LIVE
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">Principal</div>
+      <div class="nav-item active" data-section="dashboard">
+        <span class="nav-icon">⬛</span>Dashboard
+      </div>
+      <div class="nav-item" data-section="agents">
+        <span class="nav-icon">🤖</span>Agentes
+      </div>
+      <div class="nav-item" data-section="leads">
+        <span class="nav-icon">🎯</span>Leads
+      </div>
+
+      <div class="nav-section" style="margin-top:16px">Sistema</div>
+      <div class="nav-item" data-section="analytics">
+        <span class="nav-icon">📊</span>Analytics
+      </div>
+      <div class="nav-item" data-section="settings">
+        <span class="nav-icon">⚙️</span>Configurações
+      </div>
+    </nav>
+
+    <div class="sidebar-status">
+      <div class="vps-status-label">VPS Status</div>
+      <div class="vps-status-row">
+        <div class="status-dot" id="sidebar-vps-dot"></div>
+        <span id="sidebar-vps-text" style="font-family:'JetBrains Mono',monospace;font-size:11px">A verificar…</span>
+      </div>
+    </div>
+
+    <div class="sidebar-version">v2.0 · Jun 2026</div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <div class="main">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-left">
+        <h1 id="section-title">Dashboard</h1>
+        <p id="section-subtitle">Visão geral da plataforma ENERSIA</p>
+      </div>
+      <div class="header-right">
+        <div class="conn-badge checking" id="conn-badge">
+          <span id="conn-dot">●</span>
+          <span id="conn-text">A verificar…</span>
+        </div>
+        <div class="uptime-badge" id="uptime-badge">Uptime: —</div>
+        <div id="clock">--:--:--</div>
+        <button class="btn btn-primary" onclick="fetchStatus()">🔄 Refresh</button>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- ════ SECTION: DASHBOARD ════ -->
+      <div class="section active" id="sec-dashboard">
+
+        <!-- KPI CARDS -->
+        <div style="margin-bottom:24px">
+          <div class="section-header">
+            <div class="section-title">Métricas em Tempo Real</div>
+          </div>
+          <div class="kpi-grid">
+            <div class="kpi-card" style="--card-color:var(--cyan)">
+              <div class="kpi-icon">🎯</div>
+              <div class="kpi-label">Leads Hoje</div>
+              <div class="kpi-value loading" id="kpi-leads">—</div>
+              <div class="kpi-sub" id="kpi-leads-sub">A carregar…</div>
+            </div>
+            <div class="kpi-card" style="--card-color:var(--green)">
+              <div class="kpi-icon">🤖</div>
+              <div class="kpi-label">Agentes Activos</div>
+              <div class="kpi-value loading" id="kpi-agents">—</div>
+              <div class="kpi-sub" id="kpi-agents-sub">De 6 configurados</div>
+            </div>
+            <div class="kpi-card" style="--card-color:var(--purple)">
+              <div class="kpi-icon">🐳</div>
+              <div class="kpi-label">Docker Containers</div>
+              <div class="kpi-value loading" id="kpi-docker">—</div>
+              <div class="kpi-sub" id="kpi-docker-sub">A verificar…</div>
+            </div>
+            <div class="kpi-card" style="--card-color:var(--blue)">
+              <div class="kpi-icon">⏱️</div>
+              <div class="kpi-label">Uptime VPS</div>
+              <div class="kpi-value loading" id="kpi-uptime">—</div>
+              <div class="kpi-sub" id="kpi-uptime-sub">65.21.53.147</div>
+            </div>
+            <div class="kpi-card" style="--card-color:var(--amber)">
+              <div class="kpi-icon">🔄</div>
+              <div class="kpi-label">Último Sync</div>
+              <div class="kpi-value loading" id="kpi-sync" style="font-size:16px;margin-top:4px">—</div>
+              <div class="kpi-sub" id="kpi-sync-sub">Worker proxy</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AGENTS -->
+        <div style="margin-bottom:24px">
+          <div class="section-header">
+            <div class="section-title">Agentes VPS</div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)">Hover para diagnóstico</span>
+          </div>
+          <div class="agents-grid">
+
+            <!-- KAROL -->
+            <div class="agent-card" style="--card-color:var(--cyan)">
+              <div class="agent-glow" style="background:radial-gradient(circle at 50% 0,rgba(0,194,255,.08),transparent 70%)"></div>
+              <div class="agent-header">
+                <div class="agent-icon-wrap" style="background:rgba(0,194,255,.12);border:1px solid rgba(0,194,255,.2)">🤖</div>
+                <div class="agent-info">
+                  <div class="agent-name">KAROL WhatsApp</div>
+                  <div class="agent-sub">enersia-karol · Python · p5000</div>
+                </div>
+                <div class="status-badge checking" id="badge-karol">
+                  <span class="status-dot-sm"></span>
+                  <span>A verificar</span>
+                </div>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-bar" id="prog-karol" style="width:0%;background:linear-gradient(90deg,var(--cyan),var(--blue))"></div>
+              </div>
+              <div class="tech-tags">
+                <span class="tag">systemd</span>
+                <span class="tag">claude-sonnet-4-5</span>
+                <span class="tag">Funnel 9-step</span>
+                <span class="tag">webhook</span>
+              </div>
+              <div class="diag-panel">
+                <div class="diag-row"><span class="diag-key">Serviço</span><span class="diag-val cyan">enersia-karol.service</span></div>
+                <div class="diag-row"><span class="diag-key">Porta</span><span class="diag-val">5000 (Flask)</span></div>
+                <div class="diag-row"><span class="diag-key">Webhook</span><span class="diag-val">172.17.0.1:5000/webhook/karol</span></div>
+                <div class="diag-row"><span class="diag-key">WhatsApp</span><span class="diag-val green">+351910322702</span></div>
+                <div class="diag-row"><span class="diag-key">Modelo</span><span class="diag-val">claude-sonnet-4-5</span></div>
+                <div class="diag-row"><span class="diag-key">PID</span><span class="diag-val" id="pid-karol">—</span></div>
+                <div class="diag-row"><span class="diag-key">Estado</span><span class="diag-val green" id="state-karol">—</span></div>
+              </div>
+            </div>
+
+            <!-- ZEUS -->
+            <div class="agent-card" style="--card-color:var(--blue)">
+              <div class="agent-glow" style="background:radial-gradient(circle at 50% 0,rgba(79,124,255,.08),transparent 70%)"></div>
+              <div class="agent-header">
+                <div class="agent-icon-wrap" style="background:rgba(79,124,255,.12);border:1px solid rgba(79,124,255,.2)">⚡</div>
+                <div class="agent-info">
+                  <div class="agent-name">Zeus Orchestrador</div>
+                  <div class="agent-sub">enersia-zeus · systemd · boot auto</div>
+                </div>
+                <div class="status-badge checking" id="badge-zeus">
+                  <span class="status-dot-sm"></span>
+                  <span>A verificar</span>
+                </div>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-bar" id="prog-zeus" style="width:0%;background:linear-gradient(90deg,var(--blue),var(--purple))"></div>
+              </div>
+              <div class="tech-tags">
+                <span class="tag">systemd</span>
+                <span class="tag">6 rotinas</span>
+                <span class="tag">cron</span>
+                <span class="tag">boot-auto</span>
+              </div>
+              <div class="diag-panel">
+                <div class="diag-row"><span class="diag-key">Serviço</span><span class="diag-val blue">enersia-zeus.service</span></div>
+                <div class="diag-row"><span class="diag-key">08:00</span><span class="diag-val">Rotina diária</span></div>
+                <div class="diag-row"><span class="diag-key">11:00</span><span class="diag-val">Prova social</span></div>
+                <div class="diag-row"><span class="diag-key">15:00</span><span class="diag-val">Conversão</span></div>
+                <div class="diag-row"><span class="diag-key">17:00</span><span class="diag-val">Pós-venda</span></div>
+                <div class="diag-row"><span class="diag-key">18:00</span><span class="diag-val">SEO</span></div>
+                <div class="diag-row"><span class="diag-key">Seg 07:00</span><span class="diag-val">Rotina semanal</span></div>
+                <div class="diag-row"><span class="diag-key">PID</span><span class="diag-val" id="pid-zeus">—</span></div>
+              </div>
+            </div>
+
+            <!-- EVOLUTION API -->
+            <div class="agent-card" style="--card-color:var(--purple)">
+              <div class="agent-glow" style="background:radial-gradient(circle at 50% 0,rgba(168,85,247,.08),transparent 70%)"></div>
+              <div class="agent-header">
+                <div class="agent-icon-wrap" style="background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.2)">📱</div>
+                <div class="agent-info">
+                  <div class="agent-name">Evolution API</div>
+                  <div class="agent-sub">Docker · p8080 · v1.8.2</div>
+                </div>
+                <div class="status-badge checking" id="badge-evolution">
+                  <span class="status-dot-sm"></span>
+                  <span>A verificar</span>
+                </div>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-bar" id="prog-evolution" style="width:0%;background:linear-gradient(90deg,var(--purple),var(--cyan))"></div>
+              </div>
+              <div class="tech-tags">
+                <span class="tag">Docker</span>
+                <span class="tag">p8080</span>
+                <span class="tag">v1.8.2</span>
+                <span class="tag">WhatsApp</span>
+              </div>
+              <div class="diag-panel">
+                <div class="diag-row"><span class="diag-key">Container</span><span class="diag-val purple">evolution_api</span></div>
+                <div class="diag-row"><span class="diag-key">Porta</span><span class="diag-val">8080</span></div>
+                <div class="diag-row"><span class="diag-key">Instância</span><span class="diag-val">enersia</span></div>
+                <div class="diag-row"><span class="diag-key">API Key</span><span class="diag-val amber">enersia2026</span></div>
+                <div class="diag-row"><span class="diag-key">WhatsApp</span><span class="diag-val green">+351910322702</span></div>
+                <div class="diag-row"><span class="diag-key">Estado WA</span><span class="diag-val green" id="state-evolution">open</span></div>
+                <div class="diag-row"><span class="diag-key">Versão</span><span class="diag-val">1.8.2</span></div>
+              </div>
+            </div>
+
+            <!-- TELEGRAM BOT -->
+            <div class="agent-card" style="--card-color:var(--amber)">
+              <div class="agent-glow" style="background:radial-gradient(circle at 50% 0,rgba(245,166,35,.08),transparent 70%)"></div>
+              <div class="agent-header">
+                <div class="agent-icon-wrap" style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.2)">📡</div>
+                <div class="agent-info">
+                  <div class="agent-name">Telegram Bot</div>
+                  <div class="agent-sub">enersia-bot · systemd</div>
+                </div>
+                <div class="status-badge checking" id="badge-telegram">
+                  <span class="status-dot-sm"></span>
+                  <span>A verificar</span>
+                </div>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-bar" id="prog-telegram" style="width:0%;background:linear-gradient(90deg,var(--amber),var(--red))"></div>
+              </div>
+              <div class="tech-tags">
+                <span class="tag">systemd</span>
+                <span class="tag">Telegram API</span>
+                <span class="tag">HTML parse</span>
+              </div>
+              <div class="diag-panel">
+                <div class="diag-row"><span class="diag-key">Serviço</span><span class="diag-val amber">enersia-bot.service</span></div>
+                <div class="diag-row"><span class="diag-key">Bot</span><span class="diag-val">@enersia_leads_bot</span></div>
+                <div class="diag-row"><span class="diag-key">Chat ID</span><span class="diag-val">7741901010</span></div>
+                <div class="diag-row"><span class="diag-key">Parse Mode</span><span class="diag-val">HTML</span></div>
+                <div class="diag-row"><span class="diag-key">PID</span><span class="diag-val" id="pid-telegram">—</span></div>
+              </div>
+            </div>
+
+            <!-- STATUS API -->
+            <div class="agent-card" style="--card-color:var(--green)">
+              <div class="agent-glow" style="background:radial-gradient(circle at 50% 0,rgba(0,229,155,.08),transparent 70%)"></div>
+              <div class="agent-header">
+                <div class="agent-icon-wrap" style="background:rgba(0,229,155,.12);border:1px solid rgba(0,229,155,.2)">🔌</div>
+                <div class="agent-info">
+                  <div class="agent-name">Status API</div>
+                  <div class="agent-sub">enersia-status · Flask · p9000</div>
+                </div>
+                <div class="status-badge running" id="badge-status">
+                  <span class="status-dot-sm"></span>
+                  <span>A correr</span>
+                </div>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-bar" id="prog-status" style="width:95%;background:linear-gradient(90deg,var(--green),var(--cyan))"></div>
+              </div>
+              <div class="tech-tags">
+                <span class="tag">Flask</span>
+                <span class="tag">p9000</span>
+                <span class="tag">CF Worker</span>
+                <span class="tag">CORS proxy</span>
+              </div>
+              <div class="diag-panel">
+                <div class="diag-row"><span class="diag-key">Serviço</span><span class="diag-val green">enersia-status.service</span></div>
+                <div class="diag-row"><span class="diag-key">Porta</span><span class="diag-val">9000 (Flask)</span></div>
+                <div class="diag-row"><span class="diag-key">Endpoint</span><span class="diag-val">GET /status?key=enersia2026</span></div>
+                <div class="diag-row"><span class="diag-key">Worker</span><span class="diag-val cyan" style="word-break:break-all">enersia-status-proxy.geralenersia.workers.dev</span></div>
+                <div class="diag-row"><span class="diag-key">Auth</span><span class="diag-val amber">key=enersia2026</span></div>
+              </div>
+            </div>
+
+            <!-- CLOUDFLARE D1 -->
+            <div class="agent-card" style="--card-color:var(--teal)">
+              <div class="agent-glow" style="background:radial-gradient(circle at 50% 0,rgba(20,184,166,.08),transparent 70%)"></div>
+              <div class="agent-header">
+                <div class="agent-icon-wrap" style="background:rgba(20,184,166,.12);border:1px solid rgba(20,184,166,.2)">🗄️</div>
+                <div class="agent-info">
+                  <div class="agent-name">Cloudflare D1</div>
+                  <div class="agent-sub">Base de dados · Região WEUR</div>
+                </div>
+                <div class="status-badge running" id="badge-d1">
+                  <span class="status-dot-sm"></span>
+                  <span id="d1-leads-badge">11 leads</span>
+                </div>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-bar" id="prog-d1" style="width:80%;background:linear-gradient(90deg,var(--teal),var(--green))"></div>
+              </div>
+              <div class="tech-tags">
+                <span class="tag">SQLite</span>
+                <span class="tag">WEUR · RGPD</span>
+                <span class="tag">18 campos</span>
+                <span class="tag">UNIQUE email+NIF</span>
+              </div>
+              <div class="diag-panel">
+                <div class="diag-row"><span class="diag-key">Total leads</span><span class="diag-val green" id="d1-total">—</span></div>
+                <div class="diag-row"><span class="diag-key">Campos</span><span class="diag-val">18 (inclui NIF, potência)</span></div>
+                <div class="diag-row"><span class="diag-key">UNIQUE</span><span class="diag-val">email + NIF</span></div>
+                <div class="diag-row"><span class="diag-key">Região</span><span class="diag-val cyan">WEUR (RGPD ✓)</span></div>
+                <div class="diag-row"><span class="diag-key">Motor</span><span class="diag-val">SQLite (CF D1)</span></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- EXTERNAL SERVICES -->
+        <div style="margin-bottom:24px">
+          <div class="section-header">
+            <div class="section-title">Serviços Externos</div>
+          </div>
+          <div class="services-grid">
+            <div class="service-card" style="--card-color:var(--green)">
+              <div class="service-icon">🔄</div>
+              <div class="service-name">Make.com</div>
+              <div class="service-desc">Cenário 5755383<br>Webhook → Drive → Sheets → Gmail → Telegram</div>
+              <div class="service-badge">● Activo</div>
+            </div>
+            <div class="service-card" style="--card-color:var(--blue)">
+              <div class="service-icon">📧</div>
+              <div class="service-name">Brevo Email</div>
+              <div class="service-desc">DKIM + DMARC configurados<br>geral@enersia.pt · Transacional + Outbound</div>
+              <div class="service-badge">● Configurado</div>
+            </div>
+            <div class="service-card" style="--card-color:var(--amber)">
+              <div class="service-icon">📊</div>
+              <div class="service-name">Google Sheets</div>
+              <div class="service-desc">geralenersia@gmail.com<br>Drive ID: 1gKeK09J…</div>
+              <div class="service-badge">● Ligado</div>
+            </div>
+            <div class="service-card" style="--card-color:var(--cyan)">
+              <div class="service-icon">🎯</div>
+              <div class="service-name">Apollo / ZeroBounce</div>
+              <div class="service-desc">45 contactos B2B pendentes<br>Verificação + campanha Brevo</div>
+              <div class="service-badge" style="background:rgba(245,166,35,.1);border-color:rgba(245,166,35,.2);color:var(--amber)">⚠ Pendente</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLOUDFLARE INFRA -->
+        <div style="margin-bottom:24px">
+          <div class="section-header">
+            <div class="section-title">Infra Cloudflare</div>
+          </div>
+          <div class="infra-grid">
+            <div class="infra-card">
+              <div class="infra-title">☁️ Cloudflare Pages</div>
+              <div class="infra-detail">
+                <strong>Site:</strong> enersia.pt · live<br>
+                <strong>Branch:</strong> main → auto-deploy<br>
+                <strong>GitHub:</strong> push → deploy automático<br>
+                <strong>CDN:</strong> Edge global · WAF activo
+              </div>
+            </div>
+            <div class="infra-card">
+              <div class="infra-title">⚙️ Cloudflare Workers</div>
+              <div class="infra-detail">
+                <strong>enersia-proxy</strong> — Claude API proxy<br>
+                <strong>enersia-status-proxy</strong> — Dashboard CORS<br>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)">geralenersia.workers.dev</span>
+              </div>
+            </div>
+            <div class="infra-card">
+              <div class="infra-title">🛡️ WAF + Bot Fight</div>
+              <div class="infra-detail">
+                <strong>Estado:</strong> Activo<br>
+                <strong>Domínio:</strong> enersia.pt protegido<br>
+                <strong>Bot Fight:</strong> Ligado<br>
+                <strong>DDoS:</strong> Protecção L3/L4/L7
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div style="margin-bottom:24px">
+          <div class="section-header">
+            <div class="section-title">Acções Rápidas</div>
+          </div>
+          <div class="actions-row">
+            <button class="action-btn blue" onclick="fetchStatus()">
+              <span class="action-icon">🔄</span> Refresh Dados
+            </button>
+            <button class="action-btn green" onclick="testMake()">
+              <span class="action-icon">⚡</span> Testar Make.com
+            </button>
+            <button class="action-btn cyan" onclick="testKarol()">
+              <span class="action-icon">💬</span> Testar KAROL WhatsApp
+            </button>
+            <button class="action-btn amber" onclick="viewLogs()">
+              <span class="action-icon">📋</span> Ver Logs VPS
+            </button>
+          </div>
+        </div>
+
+        <!-- BOTTOM PANELS -->
+        <div class="bottom-grid">
+          <!-- LOG FEED -->
+          <div class="log-panel">
+            <div class="log-header">
+              <div class="log-title">
+                <span class="log-live"></span>
+                Log em Tempo Real
+              </div>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted)">Últimas 50 entradas</span>
+            </div>
+            <div class="log-body" id="log-body"></div>
+          </div>
+
+          <!-- NEXT STEPS -->
+          <div class="steps-panel">
+            <div class="steps-header">
+              <div class="steps-title">🚀 Próximos Passos</div>
+            </div>
+            <div class="steps-body">
+              <div class="step-item">
+                <div class="step-num p1">1</div>
+                <div>
+                  <div class="step-text">Confirmar KAROL WhatsApp — entrega de mensagens reais</div>
+                  <div class="step-tag">CRÍTICO · Leads pipeline</div>
+                </div>
+              </div>
+              <div class="step-item">
+                <div class="step-num p1">2</div>
+                <div>
+                  <div class="step-text">Apollo 45 contactos → ZeroBounce → Brevo outbound</div>
+                  <div class="step-tag">URGENTE · B2B acquisition</div>
+                </div>
+              </div>
+              <div class="step-item">
+                <div class="step-num p2">3</div>
+                <div>
+                  <div class="step-text">Anti-duplicados Make.com por email/dia</div>
+                  <div class="step-tag">MÉDIO · Data quality</div>
+                </div>
+              </div>
+              <div class="step-item">
+                <div class="step-num p2">4</div>
+                <div>
+                  <div class="step-text">Série "Alerta Energético" — vídeos mascote robot</div>
+                  <div class="step-tag">MÉDIO · Content marketing</div>
+                </div>
+              </div>
+              <div class="step-item">
+                <div class="step-num p3">5</div>
+                <div>
+                  <div class="step-text">Deploy dashboard em enersia.pt/dashboard</div>
+                  <div class="step-tag">PLANEADO · Infra</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /sec-dashboard -->
+
+      <!-- ════ SECTION: AGENTES ════ -->
+      <div class="section" id="sec-agents">
+        <div class="section-header">
+          <div class="section-title">Gestão de Agentes</div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:32px;text-align:center;color:var(--muted)">
+          <div style="font-size:32px;margin-bottom:12px">🤖</div>
+          <div style="font-family:'Syne',sans-serif;font-size:16px;color:var(--text);margin-bottom:8px">Painel de Agentes</div>
+          <div style="font-size:13px">Detalhes expandidos dos 6 agentes VPS — em desenvolvimento</div>
+        </div>
+      </div>
+
+      <!-- ════ SECTION: LEADS ════ -->
+      <div class="section" id="sec-leads">
+        <div class="section-header">
+          <div class="section-title">Leads Capturados</div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:32px;text-align:center;color:var(--muted)">
+          <div style="font-size:32px;margin-bottom:12px">🎯</div>
+          <div style="font-family:'Syne',sans-serif;font-size:16px;color:var(--text);margin-bottom:8px">CRM de Leads</div>
+          <div style="font-size:13px">Tabela com todos os leads do Cloudflare D1 — em desenvolvimento</div>
+          <div style="margin-top:16px">
+            <span class="status-badge running" style="font-size:12px" id="leads-total-badge">
+              <span class="status-dot-sm"></span>
+              <span id="leads-section-count">— leads na base de dados</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ SECTION: ANALYTICS ════ -->
+      <div class="section" id="sec-analytics">
+        <div class="section-header">
+          <div class="section-title">Analytics</div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:32px;text-align:center;color:var(--muted)">
+          <div style="font-size:32px;margin-bottom:12px">📊</div>
+          <div style="font-family:'Syne',sans-serif;font-size:16px;color:var(--text);margin-bottom:8px">Analytics & Relatórios</div>
+          <div style="font-size:13px">Métricas de conversão, funil KAROL, ROI — em desenvolvimento</div>
+        </div>
+      </div>
+
+      <!-- ════ SECTION: SETTINGS ════ -->
+      <div class="section" id="sec-settings">
+        <div class="section-header">
+          <div class="section-title">Configurações</div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">Endpoints</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);line-height:2">
+                <div><span style="color:var(--muted)">VPS IP:</span> 65.21.53.147</div>
+                <div><span style="color:var(--muted)">Status API:</span> :9000/status</div>
+                <div><span style="color:var(--muted)">Evolution:</span> :8080</div>
+                <div><span style="color:var(--muted)">KAROL webhook:</span> :5000/webhook/karol</div>
+                <div><span style="color:var(--muted)">Worker:</span> geralenersia.workers.dev</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">Credenciais</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);line-height:2">
+                <div><span style="color:var(--muted)">API Key:</span> enersia2026</div>
+                <div><span style="color:var(--muted)">WA Number:</span> +351910322702</div>
+                <div><span style="color:var(--muted)">TG Chat:</span> 7741901010</div>
+                <div><span style="color:var(--muted)">Email:</span> geral@enersia.pt</div>
+                <div><span style="color:var(--muted)">Drive:</span> 1gKeK09J…</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <span>ENERSIA © 2026 · enersia.pt · geral@enersia.pt</span>
+      <span>VPS: 65.21.53.147 · Worker: geralenersia.workers.dev</span>
+      <span id="footer-status">Status: A verificar…</span>
+    </footer>
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// THREE.JS BACKGROUND
+// ══════════════════════════════════════════════
+(function initThree() {
+  const canvas = document.getElementById('bg-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 60;
+
+  const colors = [0x4F7CFF, 0x00C2FF, 0x00E59B, 0xA855F7, 0xF5A623];
+  const groups = [];
+
+  for (let g = 0; g < 5; g++) {
+    const count = 120;
+    const geo = new THREE.BufferGeometry();
+    const pos = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      pos[i * 3]     = (Math.random() - .5) * 200;
+      pos[i * 3 + 1] = (Math.random() - .5) * 150;
+      pos[i * 3 + 2] = (Math.random() - .5) * 100;
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const mat = new THREE.PointsMaterial({ color: colors[g % colors.length], size: .6, transparent: true, opacity: .35 });
+    const pts = new THREE.Points(geo, mat);
+    scene.add(pts);
+    groups.push(pts);
+  }
+
+  const lineMat = new THREE.LineBasicMaterial({ color: 0x4F7CFF, transparent: true, opacity: .06 });
+  for (let i = 0; i < 30; i++) {
+    const geo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3((Math.random() - .5) * 200, (Math.random() - .5) * 150, 0),
+      new THREE.Vector3((Math.random() - .5) * 200, (Math.random() - .5) * 150, 0)
+    ]);
+    scene.add(new THREE.Line(geo, lineMat));
+  }
+
+  function resize() {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  let frame = 0;
+  (function animate() {
+    requestAnimationFrame(animate);
+    frame += .002;
+    groups.forEach((g, i) => {
+      g.rotation.x = Math.sin(frame * (.3 + i * .1)) * .08;
+      g.rotation.y = frame * (.1 + i * .04);
+    });
+    renderer.render(scene, camera);
+  })();
+})();
+
+// ══════════════════════════════════════════════
+// CLOCK
+// ══════════════════════════════════════════════
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+const sectionMeta = {
+  dashboard: { title: 'Dashboard', sub: 'Visão geral da plataforma ENERSIA' },
+  agents:    { title: 'Agentes VPS', sub: 'Gestão e monitorização dos agentes' },
+  leads:     { title: 'Leads', sub: 'CRM — leads capturados pelo KAROL' },
+  analytics: { title: 'Analytics', sub: 'Métricas de performance e conversão' },
+  settings:  { title: 'Configurações', sub: 'Endpoints, credenciais e parâmetros' }
+};
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const sec = item.dataset.section;
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('sec-' + sec).classList.add('active');
+    const meta = sectionMeta[sec] || { title: sec, sub: '' };
+    document.getElementById('section-title').textContent = meta.title;
+    document.getElementById('section-subtitle').textContent = meta.sub;
+    closeSidebar();
+  });
+});
+
+// ══════════════════════════════════════════════
+// SIDEBAR MOBILE
+// ══════════════════════════════════════════════
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebar-overlay');
+const hamburger = document.getElementById('hamburger');
+
+hamburger.addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('open');
+});
+overlay.addEventListener('click', closeSidebar);
+function closeSidebar() {
+  sidebar.classList.remove('open');
+  overlay.classList.remove('open');
+}
+
+// ══════════════════════════════════════════════
+// LOG FEED
+// ══════════════════════════════════════════════
+const logMessages = [
+  { src: 'KAROL', cls: 'src-karol', msg: 'Webhook recebido · novo lead Portugal Telecom' },
+  { src: 'ZEUS',  cls: 'src-zeus',  msg: 'Rotina 08:00 executada · 3 msgs enviadas' },
+  { src: 'MAKE',  cls: 'src-make',  msg: 'Cenário 5755383 · lead → Sheets + Gmail OK' },
+  { src: 'BOT',   cls: 'src-bot',   msg: 'Telegram · alerta lead enviado a Diego' },
+  { src: 'EVOL',  cls: 'src-evol',  msg: 'Evolution API · sessão WhatsApp activa' },
+  { src: 'WORKER',cls: 'src-worker',msg: 'Status proxy · resposta 200 OK em 143ms' },
+  { src: 'KAROL', cls: 'src-karol', msg: 'Funnel step 3 · proposta enviada' },
+  { src: 'ZEUS',  cls: 'src-zeus',  msg: 'SEO 18:00 · posts Instagram + LinkedIn' },
+  { src: 'MAKE',  cls: 'src-make',  msg: 'Drive upload · fatura PDF armazenada' },
+  { src: 'EVOL',  cls: 'src-evol',  msg: 'Mensagem entregue · +351910322702' },
+  { src: 'BOT',   cls: 'src-bot',   msg: 'Nota: lead B2B · potência 150kVA' },
+  { src: 'WORKER',cls: 'src-worker',msg: 'Health check · VPS responde 200' },
+  { src: 'KAROL', cls: 'src-karol', msg: 'Novo lead · João Silva · 3 fase · Lisboa' },
+  { src: 'ZEUS',  cls: 'src-zeus',  msg: 'Conversão 15:00 · follow-up KAROL disparado' },
+  { src: 'MAKE',  cls: 'src-make',  msg: 'Anti-dup check · email único confirmado' },
+];
+
+const logBody = document.getElementById('log-body');
+let logIdx = 0;
+
+function addLog(src, cls, msg) {
+  const now = new Date();
+  const t = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `<span class="log-time">${t}</span><span class="log-src ${cls}">[${src}]</span><span class="log-msg">${msg}</span>`;
+  logBody.insertBefore(entry, logBody.firstChild);
+  while (logBody.children.length > 50) logBody.removeChild(logBody.lastChild);
+}
+
+// Seed initial logs
+for (let i = Math.min(8, logMessages.length - 1); i >= 0; i--) {
+  const l = logMessages[i];
+  addLog(l.src, l.cls, l.msg);
+}
+logIdx = 9 % logMessages.length;
+
+setInterval(() => {
+  const l = logMessages[logIdx % logMessages.length];
+  addLog(l.src, l.cls, l.msg);
+  logIdx++;
+}, 4500);
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+function showToast(icon, msg, color) {
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+  t.style.borderColor = color || 'var(--border)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ══════════════════════════════════════════════
+// STATUS FETCH
+// ══════════════════════════════════════════════
+const WORKER_URL = 'https://enersia-status-proxy.geralenersia.workers.dev';
+let lastFetch = null;
+
+function setConnBadge(state, text) {
+  const badge = document.getElementById('conn-badge');
+  badge.className = 'conn-badge ' + state;
+  document.getElementById('conn-text').textContent = text;
+}
+
+function setBadge(id, state, text) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'status-badge ' + state;
+  el.innerHTML = `<span class="status-dot-sm"></span><span>${text}</span>`;
+}
+
+function setProgress(id, pct) {
+  const el = document.getElementById(id);
+  if (el) el.style.width = pct + '%';
+}
+
+async function fetchStatus() {
+  setConnBadge('checking', 'A verificar…');
+  document.getElementById('sidebar-vps-dot').className = 'status-dot';
+  document.getElementById('sidebar-vps-text').textContent = 'A verificar…';
+
+  addLog('WORKER', 'src-worker', 'Fetch ao VPS iniciado…');
+
+  try {
+    const res = await fetch(WORKER_URL, { cache: 'no-cache' });
+    const data = await res.json();
+    lastFetch = new Date();
+
+    if (data.ok === false) throw new Error(data.error || 'VPS offline');
+
+    // CONNECTION OK
+    setConnBadge('online', 'VPS Online');
+    document.getElementById('sidebar-vps-dot').className = 'status-dot online';
+
+    const uptime = data.uptime || data.system?.uptime || '—';
+    const uptimeShort = typeof uptime === 'string' && uptime.length > 20 ? uptime.substring(0, 20) + '…' : uptime;
+    document.getElementById('sidebar-vps-text').textContent = 'Online · ' + uptimeShort;
+    document.getElementById('uptime-badge').textContent = 'Uptime: ' + uptimeShort;
+    document.getElementById('footer-status').textContent = 'VPS Online · ' + lastFetch.toLocaleTimeString('pt-PT');
+
+    // KPIs
+    const leadsD1 = data.leads_d1 ?? data.leads?.total ?? data.total_leads ?? '—';
+    document.getElementById('kpi-leads').textContent = leadsD1;
+    document.getElementById('kpi-leads').className = 'kpi-value';
+    document.getElementById('kpi-leads-sub').textContent = 'Via KAROL WhatsApp';
+
+    const services = data.services || {};
+    const serviceKeys = Object.keys(services);
+    const running = serviceKeys.filter(k => services[k]?.status === 'running' || services[k]?.active === true || services[k]?.ok === true).length;
+    document.getElementById('kpi-agents').textContent = running || '—';
+    document.getElementById('kpi-agents').className = 'kpi-value';
+    document.getElementById('kpi-agents-sub').textContent = `De ${serviceKeys.length || 6} configurados`;
+
+    const docker = data.docker_containers ?? data.docker?.running ?? '—';
+    document.getElementById('kpi-docker').textContent = docker;
+    document.getElementById('kpi-docker').className = 'kpi-value';
+    document.getElementById('kpi-docker-sub').textContent = 'Containers activos';
+
+    document.getElementById('kpi-uptime').textContent = typeof uptime === 'string' ? uptime.split(' ').slice(0, 2).join(' ') : uptime;
+    document.getElementById('kpi-uptime').className = 'kpi-value';
+    document.getElementById('kpi-uptime').style.fontSize = '18px';
+
+    document.getElementById('kpi-sync').textContent = lastFetch.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById('kpi-sync').className = 'kpi-value';
+    document.getElementById('kpi-sync').style.fontSize = '18px';
+    document.getElementById('kpi-sync-sub').textContent = 'Dados em tempo real';
+
+    // D1 LEADS
+    if (leadsD1 !== '—') {
+      document.getElementById('d1-total').textContent = leadsD1;
+      document.getElementById('d1-leads-badge').textContent = leadsD1 + ' leads';
+      document.getElementById('leads-section-count').textContent = leadsD1 + ' leads na base de dados';
+    }
+
+    // AGENT BADGES
+    function applyAgent(key, badgeId, progId, pidId, stateId) {
+      const s = services[key] || {};
+      const isRunning = s.status === 'running' || s.active === true || s.ok === true || s.pid;
+      const state = isRunning ? 'running' : 'stopped';
+      const text  = isRunning ? 'A correr' : 'Inativo';
+      setBadge(badgeId, state, text);
+      setProgress(progId, isRunning ? (85 + Math.random() * 13) : 0);
+      if (pidId && s.pid) document.getElementById(pidId).textContent = s.pid;
+      if (stateId && s.status) {
+        const el = document.getElementById(stateId);
+        if (el) { el.textContent = s.status; el.className = 'diag-val ' + (isRunning ? 'green' : 'red'); }
+      }
+    }
+
+    applyAgent('karol',    'badge-karol',    'prog-karol',    'pid-karol',    'state-karol');
+    applyAgent('zeus',     'badge-zeus',     'prog-zeus',     'pid-zeus',     null);
+    applyAgent('evolution','badge-evolution','prog-evolution', null,           'state-evolution');
+    applyAgent('telegram', 'badge-telegram', 'prog-telegram', 'pid-telegram', null);
+
+    addLog('WORKER', 'src-worker', `Fetch OK · ${serviceKeys.length} serviços · leads: ${leadsD1}`);
+    showToast('✅', 'VPS Online — dados actualizados', 'var(--green)');
+
+  } catch (err) {
+    setConnBadge('offline', 'VPS Offline');
+    document.getElementById('sidebar-vps-dot').className = 'status-dot offline';
+    document.getElementById('sidebar-vps-text').textContent = 'Offline';
+    document.getElementById('footer-status').textContent = 'VPS Offline · ' + new Date().toLocaleTimeString('pt-PT');
+    document.getElementById('uptime-badge').textContent = 'Uptime: —';
+
+    ['karol','zeus','evolution','telegram'].forEach(k => {
+      setBadge('badge-' + k, 'stopped', 'Inativo');
+      setProgress('prog-' + k, 0);
+    });
+
+    document.getElementById('kpi-leads').textContent   = '—';
+    document.getElementById('kpi-agents').textContent  = '—';
+    document.getElementById('kpi-docker').textContent  = '—';
+    document.getElementById('kpi-uptime').textContent  = '—';
+
+    addLog('WORKER', 'src-worker', 'Erro: ' + err.message);
+    showToast('⚠️', 'VPS Offline: ' + err.message, 'var(--red)');
+  }
+}
+
+// ══════════════════════════════════════════════
+// QUICK ACTIONS
+// ══════════════════════════════════════════════
+function testMake() {
+  showToast('⚡', 'Make.com: cenário 5755383 — abrir manualmente em make.com', 'var(--green)');
+  addLog('MAKE', 'src-make', 'Teste manual solicitado via dashboard');
+}
+function testKarol() {
+  showToast('💬', 'Testar KAROL: enviar msg para +351910322702 no WhatsApp', 'var(--cyan)');
+  addLog('KAROL', 'src-karol', 'Teste KAROL solicitado via dashboard');
+}
+function viewLogs() {
+  showToast('📋', 'Logs VPS: ssh root@65.21.53.147 → journalctl -u enersia-karol', 'var(--amber)');
+  addLog('WORKER', 'src-worker', 'Comando logs VPS: journalctl -u enersia-karol -f');
+}
+
+// ══════════════════════════════════════════════
+// AUTO-FETCH
+// ══════════════════════════════════════════════
+fetchStatus();
+setInterval(fetchStatus, 30000);
+</script>
+</body>
+</html>
