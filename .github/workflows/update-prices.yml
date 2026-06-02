@@ -381,47 +381,47 @@ jobs:
           if [ "$ALTERADO" = "true" ]; then
             # Preços mudaram — notificação positiva
             MSG="✅ ENERSIA — Preços actualizados
-📅 ${DATA}
+          📅 ${DATA}
 
-Comercializadoras actualizadas:
-${LINHAS}
+          Comercializadoras actualizadas:
+          ${LINHAS}
 
-Dados guardados em precos.json e disponíveis no site."
+          Dados guardados em precos.json e disponíveis no site."
 
           elif [ "${DIAS}" -ge 6 ] 2>/dev/null; then
             # 6+ dias sem alteração — alerta possível problema
             MSG="🚨 ENERSIA — Verificar sistema de preços
-📅 ${DATA}
+          📅 ${DATA}
 
-⚠️ Preços sem alteração há ${DIAS} dias (desde ${ULT_AT}).
-Isto pode ser normal (ERSE não actualizou) ou indicar um problema no scraper.
+          ⚠️ Preços sem alteração há ${DIAS} dias (desde ${ULT_AT}).
+          Isto pode ser normal (ERSE não actualizou) ou indicar um problema no scraper.
 
-Acção recomendada: verificar logs do GitHub Actions e simuladorprecos.erse.pt
+          Acção recomendada: verificar logs do GitHub Actions e simuladorprecos.erse.pt
 
-Preços actuais:
-${LINHAS}"
+          Preços actuais:
+          ${LINHAS}"
 
           elif [ "${DIAS}" -ge 3 ] 2>/dev/null; then
             # 3–5 dias sem alteração — aviso subtil
             MSG="⚠️ ENERSIA — Preços estáveis (${DIAS} dias)
-📅 ${DATA}
+          📅 ${DATA}
 
-Os preços da ERSE não foram alterados desde ${ULT_AT}.
-Sistema a funcionar normalmente — próxima revisão ERSE prevista trimestralmente.
+          Os preços da ERSE não foram alterados desde ${ULT_AT}.
+          Sistema a funcionar normalmente — próxima revisão ERSE prevista trimestralmente.
 
-Preços confirmados:
-${LINHAS}"
+          Preços confirmados:
+          ${LINHAS}"
 
           else
             # 0–2 dias sem alteração — normal
             MSG="ℹ️ ENERSIA — Verificação diária concluída
-📅 ${DATA}
+          📅 ${DATA}
 
-Sem alterações de preços (último update: ${ULT_AT}).
-Sistema a funcionar correctamente.
+          Sem alterações de preços (último update: ${ULT_AT}).
+          Sistema a funcionar correctamente.
 
-Preços actuais:
-${LINHAS}"
+          Preços actuais:
+          ${LINHAS}"
           fi
 
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
