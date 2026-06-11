@@ -727,7 +727,7 @@ footer{
   background:var(--bg2);border:1px solid var(--b2);color:var(--t1);
   padding:10px 14px;border-radius:12px;font-size:12.5px;font-weight:500;
   white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5);
-  display:none;z-index:1;
+  display:none;z-index:1;cursor:pointer;
 }
 .fab-teaser.show{display:block;animation:chat-in .3s var(--ease)}
 .fab-badge{
@@ -2162,10 +2162,10 @@ html, body {
       </div>
     </div>
     <div class="quick-replies" id="quickReplies">
-      <button class="quick-reply" onclick="sendQuickReply(&#39;Quero enviar a minha fatura para análise&#39;)">📄 Enviar fatura</button>
-      <button class="quick-reply" onclick="sendQuickReply(&#39;Sou particular, quero analisar a minha fatura&#39;)">Particular</button>
-      <button class="quick-reply" onclick="sendQuickReply(&#39;Sou empresa, quero análise empresarial&#39;)">Empresa</button>
-      <button class="quick-reply" onclick="sendQuickReply(&#39;Tenho interesse em energia solar&#39;)">Solar</button>
+      <button class="quick-reply" onclick="trackChat(&#39;quick_fatura&#39;);sendQuickReply(&#39;Quero enviar a minha fatura para análise&#39;)">📄 Enviar fatura</button>
+      <button class="quick-reply qr-segmento" onclick="sendQuickReply(&#39;Sou particular, quero analisar a minha fatura&#39;)">Particular</button>
+      <button class="quick-reply qr-segmento" onclick="sendQuickReply(&#39;Sou empresa, quero análise empresarial&#39;)">Empresa</button>
+      <button class="quick-reply qr-segmento" onclick="sendQuickReply(&#39;Tenho interesse em energia solar&#39;)">Solar</button>
       <button class="quick-reply" onclick="window.open(&#39;https://wa.me/351910322702&#39;,&#39;_blank&#39;)">WhatsApp</button>
     </div>
     <div class="chat-input-row">
@@ -2176,7 +2176,7 @@ html, body {
     </div>
   </div>
   <div style="position:relative;display:inline-block">
-    <div class="fab-teaser" id="fabTeaser">Analise a sua fatura aqui</div>
+    <div class="fab-teaser" id="fabTeaser" role="button" onclick="this.classList.remove(&#39;show&#39;);openChat()">Analise a sua fatura aqui</div>
     <div class="fab-badge" id="fabBadge" style="display: none;">1</div>
     <div class="fab" onclick="toggleChat()" role="button" aria-label="Abrir chat KAROL" aria-expanded="false">
 <img src="/assets/images/enersia-karol-avatar.png" alt="KAROL" style="width:66px;height:66px;border-radius:50%;object-fit:cover;object-position:center top">
@@ -2237,6 +2237,15 @@ FLUXO: empresa ou particular \u2192 comercializadora actual \u2192 valor fatura 
 LINKS: an\u00e1lise: https://enersia.pt/analisar-fatura | WhatsApp: https://wa.me/351910322702
 REGRAS: m\u00e1x 3 linhas. UMA pergunta de cada vez. Nunca dar pre\u00e7os espec\u00edficos. Sempre PT-PT.`;
 
+function trackChat(evento){
+  try{
+    fetch('https://hook.eu2.make.com/WEBHOOK_PLACEHOLDER',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({evento:evento,dispositivo:window.innerWidth>768?'desktop':'mobile',pagina:location.pathname,ts:new Date().toISOString()})
+    }).catch(function(){});
+  }catch(e){}
+}
+
 function openChat(){
   var win=document.getElementById('chatWindow');
   win.classList.add('open');
@@ -2246,12 +2255,14 @@ function openChat(){
   if(window.innerWidth>768){
     setTimeout(function(){var inp=document.getElementById('chatInput');if(inp)inp.focus()},350);
   }
+  trackChat('open');
 }
 
 function closeChat(){
   document.getElementById('chatWindow').classList.remove('open');
   var fab=document.querySelector('.fab');
   if(fab) fab.setAttribute('aria-expanded','false');
+  trackChat('close');
 }
 
 function toggleChat(){
@@ -2268,7 +2279,10 @@ document.addEventListener('click',function(e){
 
 /* Tecla Escape fecha o chat */
 document.addEventListener('keydown',function(e){
-  if(e.key==='Escape') closeChat();
+  if(e.key==='Escape'){
+    var win=document.getElementById('chatWindow');
+    if(win && win.classList.contains('open')) closeChat();
+  }
 });
 
 /* Auto-open: 8s, s\u00f3 desktop, uma vez por sess\u00e3o; em mobile mostra apenas o badge */
@@ -2333,7 +2347,11 @@ function restoreChatHistory(){
     var hist=JSON.parse(saved);
     if(!hist || !hist.length) return;
     chatHistory=hist;
-    document.getElementById('quickReplies').style.display='none';
+    document.getElementById('chatMessages').innerHTML='';
+    var temMsgUser=chatHistory.some(function(m){return m.role==='user'});
+    if(temMsgUser){
+      document.querySelectorAll('#quickReplies .qr-segmento').forEach(function(b){b.style.display='none'});
+    }
     chatHistory.forEach(function(m){
       if(m.role==='user') addMessage(m.content,'user');
       else addMessage(sanitizeMdK(m.content),'bot');
@@ -2364,6 +2382,7 @@ async function sendMessage(){
   var inp=document.getElementById('chatInput');
   var msg=inp.value.trim();
   if(!msg) return;
+  trackChat('msg');
   inp.value='';
   document.getElementById('quickReplies').style.display='none';
   addMessage(msg,'user');

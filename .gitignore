@@ -4,3 +4,6 @@ worker/.wrangler/
 
 # Node
 node_modules/
+
+# Backups locais
+*.backup
