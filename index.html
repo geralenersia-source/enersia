@@ -722,6 +722,14 @@ footer{
   animation:pulse-ring 2.8s ease-out infinite;
 }
 .fab:hover{transform:scale(1.09);box-shadow:0 12px 40px rgba(0,0,0,.6),0 0 0 8px rgba(79,124,255,.12)}
+.fab-teaser{
+  position:absolute;right:78px;top:50%;transform:translateY(-50%);
+  background:var(--bg2);border:1px solid var(--b2);color:var(--t1);
+  padding:10px 14px;border-radius:12px;font-size:12.5px;font-weight:500;
+  white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5);
+  display:none;z-index:1;
+}
+.fab-teaser.show{display:block;animation:chat-in .3s var(--ease)}
 .fab-badge{
   position:absolute;top:-4px;right:-4px;
   width:21px;height:21px;border-radius:50%;
@@ -761,10 +769,10 @@ footer{
 }
 .chat-online-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
 .chat-close-btn{
-  margin-left:auto;width:32px;height:32px;border-radius:50%;
+  margin-left:auto;width:44px;height:44px;border-radius:50%;
   background:rgba(255,255,255,.07);color:var(--t2);
   display:flex;align-items:center;justify-content:center;
-  font-size:14px;cursor:pointer;transition:all .2s;flex-shrink:0;border:none;
+  font-size:20px;cursor:pointer;transition:all .2s;flex-shrink:0;border:none;
 }
 .chat-close-btn:hover{background:rgba(255,255,255,.14);color:var(--t1)}
 .chat-messages{
@@ -844,7 +852,7 @@ footer{
   .aud-card{padding:44px 32px}
   .sec-cards-grid{grid-template-columns:1fr}
   .testi-grid{grid-template-columns:1fr}
-  .chat-window{width:calc(100vw - 32px);right:16px;bottom:100px}
+  .chat-window{width:calc(100vw - 32px);right:16px;bottom:90px;max-height:75vh}
   .solar-overlay{background:linear-gradient(180deg,rgba(7,11,20,.5) 0%,rgba(7,11,20,.92) 100%)}
   .solar-content{justify-content:flex-end;padding-bottom:32px}
 }
@@ -2134,7 +2142,7 @@ html, body {
 
 <!-- KAROL CHAT -->
 <div class="fab-wrap">
-  <div class="chat-window open" id="chatWindow">
+  <div class="chat-window" id="chatWindow" role="dialog" aria-label="Chat com KAROL, consultora energética">
     <div class="chat-header">
       <div class="chat-av">
         <img src="/assets/images/enersia-karol-avatar.png" alt="KAROL" style="width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:center top">
@@ -2143,7 +2151,7 @@ html, body {
         <div class="chat-header-name">KAROL</div>
         <div class="chat-header-status"><div class="chat-online-dot"></div>Online · Consultora Energética IA</div>
       </div>
-      <button class="chat-close-btn" onclick="toggleChat()">×</button>
+      <button class="chat-close-btn" onclick="closeChat()" aria-label="Fechar chat">×</button>
     </div>
     <div class="chat-messages" id="chatMessages">
       <div class="chat-msg">
@@ -2154,6 +2162,7 @@ html, body {
       </div>
     </div>
     <div class="quick-replies" id="quickReplies">
+      <button class="quick-reply" onclick="sendQuickReply(&#39;Quero enviar a minha fatura para análise&#39;)">📄 Enviar fatura</button>
       <button class="quick-reply" onclick="sendQuickReply(&#39;Sou particular, quero analisar a minha fatura&#39;)">Particular</button>
       <button class="quick-reply" onclick="sendQuickReply(&#39;Sou empresa, quero análise empresarial&#39;)">Empresa</button>
       <button class="quick-reply" onclick="sendQuickReply(&#39;Tenho interesse em energia solar&#39;)">Solar</button>
@@ -2167,8 +2176,9 @@ html, body {
     </div>
   </div>
   <div style="position:relative;display:inline-block">
+    <div class="fab-teaser" id="fabTeaser">Analise a sua fatura aqui</div>
     <div class="fab-badge" id="fabBadge" style="display: none;">1</div>
-    <div class="fab" onclick="toggleChat()" title="Falar com KAROL" role="button" aria-label="Abrir chat KAROL">
+    <div class="fab" onclick="toggleChat()" role="button" aria-label="Abrir chat KAROL" aria-expanded="false">
 <img src="/assets/images/enersia-karol-avatar.png" alt="KAROL" style="width:66px;height:66px;border-radius:50%;object-fit:cover;object-position:center top">
     </div>
   </div>
@@ -2215,7 +2225,7 @@ function toggleFaq(btn){
 /* ── KAROL CHAT ───────────────────────────────────────────── */
 var KAROL_WORKER='https://enersia-proxy.geralenersia.workers.dev';
 function sanitizeMdK(t){return t.replace(/\*\*([^*]*)\*\*/g,'$1').replace(/\*([^*]*)\*/g,'$1').replace(/__([^_]*)__/g,'$1').replace(/_([^_]*)_/g,'$1').replace(/```[\s\S]*?```/g,'').replace(/`([^`]*)`/g,'$1').replace(/^#{1,6}\s*/gm,'').trim();}
-var chatOpen=false, chatHistory=[];
+var chatHistory=[];
 var KAROL_MINI_SVG='<img src="/assets/images/enersia-karol-avatar.png" alt="KAROL" style="width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:center top">';
 
 var KAROL_SYSTEM=`\u00c9s a KAROL, consultora energ\u00e9tica IA da ENERSIA \u2014 plataforma independente. N\u00e3o somos a EDP nem nenhuma comercializadora.
@@ -2227,25 +2237,63 @@ FLUXO: empresa ou particular \u2192 comercializadora actual \u2192 valor fatura 
 LINKS: an\u00e1lise: https://enersia.pt/analisar-fatura | WhatsApp: https://wa.me/351910322702
 REGRAS: m\u00e1x 3 linhas. UMA pergunta de cada vez. Nunca dar pre\u00e7os espec\u00edficos. Sempre PT-PT.`;
 
-function toggleChat(){
-  chatOpen=!chatOpen;
+function openChat(){
   var win=document.getElementById('chatWindow');
-  if(chatOpen){
-    win.classList.add('open');
-    document.getElementById('fabBadge').style.display='none';
+  win.classList.add('open');
+  document.getElementById('fabBadge').style.display='none';
+  var fab=document.querySelector('.fab');
+  if(fab) fab.setAttribute('aria-expanded','true');
+  if(window.innerWidth>768){
     setTimeout(function(){var inp=document.getElementById('chatInput');if(inp)inp.focus()},350);
-  } else {
-    win.classList.remove('open');
   }
 }
 
-/* Auto-open: 5s, uma vez por sess\u00e3o */
+function closeChat(){
+  document.getElementById('chatWindow').classList.remove('open');
+  var fab=document.querySelector('.fab');
+  if(fab) fab.setAttribute('aria-expanded','false');
+}
+
+function toggleChat(){
+  var win=document.getElementById('chatWindow');
+  if(win.classList.contains('open')) closeChat();
+  else openChat();
+}
+
+/* Fechar ao clicar fora da janela */
+document.addEventListener('click',function(e){
+  var win=document.getElementById('chatWindow');
+  if(win && win.classList.contains('open') && !e.target.closest('.fab-wrap')) closeChat();
+});
+
+/* Tecla Escape fecha o chat */
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape') closeChat();
+});
+
+/* Auto-open: 8s, s\u00f3 desktop, uma vez por sess\u00e3o; em mobile mostra apenas o badge */
 setTimeout(function(){
   if(!sessionStorage.getItem('karol_opened')){
-    toggleChat();
+    if(window.innerWidth>768){
+      openChat();
+    } else {
+      document.getElementById('fabBadge').style.display='flex';
+    }
     sessionStorage.setItem('karol_opened','1');
   }
-},5000);
+},8000);
+
+/* Teaser mobile: primeira visita, desaparece ap\u00f3s 6s */
+setTimeout(function(){
+  if(window.innerWidth<=768 && !sessionStorage.getItem('karol_teaser')){
+    var t=document.getElementById('fabTeaser');
+    if(t){
+      t.classList.add('show');
+      sessionStorage.setItem('karol_teaser','1');
+      setTimeout(function(){t.classList.remove('show')},6000);
+    }
+  }
+},1500);
 
 function addMessage(text,role){
   var msgs=document.getElementById('chatMessages');
@@ -2274,8 +2322,28 @@ function removeTyping(){
   if(el) el.remove();
 }
 
+function saveChatHistory(){
+  try{sessionStorage.setItem('karol_history',JSON.stringify(chatHistory))}catch(e){}
+}
+
+function restoreChatHistory(){
+  try{
+    var saved=sessionStorage.getItem('karol_history');
+    if(!saved) return;
+    var hist=JSON.parse(saved);
+    if(!hist || !hist.length) return;
+    chatHistory=hist;
+    document.getElementById('quickReplies').style.display='none';
+    chatHistory.forEach(function(m){
+      if(m.role==='user') addMessage(m.content,'user');
+      else addMessage(sanitizeMdK(m.content),'bot');
+    });
+  }catch(e){chatHistory=[]}
+}
+
 async function getKarolReply(userMsg){
   chatHistory.push({role:'user',content:userMsg});
+  saveChatHistory();
   try{
     var res=await fetch(KAROL_WORKER+'/chat',{
       method:'POST',
@@ -2285,6 +2353,7 @@ async function getKarolReply(userMsg){
     var data=await res.json();
     var reply=data.reply||'Desculpe, erro t\u00e9cnico. Contacte-nos pelo WhatsApp: wa.me/351910322702';
     chatHistory.push({role:'assistant',content:reply});
+    saveChatHistory();
     return sanitizeMdK(reply);
   } catch(err){
     return 'Erro t\u00e9cnico. Contacte-nos pelo WhatsApp: wa.me/351910322702';
@@ -2312,6 +2381,8 @@ async function sendQuickReply(msg){
   removeTyping();
   addMessage(reply,'bot');
 }
+
+restoreChatHistory();
 
 /* ================================================================
    FORMULÁRIO DE ANÁLISE — LÓGICA COMPLETA
