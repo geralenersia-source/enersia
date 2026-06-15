@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>ENERSIA — Infraestrutura de aquisição energética</title>
+  <meta name="description" content="A ENERSIA transforma faturas de energia em oportunidades comerciais qualificadas para investidores, comercializadoras, brokers, empresas solares e parceiros estratégicos.">
+  <meta property="og:title" content="ENERSIA — Ativo estratégico de aquisição energética">
+  <meta property="og:description" content="Uma infraestrutura digital que capta, qualifica, analisa e entrega oportunidades energéticas todos os dias.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://enersia.pt">
+  <meta name="theme-color" content="#05070b">
+  <link rel="icon" type="image/png" href="/assets/images/enersia-logo-navbar.png">
+  <link rel="apple-touch-icon" href="/assets/images/enersia-logo-navbar.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --ink:#05070b;
+      --night:#07101b;
+      --deep:#0a1421;
+      --paper:#f6f8fb;
+      --paper2:#edf2f8;
+      --line:rgba(255,255,255,.14);
+      --line-dark:rgba(8,18,32,.1);
+      --text:#f7fbff;
+      --muted:#aab6c7;
+      --dark:#07101b;
+      --dark2:#415064;
+      --blue:#1684ff;
+      --blue2:#006ee6;
+      --gold:#f0b45b;
+      --green:#1fc989;
+      --radius:8px;
+      --max:1180px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--dark);
+      background:var(--paper);
+      overflow-x:hidden;
+      line-height:1.45;
+    }
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:80;
+      pointer-events:none;
+      opacity:.028;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    a{color:inherit;text-decoration:none}
+    img{display:block;max-width:100%}
+    button{font:inherit}
+    .wrap{max-width:var(--max);margin:0 auto;padding:0 28px}
+    .topbar{
+      position:fixed;
+      top:0;
+      left:0;
+      right:0;
+      z-index:50;
+      height:70px;
+      background:linear-gradient(180deg,rgba(3,7,12,.9),rgba(3,7,12,.42));
+      border-bottom:1px solid rgba(255,255,255,.08);
+      backdrop-filter:blur(18px);
+    }
+    .nav{
+      height:70px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:26px;
+    }
+    .brand{display:flex;align-items:center;gap:12px;min-width:max-content}
+    .brand img{height:34px;width:auto}
+    .navlinks{display:flex;align-items:center;gap:28px;color:rgba(255,255,255,.78);font-size:13px;font-weight:700}
+    .navlinks a:hover{color:#fff}
+    .navcta,.btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:9px;
+      min-height:42px;
+      border-radius:var(--radius);
+      padding:0 18px;
+      font-size:13px;
+      font-weight:800;
+      transition:transform .2s ease,background .2s ease,border-color .2s ease;
+    }
+    .navcta,.btn.primary{background:linear-gradient(180deg,#2392ff,#096de0);color:#fff;box-shadow:0 14px 36px rgba(22,132,255,.3)}
+    .btn.secondary{border:1px solid rgba(255,255,255,.35);color:#fff;background:rgba(255,255,255,.04)}
+    .btn.dark{background:#08111d;color:#fff}
+    .navcta:hover,.btn:hover{transform:translateY(-1px)}
+    .hero{
+      min-height:100vh;
+      position:relative;
+      display:flex;
+      align-items:center;
+      overflow:hidden;
+      color:#fff;
+      background:#03070c;
+    }
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(90deg,rgba(3,7,12,.96) 0%,rgba(3,7,12,.84) 32%,rgba(3,7,12,.2) 68%,rgba(3,7,12,.06) 100%),
+        linear-gradient(180deg,rgba(3,7,12,.25) 0%,rgba(3,7,12,.1) 56%,rgba(3,7,12,1) 100%),
+        url("/assets/images/enersia-earth-europe.jpg") center right/cover no-repeat;
+      transform:scale(1.02);
+    }
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:auto -18% -28% -18%;
+      height:44%;
+      background:radial-gradient(ellipse at center,rgba(22,132,255,.22),transparent 58%);
+      filter:blur(10px);
+    }
+    .hero-content{
+      position:relative;
+      z-index:2;
+      width:100%;
+      padding:126px 0 62px;
+    }
+    .eyebrow,.section-kicker{
+      color:#1594ff;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.34em;
+      text-transform:uppercase;
+    }
+    h1{
+      max-width:650px;
+      margin:18px 0 20px;
+      font-size:clamp(44px,6.4vw,86px);
+      line-height:.94;
+      letter-spacing:-.055em;
+      font-weight:900;
+    }
+    .blue{color:#1684ff}
+    .hero-copy{
+      max-width:548px;
+      margin:0 0 26px;
+      color:#c9d4e2;
+      font-size:18px;
+      line-height:1.68;
+      font-weight:500;
+    }
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin:28px 0 32px}
+    .hero-signals{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(120px,1fr));
+      max-width:650px;
+      gap:18px;
+      padding-top:25px;
+      border-top:1px solid rgba(255,255,255,.14);
+    }
+    .signal{display:grid;gap:5px}
+    .signal strong{font-size:13px;color:#fff}
+    .signal span{font-size:12px;color:#95a5ba;line-height:1.45}
+    .orbital-panel{
+      position:absolute;
+      right:8vw;
+      bottom:58px;
+      z-index:3;
+      width:min(390px,32vw);
+      border-left:1px solid rgba(255,255,255,.2);
+      padding:22px 0 22px 26px;
+      color:#dce8f6;
+    }
+    .orbital-panel .metric{display:flex;justify-content:space-between;gap:20px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.12)}
+    .metric b{color:#fff;font-size:24px;letter-spacing:-.04em}
+    .metric span{font-size:11px;color:#9fb0c5;text-transform:uppercase;letter-spacing:.12em}
+    section{position:relative}
+    .light{background:linear-gradient(180deg,#f7f9fc,#edf3f9);color:var(--dark)}
+    .split{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:70px;
+      align-items:center;
+      padding:66px 0;
+    }
+    h2{
+      margin:10px 0 20px;
+      font-size:clamp(32px,4vw,54px);
+      line-height:1;
+      letter-spacing:-.045em;
+      font-weight:900;
+    }
+    .lead{font-size:18px;line-height:1.62;color:#4e5d70;max-width:580px}
+    .bullets{display:grid;gap:18px;margin-top:28px}
+    .bullet{display:grid;grid-template-columns:24px 1fr;gap:14px;align-items:start}
+    .bullet i{
+      width:24px;height:24px;border-radius:50%;
+      display:grid;place-items:center;
+      background:rgba(22,132,255,.1);
+      color:#0878ef;
+      font-style:normal;
+      font-size:13px;
+      font-weight:900;
+    }
+    .bullet strong{display:block;font-size:14px;margin-bottom:3px}
+    .bullet span{display:block;color:#556579;font-size:14px;line-height:1.5}
+    .system-core{
+      min-height:330px;
+      display:grid;
+      place-items:center;
+    }
+    .core{
+      position:relative;
+      width:230px;
+      height:230px;
+      border-radius:50%;
+      background:radial-gradient(circle,#1a8cff,#0754c9 68%,#062854);
+      display:grid;
+      place-items:center;
+      color:#fff;
+      box-shadow:0 28px 80px rgba(22,132,255,.33);
+    }
+    .core::before,.core::after{
+      content:"";
+      position:absolute;
+      inset:-42px;
+      border-radius:50%;
+      border:1px solid rgba(22,132,255,.24);
+    }
+    .core::after{inset:-82px;border-style:dashed;animation:spin 28s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .core b{font-size:78px;letter-spacing:-.08em}
+    .benefits{padding:62px 0 72px;text-align:center}
+    .benefit-grid{
+      margin-top:34px;
+      display:grid;
+      grid-template-columns:repeat(6,1fr);
+      gap:14px;
+    }
+    .mini-card,.model-card{
+      background:rgba(255,255,255,.8);
+      border:1px solid var(--line-dark);
+      border-radius:var(--radius);
+      box-shadow:0 18px 46px rgba(31,50,74,.07);
+    }
+    .mini-card{padding:24px 18px;text-align:left}
+    .iconline{width:38px;height:38px;margin-bottom:18px;color:#127cff}
+    .mini-card h3,.model-card h3{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+    .mini-card p,.model-card p{margin:0;color:#536478;font-size:13px;line-height:1.48}
+    .platform-proof{
+      padding:74px 0 82px;
+      color:#fff;
+      background:
+        radial-gradient(circle at 78% 20%,rgba(22,132,255,.22),transparent 34%),
+        linear-gradient(180deg,#06101c,#03070c);
+      overflow:hidden;
+    }
+    .proof-head{
+      display:grid;
+      grid-template-columns:.88fr 1.12fr;
+      gap:48px;
+      align-items:end;
+      margin-bottom:34px;
+    }
+    .proof-head h2{margin-bottom:0}
+    .proof-text{
+      margin:0;
+      color:#c1ccda;
+      font-size:17px;
+      line-height:1.7;
+      max-width:620px;
+    }
+    .proof-text strong{display:block;color:#fff;font-weight:900}
+    .platform-shot{
+      display:block;
+      position:relative;
+      border-radius:12px;
+      background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 34px 110px rgba(0,0,0,.58),0 0 0 1px rgba(22,132,255,.12);
+      overflow:hidden;
+      transition:transform .35s ease,box-shadow .35s ease,border-color .35s ease;
+    }
+    .platform-shot:hover{
+      transform:translateY(-4px) scale(1.012);
+      border-color:rgba(22,132,255,.48);
+      box-shadow:0 42px 130px rgba(0,0,0,.66),0 0 60px rgba(22,132,255,.22);
+    }
+    .browser-bar{
+      height:42px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:0 16px;
+      background:rgba(3,7,12,.76);
+      border-bottom:1px solid rgba(255,255,255,.12);
+    }
+    .dots{display:flex;gap:7px}
+    .dots i{width:9px;height:9px;border-radius:50%;background:#596779}
+    .dots i:nth-child(1){background:#ff6b6b}.dots i:nth-child(2){background:#f0b45b}.dots i:nth-child(3){background:#1fc989}
+    .urlbar{
+      flex:1;
+      min-width:0;
+      height:24px;
+      border-radius:99px;
+      background:rgba(255,255,255,.08);
+      color:#b8c5d6;
+      display:flex;
+      align-items:center;
+      padding:0 12px;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.03em;
+    }
+    .shot-grid{
+      display:grid;
+      grid-template-columns:1.28fr .72fr;
+      min-height:470px;
+      background:#07101b;
+    }
+    .shot-main{
+      position:relative;
+      padding:32px;
+      background:
+        linear-gradient(90deg,rgba(3,7,12,.92),rgba(3,7,12,.48)),
+        url("/assets/images/enersia-earth-europe.jpg") center/cover no-repeat;
+      overflow:hidden;
+    }
+    .shot-main::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg,transparent,rgba(3,7,12,.62));
+    }
+    .shot-copy{position:relative;z-index:1;max-width:460px}
+    .shot-copy span{color:#1684ff;font-size:10px;font-weight:900;letter-spacing:.28em;text-transform:uppercase}
+    .shot-copy h3{
+      margin:12px 0 14px;
+      font-size:42px;
+      line-height:.96;
+      letter-spacing:-.05em;
+    }
+    .shot-copy p{margin:0;color:#c4cedb;font-size:15px;line-height:1.58}
+    .screen-stack{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:1px;
+      background:rgba(255,255,255,.12);
+      border-left:1px solid rgba(255,255,255,.12);
+    }
+    .screen-tile{
+      min-height:156px;
+      padding:18px;
+      background:linear-gradient(145deg,#f7f9fc,#e7eef7);
+      color:#07101b;
+      position:relative;
+      overflow:hidden;
+    }
+    .screen-tile:first-child{grid-column:1 / -1}
+    .screen-tile.wide{grid-column:1 / -1}
+    .screen-tile::before{
+      content:"";
+      position:absolute;
+      left:18px;
+      right:18px;
+      top:58px;
+      height:8px;
+      border-radius:99px;
+      background:linear-gradient(90deg,#1684ff 32%,rgba(7,16,27,.12) 32%);
+      box-shadow:0 22px 0 rgba(7,16,27,.1),0 44px 0 rgba(7,16,27,.07);
+    }
+    .screen-tile.dark{
+      background:linear-gradient(145deg,#07101b,#0d2035);
+      color:#fff;
+    }
+    .screen-tile.dark::before{background:linear-gradient(90deg,#1684ff 44%,rgba(255,255,255,.16) 44%);box-shadow:0 22px 0 rgba(255,255,255,.11),0 44px 0 rgba(255,255,255,.08)}
+    .screen-tile b{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.08em;position:relative;z-index:1}
+    .screen-tile small{display:block;margin-top:70px;color:inherit;opacity:.58;position:relative;z-index:1}
+    .live-badge{
+      position:absolute;
+      right:18px;
+      top:18px;
+      z-index:2;
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      color:#1fc989;
+      background:rgba(31,201,137,.12);
+      border:1px solid rgba(31,201,137,.24);
+      border-radius:99px;
+      padding:5px 10px;
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    .live-badge i{width:6px;height:6px;border-radius:50%;background:#1fc989}
+    .proof-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:26px;
+    }
+    .dark-band{
+      color:#fff;
+      background:
+        linear-gradient(90deg,rgba(3,7,12,.96),rgba(3,7,12,.84),rgba(3,7,12,.62)),
+        url("/assets/images/enersia-earth-europe.jpg") center bottom/cover no-repeat;
+      padding:64px 0;
+    }
+    .revenue{
+      display:grid;
+      grid-template-columns:.95fr 1.55fr;
+      gap:60px;
+      align-items:center;
+    }
+    .revenue p{color:#b4c0d0}
+    .numbers{display:grid;grid-template-columns:repeat(3,1fr);border-left:1px solid rgba(255,255,255,.2)}
+    .number{padding:10px 26px;border-right:1px solid rgba(255,255,255,.16)}
+    .number b{display:block;color:#1684ff;font-size:29px;line-height:1;font-weight:900;margin-bottom:8px}
+    .number strong{display:block;color:#fff;font-size:21px;margin:15px 0 3px;letter-spacing:-.04em}
+    .number span{display:block;color:#a4b0c2;font-size:12px;line-height:1.4}
+    .models{padding:68px 0;text-align:center}
+    .model-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:34px;text-align:left}
+    .model-card{padding:26px 22px}
+    .closing{
+      color:#fff;
+      background:
+        linear-gradient(90deg,#03070c 0%,rgba(3,7,12,.92) 46%,rgba(3,7,12,.42) 100%),
+        url("/assets/images/enersia-earth-europe.jpg") center right/cover no-repeat;
+      padding:56px 0 34px;
+    }
+    .close-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+    .closing h2{margin:0;font-size:clamp(34px,4vw,58px)}
+    .closing p{color:#c0cad8;margin:0 0 20px;line-height:1.6}
+    footer{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:20px;
+      color:#7d8998;
+      font-size:11px;
+      padding-top:28px;
+      flex-wrap:wrap;
+    }
+    .wa-float{
+      position:fixed;
+      right:20px;
+      bottom:20px;
+      z-index:60;
+      width:52px;
+      height:52px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:#111923;
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 18px 42px rgba(0,0,0,.28);
+    }
+    @media(max-width:980px){
+      .navlinks{display:none}
+      .hero{min-height:auto}
+      .hero-content{padding:116px 0 56px}
+      .hero::before{
+        background:
+          linear-gradient(180deg,rgba(3,7,12,.74) 0%,rgba(3,7,12,.95) 58%,rgba(3,7,12,1) 100%),
+          url("/assets/images/enersia-earth-europe.jpg") 62% top/cover no-repeat;
+      }
+      .orbital-panel{position:relative;right:auto;bottom:auto;width:100%;margin-top:30px;padding:0;border-left:0}
+      .split,.revenue,.close-grid{grid-template-columns:1fr;gap:34px}
+      .benefit-grid{grid-template-columns:repeat(2,1fr)}
+      .model-grid{grid-template-columns:repeat(2,1fr)}
+      .proof-head{grid-template-columns:1fr;gap:18px}
+      .shot-grid{grid-template-columns:1fr;min-height:auto}
+      .screen-stack{border-left:0;border-top:1px solid rgba(255,255,255,.12)}
+      .numbers{grid-template-columns:1fr;border-left:0}
+      .number{border-right:0;border-top:1px solid rgba(255,255,255,.14);padding:22px 0}
+      .system-core{min-height:260px}
+    }
+    @media(max-width:620px){
+      .wrap{padding:0 18px}
+      .topbar,.nav{height:64px}
+      .brand img{height:28px}
+      .navcta{display:none}
+      h1{font-size:46px}
+      .hero-copy,.lead{font-size:16px}
+      .hero-signals{grid-template-columns:1fr}
+      .hero-actions{align-items:stretch}
+      .btn{width:100%}
+      .split{padding:48px 0}
+      .benefits,.models{padding:50px 0}
+      .benefit-grid,.model-grid{grid-template-columns:1fr}
+      .platform-proof{padding:52px 0}
+      .shot-main{padding:24px;min-height:330px}
+      .shot-copy h3{font-size:34px}
+      .screen-stack{grid-template-columns:1fr}
+      .dark-band,.closing{padding:48px 0}
+      footer{justify-content:flex-start}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap nav">
+      <a class="brand" href="#top" aria-label="ENERSIA">
+        <img src="/assets/images/enersia-logo-navbar.png" alt="">
+      </a>
+      <nav class="navlinks" aria-label="Navegação principal">
+        <a href="#oportunidade">Oportunidade</a>
+        <a href="#sistema">Como funciona</a>
+        <a href="#plataforma">Plataforma</a>
+        <a href="#impacto">Impacto</a>
+        <a href="#modelos">Modelos</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+      <a class="navcta" href="mailto:geral@enersia.pt?subject=Conversa%20estrat%C3%A9gica%20ENERSIA">Agendar conversa</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" id="oportunidade">
+      <div class="wrap hero-content">
+        <div class="eyebrow">Oportunidade estratégica ENERSIA</div>
+        <h1>Uma plataforma. Mais contratos. <span class="blue">Sem limites de escala.</span></h1>
+        <p class="hero-copy">A ENERSIA é a camada digital que capta, qualifica, analisa e entrega oportunidades energéticas todos os dias para que parceiros certos cresçam antes do mercado perceber a vantagem.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="mailto:geral@enersia.pt?subject=Conversa%20privada%20ENERSIA">Agendar conversa privada</a>
+          <a class="btn secondary" href="https://wa.me/351910322702?text=Ol%C3%A1%2C%20quero%20falar%20sobre%20uma%20parceria%20estrat%C3%A9gica%20com%20a%20ENERSIA." target="_blank" rel="noopener noreferrer">Falar via WhatsApp</a>
+        </div>
+        <div class="hero-signals" aria-label="Sinais principais">
+          <div class="signal"><strong>24/7</strong><span>A trabalhar todos os dias por si.</span></div>
+          <div class="signal"><strong>Sem custo fixo pesado</strong><span>Sem equipas novas. Sem estruturas lentas.</span></div>
+          <div class="signal"><strong>Foco no que importa</strong><span>Mais contratos. Mais receita. Mais crescimento.</span></div>
+        </div>
+        <aside class="orbital-panel" aria-label="Capacidade operacional">
+          <div class="metric"><span>Pipeline digital</span><b>Always on</b></div>
+          <div class="metric"><span>Input</span><b>Faturas reais</b></div>
+          <div class="metric"><span>Output</span><b>Leads qualificados</b></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="light" id="sistema">
+      <div class="wrap split">
+        <div>
+          <div class="section-kicker">O problema</div>
+          <h2>O setor energético continua dependente de métodos que não escalam.</h2>
+          <div class="bullets">
+            <div class="bullet"><i>×</i><div><strong>Equipas comerciais caras</strong><span>Custos fixos elevados e difíceis de aumentar rapidamente.</span></div></div>
+            <div class="bullet"><i>×</i><div><strong>Prospeção manual ineficiente</strong><span>Processos lentos, pouco previsíveis e de baixo retorno.</span></div></div>
+            <div class="bullet"><i>×</i><div><strong>Análise de faturas demorada</strong><span>Perda de tempo a analisar dados que podem ser automatizados.</span></div></div>
+            <div class="bullet"><i>×</i><div><strong>Concorrência agressiva</strong><span>Margens pressionadas e guerra de preços constante.</span></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="section-kicker">A solução</div>
+          <h2>A ENERSIA faz o trabalho pesado. A sua empresa fecha os contratos.</h2>
+          <div class="bullets">
+            <div class="bullet"><i>✓</i><div><strong>Captação automática de oportunidades</strong><span>Todos os dias, em todo o território nacional.</span></div></div>
+            <div class="bullet"><i>✓</i><div><strong>Qualificação inteligente</strong><span>Apenas leads com real potencial de mudança.</span></div></div>
+            <div class="bullet"><i>✓</i><div><strong>Análise energética em segundos</strong><span>IA que lê e interpreta faturas automaticamente.</span></div></div>
+            <div class="bullet"><i>✓</i><div><strong>Leads prontos para fechar</strong><span>Informação completa para a equipa comercial atuar.</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="wrap system-core" aria-hidden="true">
+        <div class="core"><b>E</b></div>
+      </div>
+    </section>
+
+    <section class="light benefits">
+      <div class="wrap">
+        <div class="section-kicker">Benefícios diretos para o seu negócio</div>
+        <h2>Mais eficiência. Mais contratos. Mais receita.</h2>
+        <div class="benefit-grid">
+          <article class="mini-card">
+            <svg class="iconline" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M9 31c8-1 16-9 20-20 5 0 8 3 8 8-11 4-19 12-20 20l-4-4-6 4 4-6-4-4 6-4Z"/><circle cx="29" cy="19" r="3"/></svg>
+            <h3>Aumente o volume</h3><p>Receba mais oportunidades qualificadas sem aumentar a equipa.</p>
+          </article>
+          <article class="mini-card">
+            <svg class="iconline" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M32 14a13 13 0 1 0 0 20"/><path d="M13 22h16M13 28h16"/></svg>
+            <h3>Reduza custos</h3><p>Menos custo de aquisição. Mais margem por contrato.</p>
+          </article>
+          <article class="mini-card">
+            <svg class="iconline" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6"><circle cx="24" cy="24" r="16"/><path d="M24 14v11l7 4"/></svg>
+            <h3>Ganhe tempo</h3><p>Análise automática em segundos. A equipa foca-se em vender.</p>
+          </article>
+          <article class="mini-card">
+            <svg class="iconline" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6"><circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="8"/><path d="M34 14l6-6M37 8h3v3"/></svg>
+            <h3>Mais precisão</h3><p>IA que identifica o melhor momento e o melhor perfil.</p>
+          </article>
+          <article class="mini-card">
+            <svg class="iconline" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M8 38h32M12 32V18M22 32V10M32 32V22M12 18l10-8 10 12 8-8"/></svg>
+            <h3>Escalabilidade real</h3><p>Cresça sem limites geográficos e sem custos fixos pesados.</p>
+          </article>
+          <article class="mini-card">
+            <svg class="iconline" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M24 6 38 12v11c0 9-6 15-14 19C16 38 10 32 10 23V12l14-6Z"/><path d="m18 24 4 4 8-9"/></svg>
+            <h3>Vantagem competitiva</h3><p>Dados, tecnologia e velocidade que outros ainda não têm.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="platform-proof" id="plataforma">
+      <div class="wrap">
+        <div class="proof-head">
+          <div>
+            <div class="section-kicker">Ver a plataforma em funcionamento</div>
+            <h2>A ENERSIA não é um conceito.</h2>
+          </div>
+          <p class="proof-text">
+            <strong>Não é uma apresentação. Não é um protótipo.</strong>
+            É uma plataforma operacional desenvolvida para captar, qualificar e analisar oportunidades energéticas.
+          </p>
+        </div>
+
+        <a class="platform-shot" href="https://www.enersia.pt/" target="_blank" rel="noopener noreferrer" aria-label="Visitar a plataforma ENERSIA">
+          <div class="browser-bar">
+            <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+            <div class="urlbar">https://www.enersia.pt</div>
+          </div>
+          <div class="shot-grid">
+            <div class="shot-main">
+              <div class="live-badge"><i></i>Operacional</div>
+              <div class="shot-copy">
+                <span>Homepage</span>
+                <h3>Plataforma real. Fluxo real. Oportunidades reais.</h3>
+                <p>Entrada pública, análise IA, upload de faturas, segmentos comerciais e captação digital num único ecossistema.</p>
+              </div>
+            </div>
+            <div class="screen-stack">
+              <div class="screen-tile dark"><b>Upload de Faturas</b><small>PDF ou imagem analisados por IA.</small></div>
+              <div class="screen-tile"><b>Área Empresas</b><small>Captação B2B e perfis comerciais.</small></div>
+              <div class="screen-tile"><b>Área Famílias</b><small>Entrada residencial e qualificação.</small></div>
+              <div class="screen-tile dark wide"><b>Área Solar</b><small>Potencial fotovoltaico e leads solares.</small></div>
+            </div>
+          </div>
+        </a>
+
+        <div class="proof-actions">
+          <a class="btn primary" href="https://www.enersia.pt/" target="_blank" rel="noopener noreferrer">🌐 Visitar Plataforma</a>
+          <a class="btn secondary" href="mailto:geral@enersia.pt?subject=Conversa%20privada%20ENERSIA">📅 Agendar Conversa Privada</a>
+          <a class="btn secondary" href="https://wa.me/351910322702?text=Ol%C3%A1%2C%20quero%20ver%20a%20plataforma%20ENERSIA%20em%20funcionamento." target="_blank" rel="noopener noreferrer">💬 WhatsApp Direto</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="dark-band" id="impacto">
+      <div class="wrap revenue">
+        <div>
+          <div class="section-kicker">Potencial de receita</div>
+          <h2>Um impacto direto no seu resultado.</h2>
+          <p>Exemplo conservador com base em comissões médias praticadas no mercado energético nacional. Os valores reais dependem do modelo comercial e do volume da sua operação.</p>
+        </div>
+        <div class="numbers">
+          <div class="number"><b>100</b><span>contratos residenciais / mês</span><strong>3.000-6.000€</strong><span>receita mensal estimada</span></div>
+          <div class="number"><b>30</b><span>contratos empresariais / mês</span><strong>4.500-12.000€</strong><span>receita mensal estimada</span></div>
+          <div class="number"><b>20</b><span>contratos solares / mês</span><strong>4.000-10.000€</strong><span>receita mensal estimada</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="light models" id="modelos">
+      <div class="wrap">
+        <div class="section-kicker">Modelos de colaboração</div>
+        <h2>Flexibilidade para o que faz sentido para si.</h2>
+        <div class="model-grid">
+          <article class="model-card"><h3>Exclusividade regional</h3><p>Direito exclusivo de operação numa região geográfica definida.</p></article>
+          <article class="model-card"><h3>Participação societária</h3><p>Entre como sócio e participe no crescimento e valorização da ENERSIA.</p></article>
+          <article class="model-card"><h3>Aquisição</h3><p>Aquisição da plataforma, tecnologia e propriedade intelectual.</p></article>
+          <article class="model-card"><h3>Joint venture</h3><p>Estrutura conjunta para operar e expandir a plataforma num segmento ou mercado.</p></article>
+          <article class="model-card"><h3>Parcerias estratégicas</h3><p>Para comercializadoras, brokers, empresas solares e grupos empresariais.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing" id="contacto">
+      <div class="wrap close-grid">
+        <h2>Esta oportunidade não é para todos. <span class="blue">É para quem quer liderar.</span></h2>
+        <div>
+          <p>Estamos a selecionar um número limitado de parceiros por região e por modelo. Se acredita que esta oportunidade pode transformar os resultados da sua empresa, marque uma conversa privada connosco.</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="mailto:geral@enersia.pt?subject=Conversa%20privada%20ENERSIA">Agendar conversa privada</a>
+            <a class="btn secondary" href="https://wa.me/351910322702?text=Ol%C3%A1%2C%20quero%20falar%20sobre%20a%20oportunidade%20estrat%C3%A9gica%20ENERSIA." target="_blank" rel="noopener noreferrer">Falar via WhatsApp</a>
+          </div>
+        </div>
+      </div>
+      <footer class="wrap">
+        <span>ENERSIA © 2026</span>
+        <span>Todos os direitos reservados</span>
+        <span>Portugal Continental</span>
+        <a href="/privacidade.html">Privacidade</a>
+        <a href="/termos.html">Termos</a>
+      </footer>
+    </section>
+  </main>
+
+  <a class="wa-float" href="https://wa.me/351910322702?text=Ol%C3%A1%20%F0%9F%91%8B%20Vim%20atrav%C3%A9s%20do%20site%20da%20ENERSIA." target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+    <svg width="25" height="25" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+  <script src="/assets/js/rgpd-banner.js"></script>
+</body>
+</html>
