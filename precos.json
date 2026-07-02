@@ -4,12 +4,12 @@
   "golden": "0.1290",
   "coop": "0.1852",
   "plenitude": "0.1366",
-  "iber": "0.1382",
+  "iber": "0.1449",
   "repsol": "0.1424",
   "endesa": "0.1467",
-  "ultima_atualizacao": "2026-06-24T10:18:58Z",
-  "ultima_verificacao": "2026-07-01T10:39:14Z",
-  "alterado": false,
-  "dias_sem_alteracao": 7,
+  "ultima_atualizacao": "2026-07-02T09:58:12Z",
+  "ultima_verificacao": "2026-07-02T09:58:12Z",
+  "alterado": true,
+  "dias_sem_alteracao": 0,
   "fonte": "ERSE"
 }
