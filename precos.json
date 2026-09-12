@@ -1,32 +1,15 @@
 {
-  "meta": {
-    "actualizado_em": "2026-09-12 10:20",
-    "metodo": "ENERSIA-AI v2.0",
-    "fontes_ok": 1,
-    "fontes_total": 3
-  },
-  "comercializadoras": {
-    "EDP": {
-      "preco_kwh": 0.142
-    },
-    "Endesa": {
-      "preco_kwh": 0.148
-    },
-    "Repsol": {
-      "preco_kwh": 0.1509
-    },
-    "Plenitude": {
-      "preco_kwh": 0.1509
-    },
-    "Goldenergy": {
-      "preco_kwh": 0.1521
-    },
-    "Iberdrola": {
-      "preco_kwh": 0.1707
-    },
-    "Galp": {
-      "preco_kwh": 0.2123
-    }
-  },
-  "melhor_oferta": "EDP"
+  "edp": "0.1337",
+  "galp": "0.1443",
+  "golden": "0.1290",
+  "coop": "0.2212",
+  "plenitude": "0.1509",
+  "iber": "0.1449",
+  "repsol": "0.1424",
+  "endesa": "0.1399",
+  "ultima_atualizacao": "2026-09-12T11:25:55Z",
+  "ultima_verificacao": "2026-09-12T11:25:55Z",
+  "alterado": true,
+  "dias_sem_alteracao": 0,
+  "fonte": "ERSE"
 }
