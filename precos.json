@@ -1,15 +1,15 @@
 {
   "edp": "0.1337",
   "galp": "0.1443",
-  "golden": "0.1290",
+  "golden": "0.1455",
   "coop": "0.2212",
   "plenitude": "0.1635",
-  "iber": "0.1449",
+  "iber": "0.1486",
   "repsol": "0.1424",
   "endesa": "0.2239",
-  "ultima_atualizacao": "2026-09-25T12:30:54Z",
-  "ultima_verificacao": "2026-09-30T13:16:40Z",
-  "alterado": false,
-  "dias_sem_alteracao": 5,
+  "ultima_atualizacao": "2026-10-01T14:07:08Z",
+  "ultima_verificacao": "2026-10-01T14:07:08Z",
+  "alterado": true,
+  "dias_sem_alteracao": 0,
   "fonte": "ERSE"
 }
