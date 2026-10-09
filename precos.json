@@ -1,6 +1,6 @@
 {
   "meta": {
-    "actualizado_em": "2026-10-03 11:07",
+    "actualizado_em": "2026-10-09 07:00",
     "metodo": "ENERSIA-AI v2.0",
     "fontes_ok": 1,
     "fontes_total": 3
@@ -12,14 +12,14 @@
     "Endesa": {
       "preco_kwh": 0.148
     },
+    "Goldenergy": {
+      "preco_kwh": 0.1599
+    },
     "Repsol": {
-      "preco_kwh": 0.1509
+      "preco_kwh": 0.1635
     },
     "Plenitude": {
-      "preco_kwh": 0.1509
-    },
-    "Goldenergy": {
-      "preco_kwh": 0.1521
+      "preco_kwh": 0.1635
     },
     "Iberdrola": {
       "preco_kwh": 0.1707
